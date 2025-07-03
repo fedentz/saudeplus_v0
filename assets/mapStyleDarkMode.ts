@@ -131,14 +131,6 @@
   },
   {
     "featureType": "road",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
     "elementType": "geometry.fill",
     "stylers": [
       {
