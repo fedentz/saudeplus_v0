@@ -1,21 +1,29 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { theme } from '../constants/theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 
 export default function SplashScreen() {
   const navigation = useNavigation<any>();
+  const theme = useAppTheme();
+  const styles = createStyles(theme);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Saúde+</Text>
       <Text style={styles.subtitle}>Transforme passos em economia</Text>
 
-      <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate('Register')}>
+      <TouchableOpacity
+        style={styles.primaryButton}
+        onPress={() => navigation.navigate('Register')}
+      >
         <Text style={styles.primaryButtonText}>CRIAR CONTA</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity
+        style={styles.secondaryButton}
+        onPress={() => navigation.navigate('Login')}
+      >
         <Text style={styles.secondaryButtonText}>JÁ POSSUO CONTA</Text>
       </TouchableOpacity>
 
@@ -24,14 +32,15 @@ export default function SplashScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-    paddingHorizontal: 20,
-  },
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background,
+      paddingHorizontal: 20,
+    },
   title: {
     fontSize: 40,
     color: theme.colors.primary,

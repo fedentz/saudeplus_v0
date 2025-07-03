@@ -1,11 +1,27 @@
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/firebase';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { theme } from '../constants/theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Profile() {
   const navigation = useNavigation<any>();
+  const theme = useAppTheme();
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background,
+    },
+    logoutButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 12,
+      paddingHorizontal: 40,
+      borderRadius: 6,
+    },
+    logoutText: { color: theme.colors.white, fontWeight: 'bold' },
+  });
 
   const handleLogout = async () => {
     try {
@@ -25,8 +41,3 @@ export default function Profile() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background },
-  logoutButton: { backgroundColor: theme.colors.primary, paddingVertical: 12, paddingHorizontal: 40, borderRadius: 6 },
-  logoutText: { color: theme.colors.white, fontWeight: 'bold' },
-});
