@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, SafeAreaView } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { loginWithEmail } from '../services/authService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth } from '../firebase/firebase';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../hooks/useUser';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -43,6 +45,7 @@ export default function Login({ navigation }: any) {
     try {
       setLoading(true);
       await loginWithEmail(email, password);
+      await AsyncStorage.setItem('user', JSON.stringify(auth.currentUser));
       navigation.replace('MainTabs');
     } catch (error: any) {
       if (error.code === 'auth/user-not-found') {

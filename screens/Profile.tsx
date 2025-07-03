@@ -14,6 +14,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../hooks/useUser';
 import { useEmoji } from '../context/EmojiContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Profile() {
   const navigation = useNavigation<any>();
@@ -78,6 +79,7 @@ export default function Profile() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      await AsyncStorage.removeItem('user');
       navigation.replace('Login');
     } catch (error) {
       console.error('Erro ao sair:', error);

@@ -11,6 +11,7 @@ import MainTabs from './navigation/MainTabs';
 import { ThemeProvider } from './context/ThemeContext';
 import { EmojiProvider } from './context/EmojiContext';
 import { useUser } from './hooks/useUser';
+import { ActivityIndicator, View } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,7 +19,12 @@ export default function App() {
   const { user, loading } = useUser();
   const initialRoute = user ? 'MainTabs' : 'Splash';
 
-  if (loading) return null;
+  if (loading)
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
 
   return (
     <ThemeProvider>
