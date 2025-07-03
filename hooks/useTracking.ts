@@ -45,6 +45,8 @@ export default function useTracking() {
         accuracy: Location.Accuracy.High,
         distanceInterval: 5,
         timeInterval: 1000,
+        // Configura el modo de actividad para optimizar seguimientos en vehículo
+        activityType: Location.ActivityType.AutomotiveNavigation,
       },
       (loc) => {
         const coords = loc.coords;

@@ -9,6 +9,7 @@ import {
   Modal,
   Text,
   Button,
+  Alert,
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
@@ -54,6 +55,14 @@ export default function Activity() {
       index: 0,
       routes: [{ name: 'MainTabs' }],
     });
+  };
+
+  const stopActivityWithoutSaving = async () => {
+    if (activityEnded) return;
+    setActivityEnded(true);
+    await stopTracking();
+    setExitModalVisible(false);
+    navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
   };
 
 const handleEndActivity = async () => {
@@ -119,6 +128,17 @@ useFocusEffect(
       setLocationReady(true);
     }
   }, [location]);
+
+  useEffect(() => {
+    if (location?.speed !== null && location?.speed !== undefined && location.speed > 6) {
+      Alert.alert(
+        'Atividade finalizada',
+        'Detectamos que você está em um veículo. A atividade foi encerrada automaticamente.',
+        [{ text: 'OK' }]
+      );
+      stopActivityWithoutSaving();
+    }
+  }, [location?.speed]);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
