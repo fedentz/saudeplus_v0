@@ -10,16 +10,16 @@ import { useEmoji } from '../../context/EmojiContext';
 type Props = {
   location: LocationObjectCoords;
   route: LocationObjectCoords[];
-  mapReady: boolean;
-  setMapReady: (ready: boolean) => void;
+  mapLoaded: boolean;
+  setMapLoaded: (ready: boolean) => void;
   mapRef: React.RefObject<MapView | null>;
 };
 
 export default function ActivityMap({
   location,
   route,
-  mapReady,
-  setMapReady,
+  mapLoaded,
+  setMapLoaded,
   mapRef,
 }: Props) {
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function ActivityMap({
 
   const handleMapReady = () => {
     console.timeEnd('MAP_LOAD');
-    setMapReady(true);
+    setMapLoaded(true);
   };
 
   return (
