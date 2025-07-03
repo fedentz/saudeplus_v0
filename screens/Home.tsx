@@ -30,7 +30,7 @@ const createStyles = (theme: any) =>
       backgroundColor: theme.colors.background,
     },
     centerContent: {
-      flex: 1,
+      flexGrow: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 24,

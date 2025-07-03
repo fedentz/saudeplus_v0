@@ -36,7 +36,6 @@ export default function Settings() {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          backgroundColor: theme === 'dark' ? '#000' : '#fff',
         }}
       >
         <TouchableOpacity onPress={() => navigation.goBack()}>
