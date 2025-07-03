@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Vibration, Platform } from 'react-native';
+import { View, Vibration, Platform, SafeAreaView } from 'react-native';
 import MapView from 'react-native-maps';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -89,7 +89,7 @@ const handleEndActivity = async () => {
   if (!location) return null;
 
   return (
-    <>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
         <ActivityMap
           location={location}
@@ -114,6 +114,6 @@ const handleEndActivity = async () => {
           onClose={() => setSummaryVisible(false)}
         />
       )}
-    </>
+    </SafeAreaView>
   );
 }

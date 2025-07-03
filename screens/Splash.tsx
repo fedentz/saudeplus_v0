@@ -1,15 +1,23 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
+import { useUser } from '../hooks/useUser';
 
 export default function SplashScreen() {
   const navigation = useNavigation<any>();
+  const { user } = useUser();
   const theme = useAppTheme();
   const styles = createStyles(theme);
 
+  useEffect(() => {
+    if (user) {
+      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+    }
+  }, [user]);
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Saúde+</Text>
       <Text style={styles.subtitle}>Transforme passos em economia</Text>
 
@@ -28,7 +36,7 @@ export default function SplashScreen() {
       </TouchableOpacity>
 
       <Text style={styles.footer}>© 2025 Saúde+. Todos os direitos reservados.</Text>
-    </View>
+    </SafeAreaView>
   );
 }
 
