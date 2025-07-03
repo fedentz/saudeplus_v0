@@ -19,7 +19,10 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 
 import useTracking from '../hooks/useTracking';
-import { saveActivity } from '../services/activityService';
+import {
+  saveActivityWithCache,
+  syncPendingActivities,
+} from '../services/activityService';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import ActivityMap from '../components/activity/activityMap';
@@ -42,6 +45,7 @@ export default function Activity() {
   const navigation = useNavigation<any>();
   const [mapReady, setMapReady] = useState(false);
   const [locationReady, setLocationReady] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
   const [summaryVisible, setSummaryVisible] = useState(false);
   const [activityEnded, setActivityEnded] = useState(false);
   const [activitySummary, setActivitySummary] = useState('');
@@ -80,7 +84,7 @@ const handleEndActivity = async () => {
   return;
 }
   // Guardar solo si cumple la duración mínima (ya lo maneja internamente)
-  await saveActivity(
+  await saveActivityWithCache(
     elapsedTime,
     totalDistance,
     new Date(startTime) // reconstruye startTime
@@ -107,12 +111,30 @@ useFocusEffect(
 
 
   useEffect(() => {
-    const unsubscribeNet = NetInfo.addEventListener(state => {
+    let prev = true;
+    const checkInitial = async () => {
+      const state = await NetInfo.fetch();
+      const connected = Boolean(state.isConnected);
+      prev = connected;
+      setIsConnected(connected);
+      if (connected) {
+        syncPendingActivities();
+      }
+    };
+    checkInitial();
+
+    const unsubscribeNet = NetInfo.addEventListener((state) => {
       const type = state.type ?? 'desconocido';
-      const msg = state.isConnected
+      const connected = Boolean(state.isConnected);
+      const msg = connected
         ? `📶 Conexión restablecida (${type})`
         : `🚫 Sin conexión (${type})`;
       console.log(msg);
+      if (connected && !prev) {
+        syncPendingActivities();
+      }
+      prev = connected;
+      setIsConnected(connected);
     });
 
     startTracking();
