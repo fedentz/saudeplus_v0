@@ -92,21 +92,23 @@ export default function Profile() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.avatar}>
-        <Text style={styles.emojiAvatar}>{emoji}</Text>
+      <View style={{ gap: 16, alignItems: 'center', paddingVertical: 24 }}>
+        <View style={styles.avatar}>
+          <Text style={styles.emojiAvatar}>{emoji}</Text>
+        </View>
+        <Text style={styles.email}>{user?.email}</Text>
+
+        <TouchableOpacity
+          style={styles.emojiButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.label}>Escolher emoji de atividade: {emoji}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <Text style={styles.logoutText}>Sair</Text>
+        </TouchableOpacity>
       </View>
-      <Text style={styles.email}>{user?.email}</Text>
-
-      <TouchableOpacity
-        style={styles.emojiButton}
-        onPress={() => setModalVisible(true)}
-      >
-        <Text style={styles.label}>Escolher emoji de atividade: {emoji}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <Text style={styles.logoutText}>Sair</Text>
-      </TouchableOpacity>
 
       <Modal transparent visible={modalVisible} animationType="fade">
         <TouchableOpacity
