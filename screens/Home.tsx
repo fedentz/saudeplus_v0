@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
   const styles = createStyles(theme);
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>VAMOS COMENÇAR?</Text>
 
       <TouchableOpacity
@@ -19,7 +19,7 @@ export default function Home({ navigation }: any) {
       <Text style={styles.subtitle}>
         presione o botao para iniciar uma nova atividade fisica
       </Text>
-    </View>
+    </SafeAreaView>
   );
 }
 
