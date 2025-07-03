@@ -106,11 +106,19 @@ export default function Profile() {
         <Text style={styles.email}>{user?.email}</Text>
 
         <TouchableOpacity
-          style={styles.emojiButton}
+          style={[
+        styles.logoutButton,
+        { backgroundColor: theme.colors.white, borderWidth: 1, borderColor: theme.colors.primary }
+          ]}
           onPress={() => setModalVisible(true)}
         >
-          <Text style={styles.label}>Escolher emoji de atividade: {emoji}</Text>
+          <Text style={[styles.logoutText, { color: theme.colors.primary }]}>
+        Escolher emoji de atividade
+          </Text>
         </TouchableOpacity>
+
+        {/* Separador visual */}
+        <View style={{ height: 24 }} />
 
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Text style={styles.logoutText}>Sair</Text>

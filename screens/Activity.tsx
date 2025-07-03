@@ -223,7 +223,7 @@ useFocusEffect(
 
       <View style={{ flex: 1 }}>
         <ActivityMap
-          location={location}
+          location={location!}
           route={route}
           mapReady={mapReady}
           setMapReady={setMapReady}
