@@ -35,10 +35,11 @@ export default function ActivityMap({
   };
 
   return (
-    <MapView
-      customMapStyle={theme === 'dark' ? mapStyleDarkMode : customMapStyle}
-      ref={mapRef}
-      style={{ flex: 1 }}
+    <View style={{ flex: 1 }}>
+      <MapView
+        customMapStyle={theme === 'dark' ? mapStyleDarkMode : customMapStyle}
+        ref={mapRef}
+        style={{ flex: 1 }}
       scrollEnabled={false}
       zoomEnabled={false}
       rotateEnabled={false}
@@ -57,15 +58,28 @@ export default function ActivityMap({
       }}
       onMapReady={handleMapReady}
     >
-      <Marker
-        coordinate={{
-          latitude: location.latitude,
-          longitude: location.longitude,
+        <Marker
+          coordinate={{
+            latitude: location.latitude,
+            longitude: location.longitude,
+          }}
+          anchor={{ x: 0.5, y: 0.5 }}
+        >
+          <Text style={{ fontSize: 32 }}>{emoji}</Text>
+        </Marker>
+      </MapView>
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          bottom: 4,
+          left: 4,
+          width: 80,
+          height: 20,
+          backgroundColor: theme === 'dark' ? '#1e1e1e' : '#f1f1f1',
+          zIndex: 999,
         }}
-        anchor={{ x: 0.5, y: 0.5 }}
-      >
-        <Text style={{ fontSize: 24 }}>{emoji}</Text>
-      </Marker>
-    </MapView>
+      />
+    </View>
   );
 }
