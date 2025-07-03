@@ -68,18 +68,7 @@ export default function ActivityMap({
           <Text style={{ fontSize: 32 }}>{emoji}</Text>
         </Marker>
       </MapView>
-      <View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          bottom: 4,
-          left: 4,
-          width: 80,
-          height: 20,
-          backgroundColor: theme === 'dark' ? '#1e1e1e' : '#f1f1f1',
-          zIndex: 999,
-        }}
-      />
+      {/* Placeholder to avoid Google logo overlap handled by footer */}
     </View>
   );
 }
