@@ -9,7 +9,7 @@ export default function Stats() {
   const navigation = useNavigation<any>();
   const theme = useAppTheme();
   const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.colors.background },
+    container: { flex: 1, backgroundColor: theme.colors.background, paddingTop: 40 },
     header: {
       flexDirection: 'row',
       alignItems: 'center',

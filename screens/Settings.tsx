@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Switch, TouchableOpacity, SafeAreaView } from '
 import { useTheme } from '../context/ThemeContext';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function Settings() {
   const navigation = useNavigation<any>();
@@ -24,10 +25,18 @@ export default function Settings() {
     },
     label: { color: appTheme.colors.text, fontSize: 16 },
     link: { color: appTheme.colors.primary, fontSize: 16 },
+    backButton: {
+      padding: 10,
+    },
   });
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={{ padding: 16 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={appTheme.colors.text} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.settingItem}>
         <Text style={styles.label}>Modo escuro</Text>
         <Switch value={theme === 'dark'} onValueChange={toggleTheme} />
@@ -36,7 +45,7 @@ export default function Settings() {
         style={styles.settingItem}
         onPress={() => navigation.navigate('ChangePassword')}
       >
-        <Text style={styles.link}>Cambiar contraseña</Text>
+        <Text style={styles.link}>Mudar senha</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

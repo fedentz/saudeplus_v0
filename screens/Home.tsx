@@ -7,18 +7,18 @@ export default function Home({ navigation }: any) {
   const styles = createStyles(theme);
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>VAMOS COMENÇAR?</Text>
-
-      <TouchableOpacity
-        style={styles.playButton}
-        onPress={() => navigation.navigate('Activity')}
-      >
-        <Text style={styles.playIcon}>▶</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.subtitle}>
-        presione o botao para iniciar uma nova atividade fisica
-      </Text>
+      <View style={styles.centerContent}>
+        <Text style={styles.title}>VAMOS COMEÇAR?</Text>
+        <TouchableOpacity
+          style={styles.playButton}
+          onPress={() => navigation.navigate('Activity')}
+        >
+          <Text style={styles.playIcon}>▶</Text>
+        </TouchableOpacity>
+        <Text style={styles.subtitle}>
+          pressione o botão para iniciar uma nova atividade física
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -28,16 +28,19 @@ const createStyles = (theme: any) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
-      alignItems: 'center',
+    },
+    centerContent: {
+      flex: 1,
       justifyContent: 'center',
-      paddingHorizontal: 16,
+      alignItems: 'center',
+      paddingHorizontal: 24,
     },
     title: {
       fontSize: 32,
       fontWeight: 'bold',
       color: theme.colors.primary,
       textAlign: 'center',
-      marginBottom: 40,
+      marginBottom: 24,
     },
     playButton: {
       backgroundColor: theme.colors.primary,
@@ -46,7 +49,7 @@ const createStyles = (theme: any) =>
       height: 120,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: 40,
+      marginVertical: 32,
       elevation: 4,
     },
     playIcon: {

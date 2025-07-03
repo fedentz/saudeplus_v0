@@ -25,7 +25,11 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName={initialRoute}
-            screenOptions={{ headerShown: false }}
+            screenOptions={{
+              headerShown: false,
+              animation: 'fade_from_bottom',
+              gestureEnabled: true,
+            }}
           >
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="Login" component={Login} />

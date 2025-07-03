@@ -5,6 +5,7 @@ import { registerWithEmail } from '../services/authService';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../hooks/useUser';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function Register() {
   const navigation = useNavigation();
@@ -28,11 +29,11 @@ export default function Register() {
     const emailRegex = /.+@.+\..+/;
     let valid = true;
     if (!emailRegex.test(email)) {
-      setEmailError('Formato de email inválido');
+      setEmailError('Formato de e-mail inválido');
       valid = false;
     } else setEmailError('');
     if (password.length < 6) {
-      setPasswordError('La contraseña debe tener al menos 6 caracteres');
+      setPasswordError('A senha deve ter ao menos 6 caracteres');
       valid = false;
     } else setPasswordError('');
     if (!valid) return;
@@ -40,10 +41,10 @@ export default function Register() {
     try {
       setLoading(true);
       await registerWithEmail(email, password);
-      Alert.alert('Cuenta creada', 'Ya podés iniciar sesión');
+      Alert.alert('Conta criada', 'Você já pode entrar');
       navigation.goBack();
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo crear la cuenta');
+      Alert.alert('Erro', error.message || 'Não foi possível criar a conta');
     } finally {
       setLoading(false);
     }
@@ -51,10 +52,13 @@ export default function Register() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Crear cuenta</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+      </TouchableOpacity>
+      <Text style={styles.title}>Criar conta</Text>
 
       <TextInput
-        placeholder="Correo electrónico"
+        placeholder="E-mail"
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
         keyboardType="email-address"
@@ -64,7 +68,7 @@ export default function Register() {
       />
       {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
       <TextInput
-        placeholder="Contraseña"
+        placeholder="Senha"
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
         secureTextEntry
@@ -77,12 +81,12 @@ export default function Register() {
         {loading ? (
           <ActivityIndicator color={theme.colors.white} />
         ) : (
-          <Text style={styles.buttonText}>Registrarse</Text>
+          <Text style={styles.buttonText}>Registrar-se</Text>
         )}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.loginLink}>¿Ya tenés cuenta? Iniciar sesión</Text>
+        <Text style={styles.loginLink}>Já tem conta? Entrar</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -94,6 +98,7 @@ const createStyles = (theme: any, mode: string) =>
       flex: 1,
       justifyContent: 'center',
       padding: 20,
+      paddingTop: 40,
       backgroundColor: theme.colors.background,
     },
     title: {
@@ -121,6 +126,11 @@ const createStyles = (theme: any, mode: string) =>
       color: theme.colors.white,
       textAlign: 'center',
       fontWeight: 'bold',
+    },
+    backButton: {
+      position: 'absolute',
+      top: 10,
+      left: 10,
     },
     loginLink: {
       textAlign: 'center',

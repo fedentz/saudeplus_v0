@@ -15,6 +15,7 @@ import {
 } from 'firebase/auth';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useTheme } from '../context/ThemeContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function ChangePassword({ navigation }: any) {
   const [current, setCurrent] = useState('');
@@ -28,34 +29,37 @@ export default function ChangePassword({ navigation }: any) {
   const handleSave = async () => {
     setError('');
     if (!current || !newPass || !repeat) {
-      setError('Completa todos los campos');
+      setError('Preencha todos os campos');
       return;
     }
     if (newPass.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+      setError('A senha deve ter ao menos 6 caracteres');
       return;
     }
     if (newPass !== repeat) {
-      setError('Las contraseñas no coinciden');
+      setError('As senhas não coincidem');
       return;
     }
     try {
       const user = getAuth().currentUser;
-      if (!user || !user.email) throw new Error('Usuario no autenticado');
+      if (!user || !user.email) throw new Error('Usuário não autenticado');
       const cred = EmailAuthProvider.credential(user.email, current);
       await reauthenticateWithCredential(user, cred);
       await updatePassword(user, newPass);
-      Alert.alert('Éxito', 'Contraseña actualizada');
+      Alert.alert('Sucesso', 'Senha atualizada');
       navigation.goBack();
     } catch (e: any) {
-      setError(e.message || 'Error al actualizar');
+      setError(e.message || 'Erro ao atualizar');
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+      </TouchableOpacity>
       <TextInput
-        placeholder="Contraseña actual"
+        placeholder="Senha atual"
         secureTextEntry
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
@@ -63,7 +67,7 @@ export default function ChangePassword({ navigation }: any) {
         onChangeText={setCurrent}
       />
       <TextInput
-        placeholder="Nueva contraseña"
+        placeholder="Nova senha"
         secureTextEntry
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
@@ -71,7 +75,7 @@ export default function ChangePassword({ navigation }: any) {
         onChangeText={setNewPass}
       />
       <TextInput
-        placeholder="Repetir nueva contraseña"
+        placeholder="Confirmar senha"
         secureTextEntry
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
@@ -80,7 +84,7 @@ export default function ChangePassword({ navigation }: any) {
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>Guardar cambios</Text>
+        <Text style={styles.buttonText}>Salvar alterações</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -91,6 +95,7 @@ const createStyles = (theme: any, mode: string) =>
     container: {
       flex: 1,
       padding: 20,
+      paddingTop: 40,
       backgroundColor: theme.colors.background,
       justifyContent: 'center',
     },
@@ -115,4 +120,9 @@ const createStyles = (theme: any, mode: string) =>
       fontWeight: 'bold',
     },
     error: { color: 'red', textAlign: 'center', marginBottom: 10 },
+    backButton: {
+      position: 'absolute',
+      top: 10,
+      left: 10,
+    },
   });

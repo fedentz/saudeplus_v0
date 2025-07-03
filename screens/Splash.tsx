@@ -48,6 +48,7 @@ const createStyles = (theme: any) =>
       alignItems: 'center',
       backgroundColor: theme.colors.background,
       paddingHorizontal: 20,
+      paddingTop: 40,
     },
   title: {
     fontSize: 40,
