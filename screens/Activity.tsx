@@ -39,7 +39,8 @@ export default function Activity() {
 
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation<any>();
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
+  const [locationReady, setLocationReady] = useState(false);
   const [summaryVisible, setSummaryVisible] = useState(false);
   const [activityEnded, setActivityEnded] = useState(false);
   const [activitySummary, setActivitySummary] = useState('');
@@ -114,6 +115,12 @@ useFocusEffect(
   }, []);
 
   useEffect(() => {
+    if (location) {
+      setLocationReady(true);
+    }
+  }, [location]);
+
+  useEffect(() => {
     if (Platform.OS === 'android') {
       try {
         // @ts-ignore
@@ -129,7 +136,25 @@ useFocusEffect(
     }
   }, []);
 
-  if (!location) return null;
+  if (!mapReady || !locationReady) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: theme === 'dark' ? '#000' : '#fff',
+        }}
+      >
+        <ActivityIndicator size="large" color="#00AEEF" />
+        <Text
+          style={{ marginTop: 10, color: theme === 'dark' ? '#eee' : '#333' }}
+        >
+          Carregando mapa...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -155,30 +180,12 @@ useFocusEffect(
           color={theme === 'dark' ? '#fff' : '#000'}
         />
       </TouchableOpacity>
-      {!mapLoaded && (
-        <View
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: '#000',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 5,
-          }}
-        >
-          <ActivityIndicator size="large" color="#00AEEF" />
-          <Text style={{ color: '#ccc', marginTop: 16 }}>Carregando o mapa...</Text>
-        </View>
-      )}
       <View style={{ flex: 1 }}>
         <ActivityMap
           location={location}
           route={route}
-          mapLoaded={mapLoaded}
-          setMapLoaded={setMapLoaded}
+          mapReady={mapReady}
+          setMapReady={setMapReady}
           mapRef={mapRef}
         />
 
