@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { theme } from '../constants/theme';
 import { RootStackParamList } from '../App';
 import NavBar from '../components/NavBar';
 
@@ -30,33 +31,35 @@ export default function Home({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e0f7fa',
+    backgroundColor: theme.colors.background,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#03A9F4',
+    color: theme.colors.primary,
     textAlign: 'center',
     marginBottom: 40,
   },
   playButton: {
-    backgroundColor: '#03A9F4',
+    backgroundColor: theme.colors.primary,
     borderRadius: 100,
     width: 120,
     height: 120,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 40,
+    elevation: 4,
   },
   playIcon: {
     fontSize: 60,
-    color: '#fff',
+    color: theme.colors.white,
   },
   subtitle: {
     fontSize: 16,
-    color: '#03A9F4',
+    color: theme.colors.darkGray,
     textAlign: 'center',
     paddingHorizontal: 20,
   },

@@ -8,6 +8,7 @@ import {
   View,
   Platform,
 } from 'react-native';
+import { theme } from '../../constants/theme';
 
 type Props = {
   visible: boolean;
@@ -46,11 +47,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   modalContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.white,
     borderRadius: 16,
     padding: 20,
     elevation: 6,
-    shadowColor: '#000',
+    shadowColor: theme.colors.text,
     shadowOpacity: 0.25,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
@@ -71,14 +72,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#00aaff',
+    backgroundColor: theme.colors.primary,
     borderRadius: 25,
     paddingVertical: 10,
     paddingHorizontal: 30,
     marginTop: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: theme.colors.white,
     fontWeight: 'bold',
   },
 });

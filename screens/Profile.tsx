@@ -1,6 +1,7 @@
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/firebase';
-import { Button } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { theme } from '../constants/theme';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Profile() {
@@ -16,6 +17,16 @@ export default function Profile() {
   };
 
   return (
-    <Button title="Cerrar sesión" onPress={handleLogout} />
+    <View style={styles.container}>
+      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+        <Text style={styles.logoutText}>Cerrar sesión</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background },
+  logoutButton: { backgroundColor: theme.colors.primary, paddingVertical: 12, paddingHorizontal: 40, borderRadius: 6 },
+  logoutText: { color: theme.colors.white, fontWeight: 'bold' },
+});

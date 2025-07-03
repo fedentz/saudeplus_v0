@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { theme } from '../constants/theme';
 import { useUser } from '../hooks/useUser';
 import { getActivitiesByUser } from '../services/activityService';
 
@@ -75,6 +76,7 @@ const styles = StyleSheet.create({
     padding: 20,
     textAlign: 'center',
     fontSize: 16,
+    color: theme.colors.text,
   },
   centered: {
     flex: 1,
@@ -82,7 +84,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   item: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: theme.colors.white,
     padding: 16,
     marginVertical: 8,
     marginHorizontal: 16,
