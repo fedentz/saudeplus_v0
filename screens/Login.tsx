@@ -14,7 +14,7 @@ export default function Login({ navigation }: any) {
   const handleLogin = async () => {
     try {
       await loginWithEmail(email, password);
-      navigation.replace('Home');
+      navigation.replace('MainTabs');
     } catch (error: any) {
       Alert.alert('Error', error.message || 'No se pudo iniciar sesión');
     }
@@ -28,6 +28,7 @@ export default function Login({ navigation }: any) {
       <TextInput
         placeholder="Correo electrónico"
         style={styles.input}
+        placeholderTextColor={theme.colors.gray}
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
@@ -36,6 +37,7 @@ export default function Login({ navigation }: any) {
       <TextInput
         placeholder="Contraseña"
         style={styles.input}
+        placeholderTextColor={theme.colors.gray}
         secureTextEntry
         value={password}
         onChangeText={setPassword}
@@ -83,6 +85,7 @@ const createStyles = (theme: any) =>
       padding: 12,
       marginBottom: 15,
       backgroundColor: theme.colors.white,
+      color: theme.colors.text,
     },
     loginButton: {
       backgroundColor: theme.colors.primary,

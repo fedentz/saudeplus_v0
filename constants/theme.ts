@@ -16,7 +16,8 @@ export const darkTheme = {
     accent: '#03A9F4',
     background: '#121212',
     text: '#f2f2f2',
-    white: '#000000',
+    // slightly lighter background for cards/inputs in dark mode
+    white: '#1e1e1e',
     gray: '#666',
     darkGray: '#999',
   },

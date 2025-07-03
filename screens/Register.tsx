@@ -28,6 +28,7 @@ export default function Register() {
       <TextInput
         placeholder="Correo electrónico"
         style={styles.input}
+        placeholderTextColor={theme.colors.gray}
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
@@ -36,6 +37,7 @@ export default function Register() {
       <TextInput
         placeholder="Contraseña"
         style={styles.input}
+        placeholderTextColor={theme.colors.gray}
         secureTextEntry
         value={password}
         onChangeText={setPassword}
@@ -74,6 +76,7 @@ const createStyles = (theme: any) =>
       padding: 12,
       marginBottom: 15,
       backgroundColor: theme.colors.white,
+      color: theme.colors.text,
     },
     button: {
       backgroundColor: theme.colors.primary,
