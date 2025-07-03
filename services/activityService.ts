@@ -11,6 +11,9 @@ import {
 
 import { auth } from '../firebase/firebase';
 import db from '../firebase/db';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const PENDING_KEY = 'PENDING_ACTIVITIES';
 
 export const saveActivity = async (
   duration: number, // en segundos
@@ -37,6 +40,45 @@ export const saveActivity = async (
     console.log('✅ Actividad guardada correctamente.');
   } catch (error) {
     console.error('❌ Error al guardar la actividad:', error);
+  }
+};
+
+export const saveActivityWithCache = async (
+  duration: number,
+  distance: number,
+  date: Date = new Date()
+) => {
+  try {
+    await saveActivity(duration, distance, date);
+  } catch (error) {
+    console.error('❌ Error al guardar, almacenando en caché:', error);
+    const stored = await AsyncStorage.getItem(PENDING_KEY);
+    const pending = stored ? JSON.parse(stored) : [];
+    pending.push({ duration, distance, date: date.toISOString() });
+    await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+  }
+};
+
+export const syncPendingActivities = async () => {
+  const stored = await AsyncStorage.getItem(PENDING_KEY);
+  if (!stored) return;
+  const pending = JSON.parse(stored);
+  const remaining = [] as any[];
+  for (const item of pending) {
+    try {
+      await saveActivity(
+        item.duration,
+        item.distance,
+        new Date(item.date)
+      );
+    } catch (e) {
+      remaining.push(item);
+    }
+  }
+  if (remaining.length === 0) {
+    await AsyncStorage.removeItem(PENDING_KEY);
+  } else {
+    await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
   }
 };
 
