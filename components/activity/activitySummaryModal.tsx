@@ -34,7 +34,13 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
           <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>Resumo da atividade:</Text>
             <Text style={styles.text}>{summary}</Text>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                onClose();
+                navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+              }}
+            >
               <Text style={styles.buttonText}>FECHAR</Text>
             </TouchableOpacity>
             <Button
@@ -91,6 +97,8 @@ const createStyles = (theme: any) =>
     borderRadius: 25,
     paddingVertical: 10,
     paddingHorizontal: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
   },
   buttonText: {

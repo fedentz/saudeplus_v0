@@ -86,9 +86,7 @@ const createStyles = (theme: any) =>
       left: 0,
       right: 0,
       backgroundColor:
-        theme.colors.white === '#000000'
-          ? 'rgba(30,30,30,0.95)'
-          : 'rgba(255,255,255,0.85)',
+        theme.colors.white === '#000000' ? '#1e1e1e' : '#fff',
       borderTopLeftRadius: 16,
       borderTopRightRadius: 16,
       paddingVertical: 12,
