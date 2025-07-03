@@ -16,6 +16,7 @@ import {
 import MapView from 'react-native-maps';
 import NetInfo from '@react-native-community/netinfo';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { logEvent } from '../utils/logger';
 import { useTheme } from '../context/ThemeContext';
 
 import useTracking from '../hooks/useTracking';
@@ -80,14 +81,18 @@ const handleEndActivity = async () => {
   setSummaryVisible(true);
  
   if (!startTime) {
-  console.warn('No se puede guardar actividad: startTime es null');
-  return;
-}
+    logEvent('ACTIVITY', 'No se puede guardar actividad: startTime es null');
+    return;
+  }
   // Guardar solo si cumple la duración mínima (ya lo maneja internamente)
   await saveActivityWithCache(
     elapsedTime,
     totalDistance,
     new Date(startTime) // reconstruye startTime
+  );
+  logEvent(
+    'UPLOAD',
+    isConnected ? 'Actividad enviada a Firebase' : 'Guardada en AsyncStorage'
   );
 
   Vibration.vibrate(500);
@@ -117,6 +122,7 @@ useFocusEffect(
       const connected = Boolean(state.isConnected);
       prev = connected;
       setIsConnected(connected);
+      logEvent('NETWORK', connected ? 'Conectado' : 'Sin conexión');
       if (connected) {
         syncPendingActivities();
       }
@@ -129,7 +135,7 @@ useFocusEffect(
       const msg = connected
         ? `📶 Conexión restablecida (${type})`
         : `🚫 Sin conexión (${type})`;
-      console.log(msg);
+      logEvent('NETWORK', msg);
       if (connected && !prev) {
         syncPendingActivities();
       }
@@ -173,7 +179,7 @@ useFocusEffect(
           longitudeDelta: 0.1,
         });
       } catch (err) {
-        console.log('⚠️ preloadMapArea no soportado o falló', err);
+        logEvent('MAP', `preloadMapArea no soportado: ${err}`);
       }
     }
   }, []);

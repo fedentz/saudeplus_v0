@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 import * as Location from 'expo-location';
 import type { LocationObjectCoords } from 'expo-location';
+import { logEvent } from '../utils/logger';
 
 export default function useTracking() {
   const [location, setLocation] = useState<LocationObjectCoords | null>(null);
@@ -10,6 +12,7 @@ export default function useTracking() {
   const [totalDistance, setTotalDistance] = useState<number>(0);
   const watcherRef = useRef<Location.LocationSubscription | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startTimeRef = useRef<number | null>(null);
 
   const toRad = (value: number) => (value * Math.PI) / 180;
 
@@ -31,15 +34,17 @@ export default function useTracking() {
   const startTracking = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
-      console.warn('Permiso de ubicación denegado');
+      logEvent('GPS', 'Permiso de ubicación denegado');
       return;
     }
 
     const now = Date.now();
     setStartTime(now);
+    startTimeRef.current = now;
     setElapsedTime(0);
     setRoute([]);
     setTotalDistance(0);
+    logEvent('ACTIVITY', 'Inicio de actividad');
     watcherRef.current = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
@@ -51,9 +56,9 @@ export default function useTracking() {
       (loc) => {
         const coords = loc.coords;
 
-        // ✅ 1. Ignorar si la precisión es mala (> 30 metros)
-        if (coords.accuracy && coords.accuracy > 30) {
-          console.log('❌ Punto descartado por baja precisión:', coords.accuracy);
+        // ✅ 1. Ignorar si la precisión es mala (> 25 metros)
+        if (coords.accuracy && coords.accuracy > 25) {
+          logEvent('GPS', `Punto descartado por precisión: ${coords.accuracy}`);
           return;
         }
 
@@ -64,13 +69,14 @@ export default function useTracking() {
             const last = prevRoute[prevRoute.length - 1];
             const dist = getDistance(last, coords);
 
-            // ✅ 2. Ignorar si el movimiento es muy pequeño (< 15 metros)
-            if (dist > 0.015) {
+            // ✅ 2. Ignorar si el movimiento es muy pequeño (< 30 metros)
+            if (dist > 0.03) {
               setTotalDistance((prev) => prev + dist);
+              logEvent('GPS', `Movimiento registrado: ${dist.toFixed(3)} km`);
               return [...prevRoute, coords];
             }
 
-            console.log('📉 Movimiento descartado por ser menor a 15m:', dist);
+            logEvent('GPS', `Movimiento descartado (<30m): ${dist}`);
             return prevRoute;
           }
 
@@ -83,7 +89,8 @@ export default function useTracking() {
 
 
     intervalRef.current = setInterval(() => {
-      setElapsedTime(Math.floor((Date.now() - now) / 1000));
+      if (!startTimeRef.current) return;
+      setElapsedTime(Math.floor((Date.now() - startTimeRef.current) / 1000));
     }, 1000);
   };
 
@@ -96,6 +103,7 @@ export default function useTracking() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    logEvent('ACTIVITY', 'Seguimiento detenido');
   };
 
   const formatElapsedTime = (seconds: number): string => {
@@ -107,8 +115,15 @@ export default function useTracking() {
   };
 
   useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      logEvent('APPSTATE', `Cambio a ${state}`);
+      if (state === 'active' && startTimeRef.current) {
+        setElapsedTime(Math.floor((Date.now() - startTimeRef.current) / 1000));
+      }
+    });
     return () => {
       stopTracking();
+      sub.remove();
     };
   }, []);
 
