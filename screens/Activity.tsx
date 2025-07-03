@@ -34,6 +34,15 @@ export default function Activity() {
   const [exitModalVisible, setExitModalVisible] = useState(false);
   const { theme } = useTheme();
 
+  const handleSaveAndExit = async () => {
+    await handleEndActivity();
+    setExitModalVisible(false);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Home' }],
+    });
+  };
+
 const handleEndActivity = async () => {
   if (activityEnded) return;
 
@@ -207,11 +216,7 @@ useFocusEffect(
               <Button
                 title="Salvar e sair"
                 color="#1d3557"
-                onPress={async () => {
-                  await handleEndActivity();
-                  setExitModalVisible(false);
-                  navigation.goBack();
-                }}
+                onPress={handleSaveAndExit}
               />
               <Button
                 title="Cancelar"
