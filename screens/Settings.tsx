@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Switch, TouchableOpacity, SafeAreaView, Platform } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
@@ -25,17 +25,32 @@ export default function Settings() {
     },
     label: { color: appTheme.colors.text, fontSize: 16 },
     link: { color: appTheme.colors.primary, fontSize: 16 },
-    backButton: {
-      padding: 10,
-    },
   });
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ padding: 16 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={appTheme.colors.text} />
+      <View
+        style={{
+          paddingTop: Platform.OS === 'ios' ? 60 : 40,
+          paddingHorizontal: 20,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color={theme === 'dark' ? '#fff' : '#000'} />
         </TouchableOpacity>
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: theme === 'dark' ? '#fff' : '#000',
+          }}
+        >
+          Settings
+        </Text>
+        <View style={{ width: 24 }} />
       </View>
       <View style={styles.settingItem}>
         <Text style={styles.label}>Modo escuro</Text>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, SafeAreaView } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { loginWithEmail } from '../services/authService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth } from '../firebase/firebase';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../hooks/useUser';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -24,24 +26,33 @@ export default function Login({ navigation }: any) {
   }, [user]);
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Atenção', 'Preencha todos os campos');
+      return;
+    }
+
     const emailRegex = /.+@.+\..+/;
-    let valid = true;
     if (!emailRegex.test(email)) {
       setEmailError('Formato de e-mail inválido');
-      valid = false;
+      return;
     } else setEmailError('');
+
     if (password.length < 6) {
-      setPasswordError('A senha deve ter ao menos 6 caracteres');
-      valid = false;
+      setPasswordError('A senha deve ter no mínimo 6 caracteres');
+      return;
     } else setPasswordError('');
-    if (!valid) return;
 
     try {
       setLoading(true);
       await loginWithEmail(email, password);
+      await AsyncStorage.setItem('user', JSON.stringify(auth.currentUser));
       navigation.replace('MainTabs');
     } catch (error: any) {
-      Alert.alert('Erro', error.message || 'Não foi possível entrar');
+      if (error.code === 'auth/user-not-found') {
+        Alert.alert('Usuário não encontrado');
+      } else {
+        Alert.alert('Erro ao fazer login, verifique seus dados');
+      }
     } finally {
       setLoading(false);
     }
