@@ -4,7 +4,6 @@ import Splash from './screens/Splash';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import Activity from './screens/Activity';
-import ActivityLoading from './screens/ActivityLoading';
 import Settings from './screens/Settings';
 import ChangePassword from './screens/ChangePassword';
 import MainTabs from './navigation/MainTabs';
@@ -36,7 +35,6 @@ export default function App() {
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="MainTabs" component={MainTabs} />
-            <Stack.Screen name="ActivityLoading" component={ActivityLoading} />
             <Stack.Screen name="Activity" component={Activity} />
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />
