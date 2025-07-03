@@ -85,10 +85,11 @@ useFocusEffect(
       handleExit();
       return true;
     };
-    BackHandler.addEventListener('hardwareBackPress', onBack);
-    return () => BackHandler.removeEventListener('hardwareBackPress', onBack);
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBack);
+    return () => subscription.remove();
   }, [activityEnded, elapsedTime])
 );
+
 
 
   useEffect(() => {
