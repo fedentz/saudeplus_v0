@@ -15,7 +15,7 @@ export default function ActivityOverlay({ distance, timeFormatted, onEnd, disabl
   return (
     <View style={styles.overlay}>
       <Text style={styles.distance}>{distance.toFixed(2)} km</Text>
-      <Text style={styles.time}>Duración: {timeFormatted}</Text>
+      <Text style={styles.time}>Duração: {timeFormatted}</Text>
       <TouchableOpacity style={styles.button} onPress={onEnd} disabled={disabled}>
         <Text style={styles.buttonText}>FINALIZAR</Text>
       </TouchableOpacity>

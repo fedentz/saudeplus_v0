@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Vibration, Platform, SafeAreaView } from 'react-native';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { View, Vibration, Platform, SafeAreaView, TouchableOpacity, Alert, BackHandler } from 'react-native';
 import MapView from 'react-native-maps';
 import NetInfo from '@react-native-community/netinfo';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 import useTracking from '../hooks/useTracking';
 import { saveActivity } from '../services/activityService';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import ActivityMap from '../components/activity/activityMap';
 import ActivityOverlay from '../components/activity/activityOverlay';
@@ -23,6 +25,7 @@ export default function Activity() {
   } = useTracking();
 
   const mapRef = useRef<MapView>(null);
+  const navigation = useNavigation<any>();
   const [mapReady, setMapReady] = useState(false);
   const [summaryVisible, setSummaryVisible] = useState(false);
   const [activityEnded, setActivityEnded] = useState(false);
@@ -51,6 +54,41 @@ const handleEndActivity = async () => {
 
   Vibration.vibrate(500);
 };
+
+const handleExit = () => {
+  Alert.alert(
+    'Você está em uma atividade',
+    'Deseja encerrar ou salvar antes de sair?',
+    [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Salvar e sair',
+        onPress: async () => {
+          await handleEndActivity();
+          navigation.goBack();
+        },
+      },
+      {
+        text: 'Encerrar sem salvar',
+        onPress: () => {
+          stopTracking();
+          navigation.goBack();
+        },
+      },
+    ],
+  );
+};
+
+useFocusEffect(
+  useCallback(() => {
+    const onBack = () => {
+      handleExit();
+      return true;
+    };
+    BackHandler.addEventListener('hardwareBackPress', onBack);
+    return () => BackHandler.removeEventListener('hardwareBackPress', onBack);
+  }, [activityEnded, elapsedTime])
+);
 
 
   useEffect(() => {
@@ -89,7 +127,10 @@ const handleEndActivity = async () => {
   if (!location) return null;
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, paddingTop: 40 }}>
+      <TouchableOpacity onPress={handleExit} style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
+        <Ionicons name="arrow-back" size={24} color="#fff" />
+      </TouchableOpacity>
       <View style={{ flex: 1 }}>
         <ActivityMap
           location={location}
