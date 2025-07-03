@@ -1,15 +1,12 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { theme } from '../constants/theme';
-import { RootStackParamList } from '../App';
-import NavBar from '../components/NavBar';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { useAppTheme } from '../hooks/useAppTheme';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
-
-export default function Home({ navigation }: Props) {
+export default function Home({ navigation }: any) {
+  const theme = useAppTheme();
+  const styles = createStyles(theme);
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>VAMOS COMENÇAR?</Text>
 
       <TouchableOpacity
@@ -22,45 +19,44 @@ export default function Home({ navigation }: Props) {
       <Text style={styles.subtitle}>
         presione o botao para iniciar uma nova atividade fisica
       </Text>
-
-      <NavBar />
-    </View>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: theme.colors.primary,
-    textAlign: 'center',
-    marginBottom: 40,
-  },
-  playButton: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: 100,
-    width: 120,
-    height: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 40,
-    elevation: 4,
-  },
-  playIcon: {
-    fontSize: 60,
-    color: theme.colors.white,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: theme.colors.darkGray,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 16,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      textAlign: 'center',
+      marginBottom: 40,
+    },
+    playButton: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: 100,
+      width: 120,
+      height: 120,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 40,
+      elevation: 4,
+    },
+    playIcon: {
+      fontSize: 60,
+      color: theme.colors.white,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: theme.colors.darkGray,
+      textAlign: 'center',
+      paddingHorizontal: 20,
+    },
+  });

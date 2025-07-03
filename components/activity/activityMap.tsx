@@ -3,6 +3,9 @@ import { View, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import type { LocationObjectCoords } from 'expo-location';
 import customMapStyle from '../../assets/mapStyle';
+import mapStyleDarkMode from '../../assets/mapStyleDarkMode';
+import { useTheme } from '../../context/ThemeContext';
+import { useEmoji } from '../../context/EmojiContext';
 
 type Props = {
   location: LocationObjectCoords;
@@ -23,6 +26,9 @@ export default function ActivityMap({
     console.time('MAP_LOAD');
   }, []);
 
+  const { theme } = useTheme();
+  const { emoji } = useEmoji();
+
   const handleMapReady = () => {
     console.timeEnd('MAP_LOAD');
     setMapReady(true);
@@ -30,7 +36,7 @@ export default function ActivityMap({
 
   return (
     <MapView
-      customMapStyle={customMapStyle}
+      customMapStyle={theme === 'dark' ? mapStyleDarkMode : customMapStyle}
       ref={mapRef}
       style={{ flex: 1 }}
       scrollEnabled={false}
@@ -58,7 +64,7 @@ export default function ActivityMap({
         }}
         anchor={{ x: 0.5, y: 0.5 }}
       >
-        <Text style={{ fontSize: 24 }}>🏃‍♂️</Text>
+        <Text style={{ fontSize: 24 }}>{emoji}</Text>
       </Marker>
     </MapView>
   );

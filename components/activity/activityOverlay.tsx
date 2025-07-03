@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { theme } from '../../constants/theme';
+import { useAppTheme } from '../../hooks/useAppTheme';
 
 type Props = {
   distance: number;
@@ -10,6 +10,8 @@ type Props = {
 };
 
 export default function ActivityOverlay({ distance, timeFormatted, onEnd, disabled }: Props) {
+  const theme = useAppTheme();
+  const styles = createStyles(theme);
   return (
     <View style={styles.overlay}>
       <Text style={styles.distance}>{distance.toFixed(2)} km</Text>
@@ -21,7 +23,8 @@ export default function ActivityOverlay({ distance, timeFormatted, onEnd, disabl
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) =>
+  StyleSheet.create({
   overlay: {
     position: 'absolute',
     top: 0,
