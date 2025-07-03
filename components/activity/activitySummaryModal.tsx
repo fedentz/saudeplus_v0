@@ -7,8 +7,10 @@ import {
   StyleSheet,
   View,
   Platform,
+  Button,
 } from 'react-native';
 import { useAppTheme } from '../../hooks/useAppTheme';
+import { useNavigation } from '@react-navigation/native';
 
 type Props = {
   visible: boolean;
@@ -19,6 +21,7 @@ type Props = {
 export default function ActivitySummaryModal({ visible, summary, onClose }: Props) {
   const theme = useAppTheme();
   const styles = createStyles(theme);
+  const navigation = useNavigation<any>();
   return (
     <Modal
       visible={visible}
@@ -29,10 +32,16 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
       <View style={styles.modalBackground}>
         <View style={styles.modalContainer}>
           <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Resumen de la actividad:</Text>
+            <Text style={styles.title}>Resumo da atividade:</Text>
             <Text style={styles.text}>{summary}</Text>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
-              <Text style={styles.buttonText}>CERRAR</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                onClose();
+                navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+              }}
+            >
+              <Text style={styles.buttonText}>FECHAR</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -49,10 +58,11 @@ const createStyles = (theme: any) =>
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
-  modalContainer: {
-    backgroundColor: theme.colors.white,
-    borderRadius: 16,
-    padding: 20,
+    modalContainer: {
+      backgroundColor:
+        theme.colors.white === '#000000' ? '#1e1e1e' : '#fff',
+      borderRadius: 16,
+      padding: 20,
     elevation: 6,
     shadowColor: theme.colors.text,
     shadowOpacity: 0.25,
@@ -63,22 +73,26 @@ const createStyles = (theme: any) =>
   container: {
     alignItems: 'center',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  text: {
-    fontFamily: Platform.select({ ios: 'Courier', android: 'monospace' }),
-    textAlign: 'center',
-    marginBottom: 20,
-  },
+    title: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 12,
+      textAlign: 'center',
+      color: theme.colors.white === '#000000' ? '#fff' : '#000',
+    },
+    text: {
+      fontFamily: Platform.select({ ios: 'Courier', android: 'monospace' }),
+      textAlign: 'center',
+      marginBottom: 20,
+      color: theme.colors.white === '#000000' ? '#ccc' : '#444',
+    },
   button: {
     backgroundColor: theme.colors.primary,
     borderRadius: 25,
     paddingVertical: 10,
     paddingHorizontal: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
   },
   buttonText: {

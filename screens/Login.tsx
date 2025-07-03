@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, SafeAreaView } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { loginWithEmail } from '../services/authService';
-import { useGoogleAuth } from '../firebase/googleAuth';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../hooks/useUser';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function Login({ navigation }: any) {
   const [email, setEmail] = useState('');
@@ -12,7 +12,6 @@ export default function Login({ navigation }: any) {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { promptAsync } = useGoogleAuth();
   const theme = useAppTheme();
   const { theme: mode } = useTheme();
   const { user } = useUser();
@@ -28,11 +27,11 @@ export default function Login({ navigation }: any) {
     const emailRegex = /.+@.+\..+/;
     let valid = true;
     if (!emailRegex.test(email)) {
-      setEmailError('Formato de email inválido');
+      setEmailError('Formato de e-mail inválido');
       valid = false;
     } else setEmailError('');
     if (password.length < 6) {
-      setPasswordError('La contraseña debe tener al menos 6 caracteres');
+      setPasswordError('A senha deve ter ao menos 6 caracteres');
       valid = false;
     } else setPasswordError('');
     if (!valid) return;
@@ -42,7 +41,7 @@ export default function Login({ navigation }: any) {
       await loginWithEmail(email, password);
       navigation.replace('MainTabs');
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo iniciar sesión');
+      Alert.alert('Erro', error.message || 'Não foi possível entrar');
     } finally {
       setLoading(false);
     }
@@ -50,11 +49,14 @@ export default function Login({ navigation }: any) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+      </TouchableOpacity>
       <Text style={styles.logo}>Saúde+</Text>
-      <Text style={styles.subtitle}>Inicia sesión para comenzar</Text>
+      <Text style={styles.subtitle}>Entre para continuar</Text>
 
       <TextInput
-        placeholder="Correo electrónico"
+        placeholder="E-mail"
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
         keyboardType="email-address"
@@ -64,7 +66,7 @@ export default function Login({ navigation }: any) {
       />
       {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
       <TextInput
-        placeholder="Contraseña"
+        placeholder="Senha"
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
         secureTextEntry
@@ -77,16 +79,12 @@ export default function Login({ navigation }: any) {
         {loading ? (
           <ActivityIndicator color={theme.colors.white} />
         ) : (
-          <Text style={styles.loginText}>Iniciar sesión</Text>
+          <Text style={styles.loginText}>Entrar</Text>
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.googleButton} onPress={() => promptAsync()}>
-        <Text style={styles.googleText}>Continuar con Google</Text>
-      </TouchableOpacity>
-
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-        <Text style={styles.registerLink}>¿No tienes cuenta? Crear una</Text>
+        <Text style={styles.registerLink}>Não tem conta? Criar uma</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -98,6 +96,7 @@ const createStyles = (theme: any, mode: string) =>
       flex: 1,
       justifyContent: 'center',
       padding: 20,
+      paddingTop: 40,
       backgroundColor: theme.colors.background,
     },
     logo: {
@@ -133,17 +132,10 @@ const createStyles = (theme: any, mode: string) =>
       textAlign: 'center',
       fontWeight: 'bold',
     },
-    googleButton: {
-      borderColor: '#DB4437',
-      borderWidth: 1,
-      padding: 15,
-      borderRadius: 6,
-      marginBottom: 20,
-    },
-    googleText: {
-      color: '#DB4437',
-      textAlign: 'center',
-      fontWeight: 'bold',
+    backButton: {
+      position: 'absolute',
+      top: 10,
+      left: 10,
     },
     registerLink: {
       textAlign: 'center',

@@ -25,12 +25,15 @@ export default function Profile() {
     container: {
       flex: 1,
       padding: 20,
+      paddingTop: 40,
       alignItems: 'center',
       backgroundColor: theme.colors.background,
     },
     header: {
       width: '100%',
-      alignItems: 'flex-end',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
     avatar: {
       width: 80,
@@ -41,8 +44,8 @@ export default function Profile() {
       justifyContent: 'center',
       marginVertical: 20,
     },
-    name: { fontSize: 20, color: theme.colors.text, marginBottom: 4 },
-    email: { color: theme.colors.darkGray, marginBottom: 10 },
+    emojiAvatar: { fontSize: 40 },
+    email: { fontSize: 20, color: theme.colors.text, marginBottom: 20 },
     label: { color: theme.colors.text },
     logoutButton: {
       backgroundColor: theme.colors.primary,
@@ -63,9 +66,13 @@ export default function Profile() {
       backgroundColor: theme.colors.background,
       padding: 20,
       borderRadius: 8,
-      flexDirection: 'row',
     },
-    emojiOption: { marginHorizontal: 10 },
+    emojiGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+    },
+    emojiOption: { width: '25%', alignItems: 'center', marginVertical: 10 },
   });
 
   const handleLogout = async () => {
@@ -73,36 +80,40 @@ export default function Profile() {
       await signOut(auth);
       navigation.replace('Login');
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      console.error('Erro ao sair:', error);
     }
   };
 
-  const emojis = ['🏃‍♂️', '🚴‍♀️', '🏊‍♂️', '🤸‍♂️', '🏋️‍♂️'];
+  const emojis = ['🏃‍♂️', '🏃‍♀️', '🐶', '🐱', '🐢', '🐟', '🦁'];
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10 }}>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Ionicons name="settings-outline" size={24} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.avatar}>
-        <Ionicons name="person" size={40} color={theme.colors.white} />
+      <View style={{ gap: 16, alignItems: 'center', paddingVertical: 24 }}>
+        <View style={styles.avatar}>
+          <Text style={styles.emojiAvatar}>{emoji}</Text>
+        </View>
+        <Text style={styles.email}>{user?.email}</Text>
+
+        <TouchableOpacity
+          style={styles.emojiButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.label}>Escolher emoji de atividade: {emoji}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <Text style={styles.logoutText}>Sair</Text>
+        </TouchableOpacity>
       </View>
-      <Text style={styles.name}>{user?.displayName || 'Usuario'}</Text>
-      <Text style={styles.email}>{user?.email}</Text>
-
-      <TouchableOpacity
-        style={styles.emojiButton}
-        onPress={() => setModalVisible(true)}
-      >
-        <Text style={styles.label}>Elegir emoji de actividad: {emoji}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <Text style={styles.logoutText}>Cerrar sesión</Text>
-      </TouchableOpacity>
 
       <Modal transparent visible={modalVisible} animationType="fade">
         <TouchableOpacity
@@ -111,18 +122,20 @@ export default function Profile() {
           onPress={() => setModalVisible(false)}
         >
           <View style={styles.modalContent}>
-            {emojis.map((e) => (
-              <TouchableOpacity
-                key={e}
-                style={styles.emojiOption}
-                onPress={() => {
-                  setEmoji(e);
-                  setModalVisible(false);
-                }}
-              >
-                <Text style={styles.emoji}>{e}</Text>
-              </TouchableOpacity>
-            ))}
+            <View style={styles.emojiGrid}>
+              {emojis.map((e) => (
+                <TouchableOpacity
+                  key={e}
+                  style={styles.emojiOption}
+                  onPress={() => {
+                    setEmoji(e);
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.emoji}>{e}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </TouchableOpacity>
       </Modal>
