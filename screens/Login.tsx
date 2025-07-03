@@ -14,7 +14,7 @@ export default function Login({ navigation }: any) {
   const handleLogin = async () => {
     try {
       await loginWithEmail(email, password);
-      navigation.replace('Home');
+      navigation.replace('MainTabs');
     } catch (error: any) {
       Alert.alert('Error', error.message || 'No se pudo iniciar sesión');
     }
