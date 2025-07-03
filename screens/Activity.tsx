@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Vibration, Platform, SafeAreaView, TouchableOpacity, BackHandler, Modal, Text, Button } from 'react-native';
+import { View, Vibration, Platform, SafeAreaView, TouchableOpacity, BackHandler, Modal, Text, Button, StatusBar } from 'react-native';
 import MapView from 'react-native-maps';
 import NetInfo from '@react-native-community/netinfo';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -111,7 +111,14 @@ useFocusEffect(
   if (!location) return null;
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: 40 }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: theme === 'dark' ? '#000' : '#fff' }}
+    >
+      <StatusBar
+        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor="transparent"
+        translucent
+      />
       <TouchableOpacity
         onPress={handleExit}
         style={{
@@ -121,7 +128,11 @@ useFocusEffect(
           zIndex: 10,
         }}
       >
-        <Ionicons name="arrow-back" size={24} color="#fff" />
+        <Ionicons
+          name="arrow-back"
+          size={24}
+          color={theme === 'dark' ? '#fff' : '#000'}
+        />
       </TouchableOpacity>
       <View style={{ flex: 1 }}>
         <ActivityMap
@@ -193,15 +204,6 @@ useFocusEffect(
               Deseja encerrar ou salvar antes de sair?
             </Text>
             <View style={{ marginTop: 24 }}>
-              <Button
-                title="Encerrar sem salvar"
-                color="#e63946"
-                onPress={() => {
-                  stopTracking();
-                  setExitModalVisible(false);
-                  navigation.goBack();
-                }}
-              />
               <Button
                 title="Salvar e sair"
                 color="#1d3557"

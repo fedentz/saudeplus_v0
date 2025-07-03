@@ -15,6 +15,8 @@ export default function MainTabs() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor:
+          theme.colors.background === '#121212' ? '#aaa' : '#444',
         tabBarStyle: { backgroundColor: theme.colors.background },
         tabBarIcon: ({ color, size }) => {
           let icon = 'home';

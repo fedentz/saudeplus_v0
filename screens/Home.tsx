@@ -11,7 +11,7 @@ export default function Home({ navigation }: any) {
 
       <TouchableOpacity
         style={styles.playButton}
-        onPress={() => navigation.navigate('Activity')}
+        onPress={() => navigation.navigate('ActivityLoading')}
       >
         <Text style={styles.playIcon}>▶</Text>
       </TouchableOpacity>
@@ -30,8 +30,7 @@ const createStyles = (theme: any) =>
       backgroundColor: theme.colors.background,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: 16,
-      paddingTop: 40,
+      paddingHorizontal: 24,
     },
     title: {
       fontSize: 32,
