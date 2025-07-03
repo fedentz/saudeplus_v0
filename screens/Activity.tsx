@@ -1,5 +1,17 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Vibration, Platform, SafeAreaView, TouchableOpacity, BackHandler, Modal, Text, Button, StatusBar } from 'react-native';
+import {
+  View,
+  Vibration,
+  Platform,
+  SafeAreaView,
+  TouchableOpacity,
+  BackHandler,
+  Modal,
+  Text,
+  Button,
+  StatusBar,
+  ActivityIndicator,
+} from 'react-native';
 import MapView from 'react-native-maps';
 import NetInfo from '@react-native-community/netinfo';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -39,7 +51,7 @@ export default function Activity() {
     setExitModalVisible(false);
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Home' }],
+      routes: [{ name: 'MainTabs' }],
     });
   };
 
@@ -143,6 +155,24 @@ useFocusEffect(
           color={theme === 'dark' ? '#fff' : '#000'}
         />
       </TouchableOpacity>
+      {!mapReady && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#000',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 5,
+          }}
+        >
+          <ActivityIndicator size="large" color="#00AEEF" />
+          <Text style={{ color: '#ccc', marginTop: 16 }}>Carregando o mapa...</Text>
+        </View>
+      )}
       <View style={{ flex: 1 }}>
         <ActivityMap
           location={location}

@@ -38,17 +38,11 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
               style={styles.button}
               onPress={() => {
                 onClose();
-                navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+                navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
               }}
             >
               <Text style={styles.buttonText}>FECHAR</Text>
             </TouchableOpacity>
-            <Button
-              title="Voltar ao início"
-              onPress={() =>
-                navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
-              }
-            />
           </ScrollView>
         </View>
       </View>
