@@ -65,7 +65,7 @@ export default function ActivityMap({
           }}
           anchor={{ x: 0.5, y: 0.5 }}
         >
-          <Text style={{ fontSize: 42 }}>{emoji}</Text>
+          <Text style={{ fontSize: 42, zIndex: 99 }}>{emoji}</Text>
         </Marker>
       </MapView>
       {/* Placeholder to avoid Google logo overlap handled by footer */}
