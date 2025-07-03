@@ -82,16 +82,15 @@ const createStyles = (theme: any) =>
     },
     footer: {
       position: 'absolute',
-      bottom: 20,
+      bottom: 0,
       left: 0,
       right: 0,
       backgroundColor:
-        theme.colors.white === '#000000'
-          ? 'rgba(30,30,30,0.95)'
-          : 'rgba(255,255,255,0.85)',
+        theme.colors.white === '#000000' ? '#1e1e1e' : '#fff',
       borderTopLeftRadius: 16,
       borderTopRightRadius: 16,
       paddingVertical: 12,
+      paddingBottom: 32,
       paddingHorizontal: 24,
       alignItems: 'center',
       elevation: 6,
