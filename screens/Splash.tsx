@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { theme } from '../constants/theme';
 import { useNavigation } from '@react-navigation/native';
 
 export default function SplashScreen() {
@@ -28,41 +29,41 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 40,
-    color: '#00BFFF',
+    color: theme.colors.primary,
     fontWeight: 'bold',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#333',
+    color: theme.colors.darkGray,
     marginBottom: 40,
   },
   primaryButton: {
-    backgroundColor: '#00BFFF',
+    backgroundColor: theme.colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 6,
     marginBottom: 15,
   },
   primaryButtonText: {
-    color: '#fff',
+    color: theme.colors.white,
     fontSize: 16,
     fontWeight: 'bold',
   },
   secondaryButton: {
-    borderColor: '#00BFFF',
+    borderColor: theme.colors.primary,
     borderWidth: 1.5,
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 6,
   },
   secondaryButtonText: {
-    color: '#00BFFF',
+    color: theme.colors.primary,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -70,6 +71,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     fontSize: 12,
-    color: '#666',
+    color: theme.colors.darkGray,
   },
 });
