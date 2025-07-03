@@ -30,7 +30,7 @@ export default function Stats() {
         setActivities(data as Activity[]);
       } catch (err: any) {
         console.error('❌ Error al traer actividades:', err);
-        setError('No se pudieron cargar las actividades.');
+        setError('Não foi possível carregar as atividades.');
       } finally {
         setLoadingActivities(false);
       }
@@ -45,14 +45,14 @@ export default function Stats() {
     return (
       <View style={s.centered}>
         <ActivityIndicator size="large" color="#333" />
-        <Text style={s.info}>Cargando actividades...</Text>
+        <Text style={s.info}>Carregando atividades...</Text>
       </View>
     );
   }
 
-  if (!user) return <Text style={s.info}>No estás logueado</Text>;
+  if (!user) return <Text style={s.info}>Você não está logado</Text>;
   if (error) return <Text style={s.info}>{error}</Text>;
-  if (activities.length === 0) return <Text style={s.info}>No hay actividades registradas</Text>;
+  if (activities.length === 0) return <Text style={s.info}>Não há atividades registradas</Text>;
 
   return (
     <FlatList
@@ -60,15 +60,15 @@ export default function Stats() {
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <View style={s.item}>
-          <Text style={s.title}>{item.name || 'Actividad'}</Text>
-          <Text style={s.text}>Duración: {Math.round((item.duration || 0) / 60)} min</Text>
+          <Text style={s.title}>{item.name || 'Atividade'}</Text>
+          <Text style={s.text}>Duração: {Math.round((item.duration || 0) / 60)} min</Text>
           <Text style={s.text}>
-            Fecha{' '}
+            Data{' '}
             {item.date?.seconds
               ? new Date(item.date.seconds * 1000).toLocaleString()
               : item.date
               ? new Date(item.date).toLocaleString()
-              : 'Sin fecha'}
+              : 'Sem data'}
           </Text>
         </View>
       )}

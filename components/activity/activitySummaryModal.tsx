@@ -29,10 +29,10 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
       <View style={styles.modalBackground}>
         <View style={styles.modalContainer}>
           <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Resumen de la actividad:</Text>
+            <Text style={styles.title}>Resumo da atividade:</Text>
             <Text style={styles.text}>{summary}</Text>
             <TouchableOpacity style={styles.button} onPress={onClose}>
-              <Text style={styles.buttonText}>CERRAR</Text>
+              <Text style={styles.buttonText}>FECHAR</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
