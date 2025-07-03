@@ -1,5 +1,6 @@
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/firebase';
+import React from 'react';
 import {
   View,
   TouchableOpacity,
