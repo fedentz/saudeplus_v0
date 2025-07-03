@@ -14,6 +14,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../hooks/useUser';
 import { useEmoji } from '../context/EmojiContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Profile() {
   const navigation = useNavigation<any>();
@@ -78,6 +79,7 @@ export default function Profile() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      await AsyncStorage.removeItem('user');
       navigation.replace('Login');
     } catch (error) {
       console.error('Erro ao sair:', error);
@@ -104,11 +106,19 @@ export default function Profile() {
         <Text style={styles.email}>{user?.email}</Text>
 
         <TouchableOpacity
-          style={styles.emojiButton}
+          style={[
+        styles.logoutButton,
+        { backgroundColor: theme.colors.white, borderWidth: 1, borderColor: theme.colors.primary }
+          ]}
           onPress={() => setModalVisible(true)}
         >
-          <Text style={styles.label}>Escolher emoji de atividade: {emoji}</Text>
+          <Text style={[styles.logoutText, { color: theme.colors.primary }]}>
+        Escolher emoji de atividade
+          </Text>
         </TouchableOpacity>
+
+        {/* Separador visual */}
+        <View style={{ height: 24 }} />
 
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Text style={styles.logoutText}>Sair</Text>

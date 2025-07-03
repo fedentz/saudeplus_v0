@@ -6,10 +6,12 @@ import Register from './screens/Register';
 import Activity from './screens/Activity';
 import Settings from './screens/Settings';
 import ChangePassword from './screens/ChangePassword';
+import AdminPanel from './screens/AdminPanel';
 import MainTabs from './navigation/MainTabs';
 import { ThemeProvider } from './context/ThemeContext';
 import { EmojiProvider } from './context/EmojiContext';
 import { useUser } from './hooks/useUser';
+import { ActivityIndicator, View } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,7 +19,12 @@ export default function App() {
   const { user, loading } = useUser();
   const initialRoute = user ? 'MainTabs' : 'Splash';
 
-  if (loading) return null;
+  if (loading)
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
 
   return (
     <ThemeProvider>
@@ -38,6 +45,7 @@ export default function App() {
             <Stack.Screen name="Activity" component={Activity} />
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />
+            <Stack.Screen name="AdminPanel" component={AdminPanel} />
           </Stack.Navigator>
         </NavigationContainer>
       </EmojiProvider>
