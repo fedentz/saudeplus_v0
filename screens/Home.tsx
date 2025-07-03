@@ -7,7 +7,7 @@ export default function Home({ navigation }: any) {
   const styles = createStyles(theme);
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>VAMOS COMENÇAR?</Text>
+      <Text style={styles.title}>VAMOS COMEÇAR?</Text>
 
       <TouchableOpacity
         style={styles.playButton}
@@ -17,7 +17,7 @@ export default function Home({ navigation }: any) {
       </TouchableOpacity>
 
       <Text style={styles.subtitle}>
-        presione o botao para iniciar uma nova atividade fisica
+        pressione o botão para iniciar uma nova atividade física
       </Text>
     </SafeAreaView>
   );
@@ -31,6 +31,7 @@ const createStyles = (theme: any) =>
       alignItems: 'center',
       justifyContent: 'center',
       paddingHorizontal: 16,
+      paddingTop: 40,
     },
     title: {
       fontSize: 32,
