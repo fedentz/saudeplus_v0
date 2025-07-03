@@ -12,6 +12,7 @@ export default function ActivityLoading() {
 
   useEffect(() => {
     if (isMapReady) {
+
       const timer = setTimeout(() => navigation.replace('Activity'), 300);
       return () => clearTimeout(timer);
     }

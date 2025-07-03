@@ -7,6 +7,7 @@ import {
   StyleSheet,
   View,
   Platform,
+  Button,
 } from 'react-native';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
@@ -42,6 +43,12 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
             >
               <Text style={styles.buttonText}>FECHAR</Text>
             </TouchableOpacity>
+            <Button
+              title="Voltar ao início"
+              onPress={() =>
+                navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
+              }
+            />
           </ScrollView>
         </View>
       </View>
