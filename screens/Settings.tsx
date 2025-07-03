@@ -13,7 +13,6 @@ export default function Settings() {
     container: {
       flex: 1,
       padding: 20,
-      paddingTop: 40,
       backgroundColor: appTheme.colors.background,
     },
     settingItem: {
@@ -27,17 +26,17 @@ export default function Settings() {
     label: { color: appTheme.colors.text, fontSize: 16 },
     link: { color: appTheme.colors.primary, fontSize: 16 },
     backButton: {
-      position: 'absolute',
-      top: 10,
-      left: 10,
+      padding: 10,
     },
   });
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={24} color={appTheme.colors.text} />
-      </TouchableOpacity>
+      <View style={{ padding: 16 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={appTheme.colors.text} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.settingItem}>
         <Text style={styles.label}>Modo escuro</Text>
         <Switch value={theme === 'dark'} onValueChange={toggleTheme} />
