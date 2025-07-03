@@ -39,7 +39,7 @@ export default function Activity() {
 
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation<any>();
-  const [mapReady, setMapReady] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [summaryVisible, setSummaryVisible] = useState(false);
   const [activityEnded, setActivityEnded] = useState(false);
   const [activitySummary, setActivitySummary] = useState('');
@@ -155,7 +155,7 @@ useFocusEffect(
           color={theme === 'dark' ? '#fff' : '#000'}
         />
       </TouchableOpacity>
-      {!mapReady && (
+      {!mapLoaded && (
         <View
           style={{
             position: 'absolute',
@@ -177,8 +177,8 @@ useFocusEffect(
         <ActivityMap
           location={location}
           route={route}
-          mapReady={mapReady}
-          setMapReady={setMapReady}
+          mapLoaded={mapLoaded}
+          setMapLoaded={setMapLoaded}
           mapRef={mapRef}
         />
 
