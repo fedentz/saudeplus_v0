@@ -137,6 +137,7 @@ useFocusEffect(
   }, []);
 
   if (!locationReady) {
+
     return (
       <View
         style={{
@@ -180,6 +181,7 @@ useFocusEffect(
           color={theme === 'dark' ? '#fff' : '#000'}
         />
       </TouchableOpacity>
+
       {!mapReady && (
         <View
           style={{
@@ -198,6 +200,7 @@ useFocusEffect(
           <Text style={{ color: '#ccc', marginTop: 16 }}>Carregando o mapa...</Text>
         </View>
       )}
+
       <View style={{ flex: 1 }}>
         <ActivityMap
           location={location}
