@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Vibration, Platform, SafeAreaView, TouchableOpacity, Alert, BackHandler } from 'react-native';
+import { View, Vibration, Platform, SafeAreaView, TouchableOpacity, BackHandler, Modal, Text, Button } from 'react-native';
 import MapView from 'react-native-maps';
 import NetInfo from '@react-native-community/netinfo';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useTheme } from '../context/ThemeContext';
 
 import useTracking from '../hooks/useTracking';
 import { saveActivity } from '../services/activityService';
@@ -30,6 +31,8 @@ export default function Activity() {
   const [summaryVisible, setSummaryVisible] = useState(false);
   const [activityEnded, setActivityEnded] = useState(false);
   const [activitySummary, setActivitySummary] = useState('');
+  const [exitModalVisible, setExitModalVisible] = useState(false);
+  const { theme } = useTheme();
 
 const handleEndActivity = async () => {
   if (activityEnded) return;
@@ -56,27 +59,7 @@ const handleEndActivity = async () => {
 };
 
 const handleExit = () => {
-  Alert.alert(
-    'Você está em uma atividade',
-    'Deseja encerrar ou salvar antes de sair?',
-    [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Salvar e sair',
-        onPress: async () => {
-          await handleEndActivity();
-          navigation.goBack();
-        },
-      },
-      {
-        text: 'Encerrar sem salvar',
-        onPress: () => {
-          stopTracking();
-          navigation.goBack();
-        },
-      },
-    ],
-  );
+  setExitModalVisible(true);
 };
 
 useFocusEffect(
@@ -129,7 +112,15 @@ useFocusEffect(
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: 40 }}>
-      <TouchableOpacity onPress={handleExit} style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
+      <TouchableOpacity
+        onPress={handleExit}
+        style={{
+          position: 'absolute',
+          top: Platform.OS === 'ios' ? 60 : 40,
+          left: 16,
+          zIndex: 10,
+        }}
+      >
         <Ionicons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
       <View style={{ flex: 1 }}>
@@ -156,6 +147,78 @@ useFocusEffect(
           onClose={() => setSummaryVisible(false)}
         />
       )}
+
+      <Modal
+        transparent
+        visible={exitModalVisible}
+        animationType="fade"
+        onRequestClose={() => setExitModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme === 'dark' ? '#2a2a2a' : '#fff',
+              borderRadius: 16,
+              padding: 24,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 6,
+              elevation: 8,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: 'bold',
+                color: theme === 'dark' ? '#fff' : '#000',
+                marginBottom: 12,
+              }}
+            >
+              Você está em uma atividade
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: theme === 'dark' ? '#aaa' : '#333',
+              }}
+            >
+              Deseja encerrar ou salvar antes de sair?
+            </Text>
+            <View style={{ marginTop: 24 }}>
+              <Button
+                title="Encerrar sem salvar"
+                color="#e63946"
+                onPress={() => {
+                  stopTracking();
+                  setExitModalVisible(false);
+                  navigation.goBack();
+                }}
+              />
+              <Button
+                title="Salvar e sair"
+                color="#1d3557"
+                onPress={async () => {
+                  await handleEndActivity();
+                  setExitModalVisible(false);
+                  navigation.goBack();
+                }}
+              />
+              <Button
+                title="Cancelar"
+                onPress={() => setExitModalVisible(false)}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
