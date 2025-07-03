@@ -8,7 +8,7 @@ import {
   View,
   Platform,
 } from 'react-native';
-import { theme } from '../../constants/theme';
+import { useAppTheme } from '../../hooks/useAppTheme';
 
 type Props = {
   visible: boolean;
@@ -17,6 +17,8 @@ type Props = {
 };
 
 export default function ActivitySummaryModal({ visible, summary, onClose }: Props) {
+  const theme = useAppTheme();
+  const styles = createStyles(theme);
   return (
     <Modal
       visible={visible}
@@ -39,7 +41,8 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) =>
+  StyleSheet.create({
   modalBackground: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
