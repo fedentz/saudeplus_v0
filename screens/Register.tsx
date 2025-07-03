@@ -26,25 +26,28 @@ export default function Register() {
   }, [user]);
 
   const handleRegister = async () => {
+    if (!email || !password) {
+      Alert.alert('Atenção', 'Preencha todos os campos');
+      return;
+    }
+
     const emailRegex = /.+@.+\..+/;
-    let valid = true;
     if (!emailRegex.test(email)) {
       setEmailError('Formato de e-mail inválido');
-      valid = false;
+      return;
     } else setEmailError('');
     if (password.length < 6) {
-      setPasswordError('A senha deve ter ao menos 6 caracteres');
-      valid = false;
+      setPasswordError('A senha deve ter no mínimo 6 caracteres');
+      return;
     } else setPasswordError('');
-    if (!valid) return;
 
     try {
       setLoading(true);
       await registerWithEmail(email, password);
-      Alert.alert('Conta criada', 'Você já pode entrar');
+      Alert.alert('Cadastro realizado com sucesso!');
       navigation.goBack();
     } catch (error: any) {
-      Alert.alert('Erro', error.message || 'Não foi possível criar a conta');
+      Alert.alert('Erro ao fazer registro, verifique seus dados');
     } finally {
       setLoading(false);
     }
