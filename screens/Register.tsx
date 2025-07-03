@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { theme } from '../constants/theme';
 import { registerWithEmail } from '../services/authService';
 import { useNavigation } from '@react-navigation/native';
 
@@ -50,15 +51,15 @@ export default function Register() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 30 },
+  container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: theme.colors.background },
+  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 30, color: theme.colors.primary },
   input: {
-    borderWidth: 1, borderColor: '#ccc', borderRadius: 5,
-    padding: 10, marginBottom: 15,
+    borderWidth: 1, borderColor: theme.colors.gray, borderRadius: 6,
+    padding: 12, marginBottom: 15, backgroundColor: theme.colors.white,
   },
   button: {
-    backgroundColor: '#00AEEF', padding: 15, borderRadius: 5,
+    backgroundColor: theme.colors.primary, padding: 15, borderRadius: 6,
   },
-  buttonText: { color: '#fff', textAlign: 'center', fontWeight: 'bold' },
-  loginLink: { textAlign: 'center', color: '#00AEEF', marginTop: 20 },
+  buttonText: { color: theme.colors.white, textAlign: 'center', fontWeight: 'bold' },
+  loginLink: { textAlign: 'center', color: theme.colors.primary, marginTop: 20 },
 });

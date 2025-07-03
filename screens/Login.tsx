@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { theme } from '../constants/theme';
 import { RootStackParamList } from '../App';
 import { loginWithEmail } from '../services/authService';
 import { useGoogleAuth } from '../firebase/googleAuth';
@@ -58,21 +59,42 @@ export default function Login({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#fff' },
-  logo: { fontSize: 32, fontWeight: 'bold', color: '#00AEEF', textAlign: 'center' },
-  subtitle: { textAlign: 'center', marginBottom: 30, color: '#555' },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: theme.colors.background,
+  },
+  logo: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: theme.colors.primary,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  subtitle: { textAlign: 'center', marginBottom: 30, color: theme.colors.darkGray },
   input: {
-    borderWidth: 1, borderColor: '#ccc', borderRadius: 5,
-    padding: 10, marginBottom: 15,
+    borderWidth: 1,
+    borderColor: theme.colors.gray,
+    borderRadius: 6,
+    padding: 12,
+    marginBottom: 15,
+    backgroundColor: theme.colors.white,
   },
   loginButton: {
-    backgroundColor: '#00AEEF', padding: 15, borderRadius: 5, marginBottom: 10,
+    backgroundColor: theme.colors.primary,
+    padding: 15,
+    borderRadius: 6,
+    marginBottom: 10,
   },
-  loginText: { color: '#fff', textAlign: 'center', fontWeight: 'bold' },
+  loginText: { color: theme.colors.white, textAlign: 'center', fontWeight: 'bold' },
   googleButton: {
-    borderColor: '#DB4437', borderWidth: 1, padding: 15, borderRadius: 5,
+    borderColor: '#DB4437',
+    borderWidth: 1,
+    padding: 15,
+    borderRadius: 6,
     marginBottom: 20,
   },
   googleText: { color: '#DB4437', textAlign: 'center', fontWeight: 'bold' },
-  registerLink: { textAlign: 'center', color: '#00AEEF', marginTop: 20 },
+  registerLink: { textAlign: 'center', color: theme.colors.primary, marginTop: 20 },
 });

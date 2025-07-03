@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { theme } from '../../constants/theme';
 
 type Props = {
   distance: number;
@@ -32,23 +33,23 @@ const styles = StyleSheet.create({
   },
   distance: {
     fontSize: 32,
-    color: '#fff',
+    color: theme.colors.white,
     fontWeight: 'bold',
   },
   time: {
     fontSize: 18,
-    color: '#fff',
+    color: theme.colors.white,
     marginVertical: 5,
   },
   button: {
-    backgroundColor: '#00aaff',
+    backgroundColor: theme.colors.primary,
     borderRadius: 25,
     paddingVertical: 10,
     paddingHorizontal: 30,
     marginTop: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: theme.colors.white,
     fontSize: 18,
     fontWeight: 'bold',
   },

@@ -1,6 +1,7 @@
 // components/NavBar.tsx
 import React from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { theme } from '../constants/theme';
 import { useNavigation } from '@react-navigation/native';
 
 export default function NavBar() {
@@ -8,8 +9,12 @@ export default function NavBar() {
 
   return (
     <View style={styles.container}>
-      <Button title="Historial" onPress={() => navigation.navigate('Stats')} />
-      <Button title="Mi Usuario" onPress={() => navigation.navigate('Profile')} />
+      <TouchableOpacity onPress={() => navigation.navigate('Stats')} style={styles.btn}>
+        <Text style={styles.btnText}>Historial</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.btn}>
+        <Text style={styles.btnText}>Mi Usuario</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -19,6 +24,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     padding: 10,
-    backgroundColor: '#eee',
+    backgroundColor: theme.colors.white,
+    borderTopWidth: 1,
+    borderColor: theme.colors.gray,
   },
+  btn: { padding: 10 },
+  btnText: { color: theme.colors.primary, fontWeight: 'bold' },
 });
