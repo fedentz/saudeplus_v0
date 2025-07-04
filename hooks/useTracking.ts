@@ -14,16 +14,34 @@ export interface TrackData {
   time: number;
 }
 
-const auth = getAuth();
-const userId = auth.currentUser?.uid || 'anon';
+
 
 const CURRENT_KEY = 'TRACKING_CURRENT';
 const PENDING_KEY = 'TRACKING_PENDING';
 
 const enviarAFirebase = async (data: TrackData) => {
-  // Simulación de envío; reemplazá por tu integración real a Firebase.
-  await new Promise(resolve => setTimeout(resolve, 500));
-  logEvent('UPLOAD', `Datos enviados (${data.distance.toFixed(2)} km)`);
+  console.log('📤 Intentando enviar actividad...', data);
+  const userId = getAuth().currentUser?.uid;
+  if (!userId) throw new Error('Usuario no autenticado');
+
+  const response = await fetch(
+    'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        date: new Date().toISOString(),
+        distance: data.distance,
+        duration: data.time,
+      }),
+    }
+  );
+
+  console.log('🔁 Respuesta de servidor:', response.status);
+  if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
+
+  logEvent('UPLOAD', `✅ Subido: ${data.distance.toFixed(2)} km`);
 };
 
 export default function useTracking() {
@@ -102,38 +120,44 @@ const sendPending = async () => {
   const pending: TrackData[] = JSON.parse(stored);
   const remaining: TrackData[] = [];
 
-console.log('📤 Iniciando subida de actividades pendientes...');
-for (const item of pending) {
-  try {
-    console.log('🚀 Intentando subir actividad:', item);
-
-    const response = await fetch(
-      'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: userId, // ⚠️ asegurate de que tenga valor
-          date: new Date().toISOString(), // o item.date si querés la original
-          distance: item.distance,
-          duration: item.time,
-        }),
-      }
-    );
-
-    console.log('🔁 Respuesta de servidor:', response.status);
-    if (!response.ok) {
-      throw new Error(`Error HTTP ${response.status}`);
-    }
-
-    logEvent('UPLOAD', `✅ Subido: ${item.distance.toFixed(2)} km`);
-  } catch (e) {
-    console.error('❌ Error al subir actividad:', e);
-    remaining.push(item);
+  console.log('📤 Iniciando subida de actividades pendientes...');
+  const userId = getAuth().currentUser?.uid;
+  if (!userId) {
+    console.log('❌ No hay usuario autenticado, no se pueden subir pendientes');
+    return;
   }
-}
-console.log('📦 Actividades restantes sin subir:', remaining.length);
 
+  for (const item of pending) {
+    try {
+      console.log('🚀 Intentando subir actividad:', item);
+
+      const response = await fetch(
+        'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            date: new Date().toISOString(),
+            distance: item.distance,
+            duration: item.time,
+          }),
+        }
+      );
+
+      console.log('🔁 Respuesta de servidor:', response.status);
+      if (!response.ok) {
+        throw new Error(`Error HTTP ${response.status}`);
+      }
+
+      logEvent('UPLOAD', `✅ Subido: ${item.distance.toFixed(2)} km`);
+    } catch (e) {
+      console.error('❌ Error al subir actividad:', e);
+      remaining.push(item);
+    }
+  }
+
+  console.log('📦 Actividades restantes sin subir:', remaining.length);
 
   if (remaining.length === 0) {
     await AsyncStorage.removeItem(PENDING_KEY);
