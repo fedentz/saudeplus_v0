@@ -20,10 +20,8 @@ import { logEvent } from '../utils/logger';
 import { useTheme } from '../context/ThemeContext';
 
 import useTracking from '../hooks/useTracking';
-import {
-  saveActivityWithCache,
-  syncPendingActivities,
-} from '../services/activityService';
+
+import { usePendingActivities } from '../context/PendingActivitiesContext';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import ActivityMap from '../components/activity/activityMap';
@@ -44,9 +42,9 @@ export default function Activity() {
 
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation<any>();
+  const { add, sync } = usePendingActivities();
   const [mapReady, setMapReady] = useState(false);
   const [locationReady, setLocationReady] = useState(false);
-  const [isConnected, setIsConnected] = useState(true);
   const [summaryVisible, setSummaryVisible] = useState(false);
   const [activityEnded, setActivityEnded] = useState(false);
   const [activitySummary, setActivitySummary] = useState('');
@@ -85,19 +83,26 @@ const handleEndActivity = async () => {
     return;
   }
   const end = new Date();
-  await saveActivityWithCache({
-    startTime: new Date(startTime).toISOString(),
-    endTime: end.toISOString(),
+  const net = await NetInfo.fetch();
+  const connection =
+    net.isConnected && net.isInternetReachable !== false
+      ? net.type || 'unknown'
+      : 'offline';
+
+  add({
+    route,
     distance: totalDistance,
     duration: elapsedTime,
+    date: end.toISOString(),
+    conexion_al_guardar: connection,
   });
-  logEvent(
-    'UPLOAD',
-    isConnected ? 'Actividad enviada a Firebase' : 'Guardada en AsyncStorage'
-  );
+
+  if (connection !== 'offline') {
+    await sync();
+  }
 
   Vibration.vibrate(500);
-};
+}; 
 
 const handleExit = () => {
   setExitModalVisible(true);
@@ -122,10 +127,9 @@ useFocusEffect(
       const state = await NetInfo.fetch();
       const connected = Boolean(state.isConnected);
       prev = connected;
-      setIsConnected(connected);
       logEvent('NETWORK', connected ? 'Conectado' : 'Sin conexión');
       if (connected) {
-        syncPendingActivities();
+        sync();
       }
     };
     checkInitial();
@@ -138,10 +142,9 @@ useFocusEffect(
         : `🚫 Sin conexión (${type})`;
       logEvent('NETWORK', msg);
       if (connected && !prev) {
-        syncPendingActivities();
+        sync();
       }
       prev = connected;
-      setIsConnected(connected);
     });
 
     startTracking();
