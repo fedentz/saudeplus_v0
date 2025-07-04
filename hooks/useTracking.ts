@@ -3,37 +3,39 @@ import { Alert, AppState } from 'react-native';
 import * as Location from 'expo-location';
 import type { LocationObjectCoords } from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { logEvent } from '../utils/logger';
 import useNetworkListener from './useNetworkListener';
+import { logEvent } from '../utils/logger';
 
-interface TrackData {
+export interface TrackData {
   route: LocationObjectCoords[];
   distance: number;
   time: number;
 }
 
-const CURRENT_KEY = 'current_activity';
-const PENDING_KEY = 'pending_activity';
+const CURRENT_KEY = 'TRACKING_CURRENT';
+const PENDING_KEY = 'TRACKING_PENDING';
 
 const enviarAFirebase = async (data: TrackData) => {
+  // Simulación de envío; reemplazá por tu integración real a Firebase.
   await new Promise(resolve => setTimeout(resolve, 500));
   logEvent('UPLOAD', `Datos enviados (${data.distance.toFixed(2)} km)`);
 };
 
 export default function useTracking() {
+  // Obtenemos el estado de red a través de nuestro hook personalizado.
+  const { isOffline } = useNetworkListener();
+
   const [location, setLocation] = useState<LocationObjectCoords | null>(null);
   const [route, setRoute] = useState<LocationObjectCoords[]>([]);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [totalDistance, setTotalDistance] = useState(0);
   const [gpsLost, setGpsLost] = useState(false);
-  const { isOffline } = useNetworkListener();
 
   const watcherRef = useRef<Location.LocationSubscription | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const persistIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const gpsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
-  const prevOffline = useRef<boolean>(false);
 
   const toRad = (v: number) => (v * Math.PI) / 180;
   const getDistance = (a: LocationObjectCoords, b: LocationObjectCoords) => {
@@ -44,11 +46,13 @@ export default function useTracking() {
     const lat2 = toRad(b.latitude);
     const aCalc =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+      Math.sin(dLon / 2) * Math.sin(dLon / 2) *
+        Math.cos(lat1) * Math.cos(lat2);
     const c = 2 * Math.atan2(Math.sqrt(aCalc), Math.sqrt(1 - aCalc));
     return R * c;
   };
 
+  // Persistencia de la sesión actual en AsyncStorage.
   const persistCurrent = async (extra?: Partial<TrackData>) => {
     const data: TrackData = {
       route,
@@ -68,15 +72,17 @@ export default function useTracking() {
       if (data.distance) setTotalDistance(data.distance);
       if (data.time) setElapsedTime(data.time);
     } catch {
-      // ignore
+      // Ignoramos posibles errores de parseo.
     }
   };
 
+  // Si no se recibe una posición por 10 s, marcamos que se perdió la señal.
   const resetGpsTimer = () => {
     if (gpsTimeoutRef.current) clearTimeout(gpsTimeoutRef.current);
     gpsTimeoutRef.current = setTimeout(() => setGpsLost(true), 10000);
   };
 
+  // Agrega datos pendientes a la cola en AsyncStorage.
   const addPending = async (data: TrackData) => {
     const stored = await AsyncStorage.getItem(PENDING_KEY);
     const pending: TrackData[] = stored ? JSON.parse(stored) : [];
@@ -84,6 +90,7 @@ export default function useTracking() {
     await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
   };
 
+  // Reintenta enviar los datos pendientes al servidor.
   const sendPending = async () => {
     const stored = await AsyncStorage.getItem(PENDING_KEY);
     if (!stored) return;
@@ -100,15 +107,17 @@ export default function useTracking() {
     else await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
   };
 
+  // Cada vez que cambie el estado de red, si estamos offline se guarda la sesión,
+  // y si volvemos online se intenta reenvío.
   useEffect(() => {
-    if (isOffline && !prevOffline.current) {
+    if (isOffline) {
       const data: TrackData = { route, distance: totalDistance, time: elapsedTime };
       addPending(data).catch(() => undefined);
-    } else if (!isOffline && prevOffline.current) {
+    } else {
       sendPending().catch(() => undefined);
     }
-    prevOffline.current = isOffline;
-  }, [isOffline]);
+    // Incluimos como dependencias la información de tracking para guardar datos actualizados.
+  }, [isOffline, route, totalDistance, elapsedTime]);
 
   const startTracking = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -133,7 +142,6 @@ export default function useTracking() {
       async loc => {
         const coords = loc.coords;
         if (coords.accuracy && coords.accuracy > 25) return;
-
         resetGpsTimer();
         setGpsLost(false);
         setLocation(coords);
@@ -157,11 +165,13 @@ export default function useTracking() {
       if (!startTimeRef.current) return;
       const secs = Math.floor((Date.now() - startTimeRef.current) / 1000);
       setElapsedTime(secs);
+      persistCurrent({ time: secs, distance: totalDistance });
     }, 1000);
 
     persistIntervalRef.current = setInterval(() => {
       persistCurrent();
     }, 10000);
+
     resetGpsTimer();
   };
 
@@ -194,17 +204,16 @@ export default function useTracking() {
       if (isOffline) throw new Error('offline');
       await enviarAFirebase(data);
     } catch {
+      // Si falla el envío (o estamos offline), agregamos el dato a la cola.
       const stored = await AsyncStorage.getItem(PENDING_KEY);
-      const pending = stored ? JSON.parse(stored) : [];
+      const pending: TrackData[] = stored ? JSON.parse(stored) : [];
       pending.push(data);
       await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
     }
   };
 
   const formatElapsedTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, '0');
+    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
     const secs = (seconds % 60).toString().padStart(2, '0');
     return `${mins}:${secs}`;
   };
@@ -233,4 +242,3 @@ export default function useTracking() {
     formatElapsedTime,
   };
 }
-
