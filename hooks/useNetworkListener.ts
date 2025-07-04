@@ -8,17 +8,25 @@ export default function useNetworkListener() {
   const prevType = useRef<NetInfoStateType | 'none' | 'unknown'>('unknown');
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(state => {
+    const setFromState = (state: {
+      type?: NetInfoStateType;
+      isConnected?: boolean | null;
+      isInternetReachable?: boolean | null;
+    }) => {
       const type = state.type ?? 'unknown';
-      const connected = Boolean(state.isConnected);
-      setNetType(type);
-      setIsOffline(!connected);
+      const offline =
+        !state.isConnected || state.isInternetReachable === false;
 
-      if (!connected) {
+      setNetType(type);
+      setIsOffline(offline);
+
+      if (offline) {
+        console.log('🚫 Sin conexión');
         Alert.alert('🚫 Sin conexión', 'Conéctate a internet para continuar', [
           { text: 'OK' },
         ]);
       } else {
+        console.log('🔌 Conectado');
         if (prevType.current === 'none') {
           Alert.alert('🔄 Conexión recuperada', 'Vuelves a estar en línea', [
             { text: 'Genial' },
@@ -33,8 +41,13 @@ export default function useNetworkListener() {
           Alert.alert('📶 Cambio de red', msg, [{ text: 'OK' }]);
         }
       }
-      prevType.current = connected ? type : 'none';
-    });
+      prevType.current = offline ? 'none' : type;
+    };
+
+    // Consultamos estado inicial
+    NetInfo.fetch().then(setFromState);
+
+    const unsubscribe = NetInfo.addEventListener(setFromState);
 
     return () => unsubscribe();
   }, []);

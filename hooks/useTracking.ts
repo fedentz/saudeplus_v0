@@ -3,6 +3,7 @@ import { Alert, AppState } from 'react-native';
 import * as Location from 'expo-location';
 import type { LocationObjectCoords } from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 import useNetworkListener from './useNetworkListener';
 import { logEvent } from '../utils/logger';
 import { getAuth } from 'firebase/auth';
@@ -107,6 +108,7 @@ export default function useTracking() {
 
   // Agrega datos pendientes a la cola en AsyncStorage.
   const addPending = async (data: TrackData) => {
+    console.log('\uD83D\uDCE5 Agregando a TRACKING_PENDING...');
     const stored = await AsyncStorage.getItem(PENDING_KEY);
     const pending: TrackData[] = stored ? JSON.parse(stored) : [];
     pending.push(data);
@@ -115,12 +117,16 @@ export default function useTracking() {
 
   // Reintenta enviar los datos pendientes al servidor.
 const sendPending = async () => {
+  console.log('\uD83D\uDD17 Ejecutando sendPending()');
   const stored = await AsyncStorage.getItem(PENDING_KEY);
-  if (!stored) return;
+  if (!stored) {
+    console.log('No hay pendientes por enviar');
+    return;
+  }
   const pending: TrackData[] = JSON.parse(stored);
   const remaining: TrackData[] = [];
 
-  console.log('📤 Iniciando subida de actividades pendientes...');
+  console.log('\uD83D\uDCE6 Enviando actividades pendientes...');
   const userId = getAuth().currentUser?.uid;
   if (!userId) {
     console.log('❌ No hay usuario autenticado, no se pueden subir pendientes');
@@ -164,20 +170,25 @@ const sendPending = async () => {
   } else {
     await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
   }
+  console.log('\u2705 Finaliza sendPending. Restantes:', remaining.length);
 };
 
 
-  // Cada vez que cambie el estado de red, si estamos offline se guarda la sesión,
-  // y si volvemos online se intenta reenvío.
+  // Cuando cambia la conectividad intentamos guardar o subir pendientes
   useEffect(() => {
     if (isOffline) {
-      const data: TrackData = { route, distance: totalDistance, time: elapsedTime };
+      const data: TrackData = {
+        route,
+        distance: totalDistance,
+        time: elapsedTime,
+      };
+      console.log('📥 Guardando pendiente por estar offline');
       addPending(data).catch(() => undefined);
     } else {
+      console.log('🌐 Online: intentando subir pendientes...');
       sendPending().catch(() => undefined);
     }
-    // Incluimos como dependencias la información de tracking para guardar datos actualizados.
-  }, [isOffline, route, totalDistance, elapsedTime]);
+  }, [isOffline]);
 
   const startTracking = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -260,13 +271,16 @@ const sendPending = async () => {
     await AsyncStorage.removeItem(CURRENT_KEY);
 
     try {
-      if (isOffline) throw new Error('offline');
+      const state = await NetInfo.fetch();
+      const offlineNow = !state.isConnected || state.isInternetReachable === false;
+      if (offlineNow) throw new Error('offline');
       await enviarAFirebase(data);
     } catch {
       // Si falla el envío (o estamos offline), agregamos el dato a la cola.
       const stored = await AsyncStorage.getItem(PENDING_KEY);
       const pending: TrackData[] = stored ? JSON.parse(stored) : [];
       pending.push(data);
+      console.log('\uD83D\uDCE5 Agregando a TRACKING_PENDING...');
       await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
     }
   };
@@ -294,6 +308,11 @@ const sendPending = async () => {
     isOffline,
     startTracking,
     stopTracking,
+    forceSendPending: sendPending,
+    logPending: async () => {
+      const stored = await AsyncStorage.getItem(PENDING_KEY);
+      console.log('📂 Contenido de TRACKING_PENDING:', stored);
+    },
     route,
     location,
     totalDistance,
