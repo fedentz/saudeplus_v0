@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 
 import type { LocationObjectCoords } from 'expo-location';
+import { getAuth } from 'firebase/auth';
 import { logDebug } from '../utils/logger';
 
 export interface TrackData {
@@ -16,9 +17,28 @@ export interface TrackData {
 const PENDING_KEY = 'TRACKING_PENDING';
 
 const enviarAFirebase = async (data: TrackData): Promise<void> => {
-  // Simula el retraso de una subida real a Firebase
-  await new Promise(resolve => setTimeout(resolve, 500));
-  console.log('📡 Datos enviados a Firebase', data);
+  console.log('📤 Intentando enviar a Firebase...', data);
+  const userId = getAuth().currentUser?.uid;
+  if (!userId) throw new Error('Usuario no autenticado');
+
+  const response = await fetch(
+    'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        date: new Date().toISOString(),
+        distance: data.distance,
+        duration: data.time,
+      }),
+    }
+  );
+
+  console.log('🔁 Respuesta de servidor:', response.status);
+  if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
+
+  console.log('✅ Envío exitoso');
 };
 
 export default function useGlobalNetwork() {
