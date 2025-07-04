@@ -10,6 +10,7 @@ import AdminPanel from './screens/AdminPanel';
 import MainTabs from './navigation/MainTabs';
 import { ThemeProvider } from './context/ThemeContext';
 import { EmojiProvider } from './context/EmojiContext';
+import { PendingActivityProvider } from './context/PendingActivitiesContext';
 import { useUser } from './hooks/useUser';
 import useGlobalNetwork from './hooks/useGlobalNetwork';
 import { ActivityIndicator, View } from 'react-native';
@@ -31,25 +32,27 @@ export default function App() {
   return (
     <ThemeProvider>
       <EmojiProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName={initialRoute}
-            screenOptions={{
+        <PendingActivityProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName={initialRoute}
+              screenOptions={{
               headerShown: false,
               animation: 'fade_from_bottom',
               gestureEnabled: true,
-            }}
-          >
-            <Stack.Screen name="Splash" component={Splash} />
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Register" component={Register} />
-            <Stack.Screen name="MainTabs" component={MainTabs} />
-            <Stack.Screen name="Activity" component={Activity} />
-            <Stack.Screen name="Settings" component={Settings} />
-            <Stack.Screen name="ChangePassword" component={ChangePassword} />
-            <Stack.Screen name="AdminPanel" component={AdminPanel} />
-          </Stack.Navigator>
-        </NavigationContainer>
+              }}
+            >
+              <Stack.Screen name="Splash" component={Splash} />
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="Register" component={Register} />
+              <Stack.Screen name="MainTabs" component={MainTabs} />
+              <Stack.Screen name="Activity" component={Activity} />
+              <Stack.Screen name="Settings" component={Settings} />
+              <Stack.Screen name="ChangePassword" component={ChangePassword} />
+              <Stack.Screen name="AdminPanel" component={AdminPanel} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </PendingActivityProvider>
       </EmojiProvider>
     </ThemeProvider>
   );
