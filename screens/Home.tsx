@@ -8,7 +8,7 @@ import { usePendingActivities } from '../context/PendingActivitiesContext';
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
-  const { sync, logPending } = usePendingActivities();
+  const { sync, logPending, pendingCount } = usePendingActivities();
   const styles = createStyles(theme);
 
   useEffect(() => {
@@ -25,6 +25,11 @@ export default function Home({ navigation }: any) {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
+      {pendingCount > 0 && (
+        <View style={styles.pendingBadge}>
+          <Text style={styles.pendingText}>{pendingCount}</Text>
+        </View>
+      )}
       <View style={styles.centerContent}>
         <Text style={styles.title}>VAMOS COMEÇAR?</Text>
         <TouchableOpacity
@@ -84,5 +89,21 @@ const createStyles = (theme: any) =>
       color: theme.colors.darkGray,
       textAlign: 'center',
       paddingHorizontal: 20,
+    },
+    pendingBadge: {
+      position: 'absolute',
+      top: 8,
+      right: 16,
+      backgroundColor: 'red',
+      borderRadius: 12,
+      minWidth: 24,
+      height: 24,
+      paddingHorizontal: 6,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    pendingText: {
+      color: '#fff',
+      fontWeight: 'bold',
     },
   });
