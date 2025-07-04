@@ -9,27 +9,17 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkSession = async () => {
-      const stored = await AsyncStorage.getItem('user');
-      if (stored) {
-        try {
-          setUser(JSON.parse(stored));
-        } catch {
-          // ignore parse errors
-        }
-      }
-      setLoading(false);
-    };
-
-    checkSession();
-
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        AsyncStorage.setItem('user', JSON.stringify(firebaseUser));
+        AsyncStorage.setItem(
+          'user',
+          JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email })
+        );
       } else {
         AsyncStorage.removeItem('user');
       }
       setUser(firebaseUser);
+      setLoading(false);
     });
 
     return () => unsubscribe(); // Limpia el listener

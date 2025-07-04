@@ -69,7 +69,8 @@ const createStyles = (theme: any) =>
       zIndex: 2,
     },
     emoji: {
-      fontSize: 36,
+      fontSize: 42,
+      zIndex: 99,
     },
     distance: {
       fontSize: 20,

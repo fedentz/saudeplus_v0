@@ -53,8 +53,8 @@ export default function ActivityMap({
       initialRegion={{
         latitude: location.latitude,
         longitude: location.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002,
       }}
       onMapReady={handleMapReady}
     >
@@ -65,7 +65,7 @@ export default function ActivityMap({
           }}
           anchor={{ x: 0.5, y: 0.5 }}
         >
-          <Text style={{ fontSize: 32 }}>{emoji}</Text>
+          <Text style={{ fontSize: 42, zIndex: 99 }}>{emoji}</Text>
         </Marker>
       </MapView>
       {/* Placeholder to avoid Google logo overlap handled by footer */}
