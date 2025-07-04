@@ -5,12 +5,17 @@ import type { LocationObjectCoords } from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useNetworkListener from './useNetworkListener';
 import { logEvent } from '../utils/logger';
+import { getAuth } from 'firebase/auth';
+
 
 export interface TrackData {
   route: LocationObjectCoords[];
   distance: number;
   time: number;
 }
+
+const auth = getAuth();
+const userId = auth.currentUser?.uid || 'anon';
 
 const CURRENT_KEY = 'TRACKING_CURRENT';
 const PENDING_KEY = 'TRACKING_PENDING';
@@ -91,21 +96,52 @@ export default function useTracking() {
   };
 
   // Reintenta enviar los datos pendientes al servidor.
-  const sendPending = async () => {
-    const stored = await AsyncStorage.getItem(PENDING_KEY);
-    if (!stored) return;
-    const pending: TrackData[] = JSON.parse(stored);
-    const remaining: TrackData[] = [];
-    for (const item of pending) {
-      try {
-        await enviarAFirebase(item);
-      } catch {
-        remaining.push(item);
+const sendPending = async () => {
+  const stored = await AsyncStorage.getItem(PENDING_KEY);
+  if (!stored) return;
+  const pending: TrackData[] = JSON.parse(stored);
+  const remaining: TrackData[] = [];
+
+console.log('📤 Iniciando subida de actividades pendientes...');
+for (const item of pending) {
+  try {
+    console.log('🚀 Intentando subir actividad:', item);
+
+    const response = await fetch(
+      'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userId, // ⚠️ asegurate de que tenga valor
+          date: new Date().toISOString(), // o item.date si querés la original
+          distance: item.distance,
+          duration: item.time,
+        }),
       }
+    );
+
+    console.log('🔁 Respuesta de servidor:', response.status);
+    if (!response.ok) {
+      throw new Error(`Error HTTP ${response.status}`);
     }
-    if (remaining.length === 0) await AsyncStorage.removeItem(PENDING_KEY);
-    else await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
-  };
+
+    logEvent('UPLOAD', `✅ Subido: ${item.distance.toFixed(2)} km`);
+  } catch (e) {
+    console.error('❌ Error al subir actividad:', e);
+    remaining.push(item);
+  }
+}
+console.log('📦 Actividades restantes sin subir:', remaining.length);
+
+
+  if (remaining.length === 0) {
+    await AsyncStorage.removeItem(PENDING_KEY);
+  } else {
+    await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
+  }
+};
+
 
   // Cada vez que cambie el estado de red, si estamos offline se guarda la sesión,
   // y si volvemos online se intenta reenvío.
@@ -137,7 +173,6 @@ export default function useTracking() {
         accuracy: Location.Accuracy.High,
         distanceInterval: 5,
         timeInterval: 1000,
-        activityType: Location.ActivityType.Fitness,
       },
       async loc => {
         const coords = loc.coords;
