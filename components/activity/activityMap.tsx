@@ -40,33 +40,56 @@ export default function ActivityMap({
         customMapStyle={theme === 'dark' ? mapStyleDarkMode : customMapStyle}
         ref={mapRef}
         style={{ flex: 1 }}
-      scrollEnabled={false}
-      zoomEnabled={false}
-      rotateEnabled={false}
-      pitchEnabled={false}
-      followsUserLocation={true}
-      showsUserLocation={false}
-      showsBuildings={false}
-      showsTraffic={false}
-      showsIndoors={false}
-      showsCompass={false}
-      initialRegion={{
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: 0.002,
-        longitudeDelta: 0.002,
+        scrollEnabled={false}
+        zoomEnabled={false}
+        rotateEnabled={false}
+        pitchEnabled={false}
+        followsUserLocation={true}
+        showsUserLocation={false}
+        showsBuildings={false}
+        showsTraffic={false}
+        showsIndoors={false}
+        showsCompass={false}
+        initialRegion={{
+          latitude: location.latitude,
+          longitude: location.longitude,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.002,
+        }}
+        onMapReady={handleMapReady}
+      >
+<Marker
+  coordinate={{
+    latitude: location.latitude,
+    longitude: location.longitude,
+  }}
+  anchor={{ x: 0.4, y: 0.5 }} // Ajusta el valor x para mover el emoji a la izquierda
+>
+  <View
+    style={{
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'transparent',
+      overflow: 'hidden',
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+    }}
+  >
+    <Text
+      style={{
+        fontSize: 36,
+        lineHeight: 44,
+        textAlign: 'center',
+        width: 48,
+        height: 48,
       }}
-      onMapReady={handleMapReady}
     >
-        <Marker
-          coordinate={{
-            latitude: location.latitude,
-            longitude: location.longitude,
-          }}
-          anchor={{ x: 0.5, y: 0.5 }}
-        >
-          <Text style={{ fontSize: 42, zIndex: 99 }}>{emoji}</Text>
-        </Marker>
+      {emoji}
+    </Text>
+  </View>
+</Marker>
+
       </MapView>
       {/* Placeholder to avoid Google logo overlap handled by footer */}
     </View>
