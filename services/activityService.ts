@@ -11,6 +11,10 @@ import {
 
 import { auth } from '../firebase/firebase';
 import db from '../firebase/db';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logEvent } from '../utils/logger';
+
+const PENDING_KEY = 'PENDING_ACTIVITIES';
 
 export const saveActivity = async (
   duration: number, // en segundos
@@ -23,7 +27,7 @@ export const saveActivity = async (
 
     // ✅ NO GUARDAR si duró menos de 5 minutos
     if (duration < 300) {
-      console.log('Actividad descartada: duró menos de 5 minutos.');
+      logEvent('UPLOAD', 'Actividad descartada: menos de 5 minutos');
       return;
     }
 
@@ -34,9 +38,51 @@ export const saveActivity = async (
       date: Timestamp.fromDate(date), // ✅ Timestamp de Firestore
     });
 
-    console.log('✅ Actividad guardada correctamente.');
+    logEvent('UPLOAD', 'Actividad guardada en Firebase');
   } catch (error) {
-    console.error('❌ Error al guardar la actividad:', error);
+    logEvent('UPLOAD', `Error al guardar: ${error}`);
+  }
+};
+
+export const saveActivityWithCache = async (
+  duration: number,
+  distance: number,
+  date: Date = new Date()
+) => {
+  try {
+    await saveActivity(duration, distance, date);
+  } catch (error) {
+    logEvent('UPLOAD', `Error al guardar, se guarda localmente: ${error}`);
+    const stored = await AsyncStorage.getItem(PENDING_KEY);
+    const pending = stored ? JSON.parse(stored) : [];
+    pending.push({ duration, distance, date: date.toISOString() });
+    await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+  }
+};
+
+export const syncPendingActivities = async () => {
+  const stored = await AsyncStorage.getItem(PENDING_KEY);
+  if (!stored) return;
+  const pending = JSON.parse(stored);
+  logEvent('UPLOAD', `Sincronizando ${pending.length} actividades pendientes`);
+  const remaining = [] as any[];
+  for (const item of pending) {
+    try {
+      await saveActivity(
+        item.duration,
+        item.distance,
+        new Date(item.date)
+      );
+    } catch (e) {
+      remaining.push(item);
+    }
+  }
+  if (remaining.length === 0) {
+    await AsyncStorage.removeItem(PENDING_KEY);
+    logEvent('UPLOAD', 'Todas las actividades pendientes fueron subidas');
+  } else {
+    await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
+    logEvent('UPLOAD', `Quedaron ${remaining.length} actividades sin subir`);
   }
 };
 

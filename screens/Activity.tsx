@@ -16,10 +16,14 @@ import {
 import MapView from 'react-native-maps';
 import NetInfo from '@react-native-community/netinfo';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { logEvent } from '../utils/logger';
 import { useTheme } from '../context/ThemeContext';
 
 import useTracking from '../hooks/useTracking';
-import { saveActivity } from '../services/activityService';
+import {
+  saveActivityWithCache,
+  syncPendingActivities,
+} from '../services/activityService';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import ActivityMap from '../components/activity/activityMap';
@@ -42,6 +46,7 @@ export default function Activity() {
   const navigation = useNavigation<any>();
   const [mapReady, setMapReady] = useState(false);
   const [locationReady, setLocationReady] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
   const [summaryVisible, setSummaryVisible] = useState(false);
   const [activityEnded, setActivityEnded] = useState(false);
   const [activitySummary, setActivitySummary] = useState('');
@@ -76,14 +81,18 @@ const handleEndActivity = async () => {
   setSummaryVisible(true);
  
   if (!startTime) {
-  console.warn('No se puede guardar actividad: startTime es null');
-  return;
-}
+    logEvent('ACTIVITY', 'No se puede guardar actividad: startTime es null');
+    return;
+  }
   // Guardar solo si cumple la duración mínima (ya lo maneja internamente)
-  await saveActivity(
+  await saveActivityWithCache(
     elapsedTime,
     totalDistance,
     new Date(startTime) // reconstruye startTime
+  );
+  logEvent(
+    'UPLOAD',
+    isConnected ? 'Actividad enviada a Firebase' : 'Guardada en AsyncStorage'
   );
 
   Vibration.vibrate(500);
@@ -107,12 +116,31 @@ useFocusEffect(
 
 
   useEffect(() => {
-    const unsubscribeNet = NetInfo.addEventListener(state => {
+    let prev = true;
+    const checkInitial = async () => {
+      const state = await NetInfo.fetch();
+      const connected = Boolean(state.isConnected);
+      prev = connected;
+      setIsConnected(connected);
+      logEvent('NETWORK', connected ? 'Conectado' : 'Sin conexión');
+      if (connected) {
+        syncPendingActivities();
+      }
+    };
+    checkInitial();
+
+    const unsubscribeNet = NetInfo.addEventListener((state) => {
       const type = state.type ?? 'desconocido';
-      const msg = state.isConnected
+      const connected = Boolean(state.isConnected);
+      const msg = connected
         ? `📶 Conexión restablecida (${type})`
         : `🚫 Sin conexión (${type})`;
-      console.log(msg);
+      logEvent('NETWORK', msg);
+      if (connected && !prev) {
+        syncPendingActivities();
+      }
+      prev = connected;
+      setIsConnected(connected);
     });
 
     startTracking();
@@ -151,7 +179,7 @@ useFocusEffect(
           longitudeDelta: 0.1,
         });
       } catch (err) {
-        console.log('⚠️ preloadMapArea no soportado o falló', err);
+        logEvent('MAP', `preloadMapArea no soportado: ${err}`);
       }
     }
   }, []);

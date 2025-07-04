@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
+import { Ionicons } from '@expo/vector-icons';
+
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
@@ -13,7 +15,12 @@ export default function Home({ navigation }: any) {
           style={styles.playButton}
           onPress={() => navigation.navigate('Activity')}
         >
-          <Text style={styles.playIcon}>▶</Text>
+          <Ionicons
+        name="play"
+        size={60}
+        color={theme.colors.white}
+        style={{ marginLeft: 6 }}
+          />
         </TouchableOpacity>
         <Text style={styles.subtitle}>
           pressione o botão para iniciar uma nova atividade física
@@ -30,7 +37,7 @@ const createStyles = (theme: any) =>
       backgroundColor: theme.colors.background,
     },
     centerContent: {
-      flexGrow: 1,
+      flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 24,
@@ -49,7 +56,7 @@ const createStyles = (theme: any) =>
       height: 120,
       alignItems: 'center',
       justifyContent: 'center',
-      marginVertical: 32,
+      marginVertical: 24,
       elevation: 4,
     },
     playIcon: {
