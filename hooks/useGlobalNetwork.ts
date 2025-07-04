@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 import type { LocationObjectCoords } from 'expo-location';
 
 export interface TrackData {
@@ -20,10 +20,13 @@ const enviarAFirebase = async (data: TrackData): Promise<void> => {
 
 export default function useGlobalNetwork() {
   const wasOffline = useRef(false);
+  const processing = useRef(false);
+  const prevType = useRef<NetInfoStateType | 'none' | 'unknown'>('unknown');
 
   useEffect(() => {
     const processPending = async () => {
-      Alert.alert('Se intentarán enviar actividades pendientes');
+      if (processing.current) return;
+      processing.current = true;
       console.log('🔄 Procesando pendientes...');
 
       try {
@@ -41,7 +44,17 @@ export default function useGlobalNetwork() {
           return;
         }
 
+        // Filtramos datos inválidos
+        pending = pending.filter(p => p.distance > 0);
+
         console.log(`Pendientes encontrados: ${pending.length}`);
+        if (pending.length === 0) {
+          await AsyncStorage.removeItem(PENDING_KEY);
+          processing.current = false;
+          console.log('No hay pendientes válidos');
+          return;
+        }
+
         const remaining: TrackData[] = [];
         for (const item of pending) {
           try {
@@ -63,18 +76,40 @@ export default function useGlobalNetwork() {
         }
       } catch (err) {
         console.log('Error procesando pendientes', err);
+      } finally {
+        processing.current = false;
       }
     };
 
     const unsubscribe = NetInfo.addEventListener(state => {
+      const type = state.type ?? 'unknown';
       const connected = Boolean(state.isConnected);
-      if (connected && wasOffline.current) {
-        wasOffline.current = false;
-        processPending();
-      } else if (!connected) {
-        console.log('🚫 Sin conexión');
+      console.log(`📡 Cambio de red: ${connected ? type : 'offline'}`);
+
+      if (!connected) {
         wasOffline.current = true;
+        Alert.alert('📴 Sin conexión');
+        console.log('🚫 Sin conexión');
+      } else {
+        if (wasOffline.current) {
+          Alert.alert('Se intentarán enviar actividades pendientes');
+          processPending();
+        } else if (
+          prevType.current !== 'unknown' &&
+          prevType.current !== type
+        ) {
+          const msg =
+            type === 'wifi'
+              ? 'Conectado a Wi-Fi'
+              : type === 'cellular'
+              ? 'Usando datos móviles'
+              : 'Tipo de conexión desconocido';
+          Alert.alert(msg);
+        }
+        wasOffline.current = false;
       }
+
+      prevType.current = connected ? type : 'none';
     });
 
     return () => unsubscribe();
