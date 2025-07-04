@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
+
 import type { LocationObjectCoords } from 'expo-location';
 
 export interface TrackData {
@@ -27,6 +29,7 @@ export default function useGlobalNetwork() {
     const processPending = async () => {
       if (processing.current) return;
       processing.current = true;
+
       console.log('🔄 Procesando pendientes...');
 
       try {
@@ -55,6 +58,7 @@ export default function useGlobalNetwork() {
           return;
         }
 
+
         const remaining: TrackData[] = [];
         for (const item of pending) {
           try {
@@ -78,6 +82,7 @@ export default function useGlobalNetwork() {
         console.log('Error procesando pendientes', err);
       } finally {
         processing.current = false;
+
       }
     };
 
