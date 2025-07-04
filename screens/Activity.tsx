@@ -84,12 +84,13 @@ const handleEndActivity = async () => {
     logEvent('ACTIVITY', 'No se puede guardar actividad: startTime es null');
     return;
   }
-  // Guardar solo si cumple la duración mínima (ya lo maneja internamente)
-  await saveActivityWithCache(
-    elapsedTime,
-    totalDistance,
-    new Date(startTime) // reconstruye startTime
-  );
+  const end = new Date();
+  await saveActivityWithCache({
+    startTime: new Date(startTime).toISOString(),
+    endTime: end.toISOString(),
+    distance: totalDistance,
+    duration: elapsedTime,
+  });
   logEvent(
     'UPLOAD',
     isConnected ? 'Actividad enviada a Firebase' : 'Guardada en AsyncStorage'
