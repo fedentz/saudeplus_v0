@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { Ionicons } from '@expo/vector-icons';
+import { usePendingActivities } from '../context/PendingActivitiesContext';
 
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
+  const { sync, logPending } = usePendingActivities();
   const styles = createStyles(theme);
+
+  useEffect(() => {
+    const check = async () => {
+      const state = await NetInfo.fetch();
+      if (state.isConnected && state.isInternetReachable !== false) {
+        await sync();
+      }
+      logPending();
+      (global as any).forceSync = sync;
+      (global as any).logPendings = logPending;
+    };
+    check();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.centerContent}>
