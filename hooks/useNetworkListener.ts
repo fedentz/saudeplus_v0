@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert } from 'react-native';
+import { logEvent } from '../utils/logger';
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 
 export default function useNetworkListener() {
@@ -22,15 +22,11 @@ export default function useNetworkListener() {
 
       if (offline) {
         console.log('🚫 Sin conexión');
-        Alert.alert('🚫 Sin conexión', 'Conéctate a internet para continuar', [
-          { text: 'OK' },
-        ]);
+        logEvent('NETWORK', 'Sin conexión');
       } else {
         console.log('🔌 Conectado');
         if (prevType.current === 'none') {
-          Alert.alert('🔄 Conexión recuperada', 'Vuelves a estar en línea', [
-            { text: 'Genial' },
-          ]);
+          logEvent('NETWORK', 'Conexión recuperada');
         }
         if (
           prevType.current !== 'unknown' &&
@@ -38,7 +34,7 @@ export default function useNetworkListener() {
           prevType.current !== type
         ) {
           const msg = type === 'wifi' ? 'Usando WiFi' : 'Usando datos móviles';
-          Alert.alert('📶 Cambio de red', msg, [{ text: 'OK' }]);
+          logEvent('NETWORK', `Cambio de red: ${msg}`);
         }
       }
       prevType.current = offline ? 'none' : type;

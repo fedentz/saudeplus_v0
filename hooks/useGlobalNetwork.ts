@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Alert } from 'react-native';
+import { logEvent } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
@@ -124,11 +124,11 @@ export default function useGlobalNetwork() {
       if (!connected) {
         wasOffline.current = true;
         reintentando.current = false;
-        Alert.alert('📴 Sin conexión');
         console.log('🚫 Sin conexión');
+        logEvent('NETWORK', 'Sin conexión');
       } else {
         if (wasOffline.current) {
-          Alert.alert('🔄 Conexión restablecida');
+          logEvent('NETWORK', 'Conexión restablecida');
           if (!reintentando.current) {
             reintentando.current = true;
             console.log('[GLOBAL NETWORK] Conexión restablecida: enviando pendientes');
@@ -146,7 +146,7 @@ export default function useGlobalNetwork() {
               : type === 'cellular'
               ? '📱 Usando datos móviles'
               : 'Tipo de conexión desconocido';
-          Alert.alert(msg);
+          logEvent('NETWORK', msg);
         }
         wasOffline.current = false;
       }
