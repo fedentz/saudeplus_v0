@@ -1,14 +1,15 @@
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  Timestamp, 
-  query, 
-  where, 
-  orderBy, 
-  getDocs 
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  Timestamp,
+  query,
+  where,
+  orderBy,
+  getDocs
 } from 'firebase/firestore';
 
+import NetInfo from '@react-native-community/netinfo';
 import { auth } from '../firebase/firebase';
 import db from '../firebase/db';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -36,12 +37,17 @@ export const uploadActivity = async (activity: LocalActivity) => {
       return;
     }
 
+    const netInfo = await NetInfo.fetch();
+    const conexion = netInfo.isConnected ? netInfo.type : 'unknown';
+
     await addDoc(collection(db, 'activities'), {
       userId: user.uid,
       startTime: Timestamp.fromDate(new Date(activity.startTime)),
       endTime: Timestamp.fromDate(new Date(activity.endTime)),
       duration: activity.duration,
       distance: activity.distance,
+      date: Timestamp.fromDate(new Date(activity.startTime)),
+      conexion_al_guardar: conexion
     });
 
     logEvent('UPLOAD', 'Actividad guardada en Firebase');
@@ -142,4 +148,3 @@ export const getUserActivitiesSummary = async (userId: string): Promise<MonthlyS
     totalTime: stats.totalTime,
   }));
 };
-
