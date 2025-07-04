@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 
 import type { LocationObjectCoords } from 'expo-location';
+import { logDebug } from '../utils/logger';
 
 export interface TrackData {
   route: LocationObjectCoords[];
@@ -23,14 +24,23 @@ const enviarAFirebase = async (data: TrackData): Promise<void> => {
 export default function useGlobalNetwork() {
   const wasOffline = useRef(false);
   const processing = useRef(false);
+  const reintentando = useRef(false);
   const prevType = useRef<NetInfoStateType | 'none' | 'unknown'>('unknown');
 
   useEffect(() => {
-    const processPending = async () => {
+    // Prueba mínima para verificar NetInfo
+    NetInfo.fetch().then(state =>
+      logDebug(
+        `[GLOBAL NETWORK] Estado inicial: ${state.isConnected ? state.type : 'offline'}`
+      )
+    );
+
+    const sendPending = async () => {
       if (processing.current) return;
       processing.current = true;
 
       console.log('🔄 Procesando pendientes...');
+      logDebug('[GLOBAL NETWORK] Conexión restablecida: enviando pendientes');
 
       try {
         const stored = await AsyncStorage.getItem(PENDING_KEY);
@@ -89,25 +99,32 @@ export default function useGlobalNetwork() {
     const unsubscribe = NetInfo.addEventListener(state => {
       const type = state.type ?? 'unknown';
       const connected = Boolean(state.isConnected);
-      console.log(`📡 Cambio de red: ${connected ? type : 'offline'}`);
+      console.log('[GLOBAL NETWORK] Tipo de conexión:', connected ? type : 'offline');
 
       if (!connected) {
         wasOffline.current = true;
+        reintentando.current = false;
         Alert.alert('📴 Sin conexión');
         console.log('🚫 Sin conexión');
       } else {
         if (wasOffline.current) {
-          Alert.alert('Se intentarán enviar actividades pendientes');
-          processPending();
+          Alert.alert('🔄 Conexión restablecida');
+          if (!reintentando.current) {
+            reintentando.current = true;
+            console.log('[GLOBAL NETWORK] Conexión restablecida: enviando pendientes');
+            sendPending().finally(() => {
+              reintentando.current = false;
+            });
+          }
         } else if (
           prevType.current !== 'unknown' &&
           prevType.current !== type
         ) {
           const msg =
             type === 'wifi'
-              ? 'Conectado a Wi-Fi'
+              ? '📶 Conectado a Wi-Fi'
               : type === 'cellular'
-              ? 'Usando datos móviles'
+              ? '📱 Usando datos móviles'
               : 'Tipo de conexión desconocido';
           Alert.alert(msg);
         }
