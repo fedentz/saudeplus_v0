@@ -240,5 +240,6 @@ export default function useTracking() {
     totalDistance,
     elapsedTime,
     formatElapsedTime,
+    startTime: startTimeRef.current,
   };
 }
