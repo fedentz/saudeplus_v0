@@ -14,28 +14,34 @@ import db from '../firebase/db';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logEvent } from '../utils/logger';
 
-const PENDING_KEY = 'PENDING_ACTIVITIES';
+export interface LocalActivity {
+  id: string;
+  startTime: string;
+  endTime: string;
+  distance: number;
+  duration: number;
+}
 
-export const saveActivity = async (
-  duration: number, // en segundos
-  distance: number,
-  date: Date = new Date()
-) => {
+const PENDING_KEY = 'PENDING_ACTIVITIES_V2';
+
+const generateId = () =>
+  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+export const uploadActivity = async (activity: LocalActivity) => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error('Usuario no autenticado');
-
-    // ✅ NO GUARDAR si duró menos de 5 minutos
-    if (duration < 300) {
+    if (activity.duration < 300) {
       logEvent('UPLOAD', 'Actividad descartada: menos de 5 minutos');
       return;
     }
 
     await addDoc(collection(db, 'activities'), {
       userId: user.uid,
-      duration,
-      distance,
-      date: Timestamp.fromDate(date), // ✅ Timestamp de Firestore
+      startTime: Timestamp.fromDate(new Date(activity.startTime)),
+      endTime: Timestamp.fromDate(new Date(activity.endTime)),
+      duration: activity.duration,
+      distance: activity.distance,
     });
 
     logEvent('UPLOAD', 'Actividad guardada en Firebase');
@@ -44,18 +50,15 @@ export const saveActivity = async (
   }
 };
 
-export const saveActivityWithCache = async (
-  duration: number,
-  distance: number,
-  date: Date = new Date()
-) => {
+export const saveActivityWithCache = async (activity: Omit<LocalActivity, 'id'>) => {
+  const data: LocalActivity = { ...activity, id: generateId() };
   try {
-    await saveActivity(duration, distance, date);
+    await uploadActivity(data);
   } catch (error) {
     logEvent('UPLOAD', `Error al guardar, se guarda localmente: ${error}`);
     const stored = await AsyncStorage.getItem(PENDING_KEY);
-    const pending = stored ? JSON.parse(stored) : [];
-    pending.push({ duration, distance, date: date.toISOString() });
+    const pending: LocalActivity[] = stored ? JSON.parse(stored) : [];
+    pending.push(data);
     await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
   }
 };
@@ -63,26 +66,29 @@ export const saveActivityWithCache = async (
 export const syncPendingActivities = async () => {
   const stored = await AsyncStorage.getItem(PENDING_KEY);
   if (!stored) return;
-  const pending = JSON.parse(stored);
-  logEvent('UPLOAD', `Sincronizando ${pending.length} actividades pendientes`);
-  const remaining = [] as any[];
+  let pending: LocalActivity[] = [];
+  try {
+    pending = JSON.parse(stored);
+  } catch {
+    return;
+  }
+  console.log(`\uD83E\uDEA5 [SYNC] Encontradas ${pending.length} actividades pendientes`);
+  const remaining: LocalActivity[] = [];
   for (const item of pending) {
     try {
-      await saveActivity(
-        item.duration,
-        item.distance,
-        new Date(item.date)
-      );
+      await uploadActivity(item);
+      console.log(`\uD83E\uDEA5 [SYNC] Actividad subida con éxito: ${item.id}`);
     } catch (e) {
+      console.log(`\uD83E\uDEA5 [SYNC] Falló la subida de ${item.id}: ${e}`);
       remaining.push(item);
     }
   }
   if (remaining.length === 0) {
     await AsyncStorage.removeItem(PENDING_KEY);
-    logEvent('UPLOAD', 'Todas las actividades pendientes fueron subidas');
+    console.log('\uD83E\uDEA5 [SYNC] Todas las actividades pendientes fueron subidas');
   } else {
     await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
-    logEvent('UPLOAD', `Quedaron ${remaining.length} actividades sin subir`);
+    console.log(`\uD83E\uDEA5 [SYNC] Quedaron ${remaining.length} pendientes`);
   }
 };
 
