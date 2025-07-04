@@ -11,11 +11,13 @@ import MainTabs from './navigation/MainTabs';
 import { ThemeProvider } from './context/ThemeContext';
 import { EmojiProvider } from './context/EmojiContext';
 import { useUser } from './hooks/useUser';
+import useGlobalNetwork from './hooks/useGlobalNetwork';
 import { ActivityIndicator, View } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  useGlobalNetwork();
   const { user, loading } = useUser();
   const initialRoute = user ? 'MainTabs' : 'Splash';
 
