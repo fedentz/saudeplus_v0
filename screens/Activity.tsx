@@ -134,24 +134,10 @@ useFocusEffect(
     };
     checkInitial();
 
-    const unsubscribeNet = NetInfo.addEventListener((state) => {
-      const type = state.type ?? 'desconocido';
-      const connected = Boolean(state.isConnected);
-      const msg = connected
-        ? `📶 Conexión restablecida (${type})`
-        : `🚫 Sin conexión (${type})`;
-      logEvent('NETWORK', msg);
-      if (connected && !prev) {
-        sync();
-      }
-      prev = connected;
-    });
-
     startTracking();
 
     return () => {
       stopTracking();
-      unsubscribeNet();
     };
   }, []);
 
