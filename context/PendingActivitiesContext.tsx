@@ -28,7 +28,10 @@ interface PendingCtx {
 }
 
 const PendingActivityContext = createContext<PendingCtx | undefined>(undefined);
-const PENDING_KEY = 'PENDING_ACTIVITIES_V2';
+const baseKey = 'PENDING_ACTIVITIES_V2';
+
+const getKey = (uid: string | null | undefined) =>
+  uid ? `${baseKey}_${uid}` : baseKey;
 
 const sendToFirebase = async (activity: PendingActivity): Promise<void> => {
   const userId = getAuth().currentUser?.uid;
@@ -54,6 +57,8 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   const [pending, setPending] = useState<PendingActivity[]>([]);
   const wasOffline = useRef(false);
 
+  const keyRef = useRef('');
+
   const sync = async () => {
     const state = await NetInfo.fetch();
     const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
@@ -70,7 +75,7 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
       }
     }
     setPending(() => {
-      AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining)).catch(() => undefined);
+      AsyncStorage.setItem(keyRef.current, JSON.stringify(remaining)).catch(() => undefined);
       return remaining;
     });
   };
@@ -78,7 +83,7 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   const add = (activity: PendingActivity) => {
     setPending(prev => {
       const updated = [...prev, activity];
-      AsyncStorage.setItem(PENDING_KEY, JSON.stringify(updated)).catch(() => undefined);
+      AsyncStorage.setItem(keyRef.current, JSON.stringify(updated)).catch(() => undefined);
       return updated;
     });
     logEvent('ACTIVITY_SAVED_LOCALLY', JSON.stringify(activity));
@@ -89,7 +94,9 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   };
 
   useEffect(() => {
-    AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending)).catch(() => undefined);
+    if (keyRef.current) {
+      AsyncStorage.setItem(keyRef.current, JSON.stringify(pending)).catch(() => undefined);
+    }
   }, [pending]);
 
   useEffect(() => {
@@ -106,8 +113,9 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   useEffect(() => {
     const unsub = onAuthStateChanged(getAuth(), async user => {
       if (user) {
+        keyRef.current = getKey(user.uid);
         try {
-          const stored = await AsyncStorage.getItem(PENDING_KEY);
+          const stored = await AsyncStorage.getItem(keyRef.current);
           if (stored) {
             setPending(JSON.parse(stored));
           }
@@ -120,6 +128,7 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
           // ignore parse errors
         }
       } else {
+        keyRef.current = '';
         setPending([]);
       }
     });

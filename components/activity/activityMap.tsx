@@ -63,7 +63,7 @@ export default function ActivityMap({
     latitude: location.latitude,
     longitude: location.longitude,
   }}
-  anchor={{ x: 0.4, y: 0.5 }} // Ajusta el valor x para mover el emoji a la izquierda
+  anchor={{ x: 0.5, y: 0.5 }}
 >
   <View
     style={{
@@ -79,7 +79,7 @@ export default function ActivityMap({
     <Text
       style={{
         fontSize: 36,
-        lineHeight: 44,
+        lineHeight: 48,
         textAlign: 'center',
         width: 48,
         height: 48,
