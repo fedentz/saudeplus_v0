@@ -65,29 +65,30 @@ export default function ActivityMap({
   }}
   anchor={{ x: 0.5, y: 0.5 }}
 >
-  <View
-    style={{
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'transparent',
-      overflow: 'hidden',
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-    }}
-  >
-    <Text
-      style={{
-        fontSize: 36,
-        lineHeight: 48,
-        textAlign: 'center',
-        width: 48,
-        height: 48,
-      }}
-    >
-      {emoji}
-    </Text>
-  </View>
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'transparent',
+          overflow: 'hidden',
+          width: 50,
+          height: 50,
+          borderRadius: 25,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 40,
+            lineHeight: 50,
+            textAlign: 'center',
+            width: 50,
+            height: 50,
+            overflow: 'hidden',
+          }}
+        >
+          {emoji}
+        </Text>
+      </View>
 </Marker>
 
       </MapView>
