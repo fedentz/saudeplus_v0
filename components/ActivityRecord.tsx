@@ -61,14 +61,17 @@ export default function Stats() {
       renderItem={({ item }) => (
         <View style={s.item}>
           <Text style={s.title}>{item.name || 'Atividade'}</Text>
-          <Text style={s.text}>Duração: {Math.round((item.duration || 0) / 60)} min</Text>
+          <Text style={s.text}>
+            Duração:
+            {Math.round((item.duration || 0) / 60)} min
+          </Text>
           <Text style={s.text}>
             Data{' '}
             {item.date?.seconds
               ? new Date(item.date.seconds * 1000).toLocaleString()
               : item.date
-              ? new Date(item.date).toLocaleString()
-              : 'Sem data'}
+                ? new Date(item.date).toLocaleString()
+                : 'Sem data'}
           </Text>
         </View>
       )}
@@ -84,11 +87,11 @@ const styles = (appTheme: any, mode: string) =>
       fontSize: 16,
       color: appTheme.colors.text,
     },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     item: {
       backgroundColor: mode === 'dark' ? '#1e1e1e' : appTheme.colors.white,
       padding: 16,

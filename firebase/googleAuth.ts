@@ -2,8 +2,8 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect } from 'react';
 import { getAuth, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
-import {app} from './firebase'; // Tu configuración Firebase
 import Constants from 'expo-constants';
+import { app } from './firebase'; // Tu configuración Firebase
 
 WebBrowser.maybeCompleteAuthSession(); // Cierra correctamente la sesión en iOS
 

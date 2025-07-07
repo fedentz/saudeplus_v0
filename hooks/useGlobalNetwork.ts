@@ -1,12 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { logEvent } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 
 import type { LocationObjectCoords } from 'expo-location';
 import { getAuth } from 'firebase/auth';
-import { logDebug } from '../utils/logger';
+import { logEvent, logDebug } from '../utils/logger';
 
 export interface TrackData {
   route: LocationObjectCoords[];
@@ -32,7 +31,7 @@ const enviarAFirebase = async (data: TrackData): Promise<void> => {
         distance: data.distance,
         duration: data.time,
       }),
-    }
+    },
   );
 
   console.log('🔁 Respuesta de servidor:', response.status);
@@ -49,10 +48,8 @@ export default function useGlobalNetwork() {
 
   useEffect(() => {
     // Prueba mínima para verificar NetInfo
-    NetInfo.fetch().then(state =>
-      logDebug(
-        `[GLOBAL NETWORK] Estado inicial: ${state.isConnected ? state.type : 'offline'}`
-      )
+    NetInfo.fetch().then((state) =>
+      logDebug(`[GLOBAL NETWORK] Estado inicial: ${state.isConnected ? state.type : 'offline'}`),
     );
 
     const sendPending = async () => {
@@ -78,7 +75,7 @@ export default function useGlobalNetwork() {
         }
 
         // Filtramos datos inválidos
-        pending = pending.filter(p => p.distance > 0);
+        pending = pending.filter((p) => p.distance > 0);
 
         console.log(`Pendientes encontrados: ${pending.length}`);
         if (pending.length === 0) {
@@ -87,7 +84,6 @@ export default function useGlobalNetwork() {
           console.log('No hay pendientes válidos');
           return;
         }
-
 
         const remaining: TrackData[] = [];
         for (const item of pending) {
@@ -112,11 +108,10 @@ export default function useGlobalNetwork() {
         console.log('Error procesando pendientes', err);
       } finally {
         processing.current = false;
-
       }
     };
 
-    const unsubscribe = NetInfo.addEventListener(state => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
       const type = state.type ?? 'unknown';
       const connected = Boolean(state.isConnected);
       console.log('[GLOBAL NETWORK] Tipo de conexión:', connected ? type : 'offline');
@@ -136,16 +131,13 @@ export default function useGlobalNetwork() {
               reintentando.current = false;
             });
           }
-        } else if (
-          prevType.current !== 'unknown' &&
-          prevType.current !== type
-        ) {
+        } else if (prevType.current !== 'unknown' && prevType.current !== type) {
           const msg =
             type === 'wifi'
               ? '📶 Conectado a Wi-Fi'
               : type === 'cellular'
-              ? '📱 Usando datos móviles'
-              : 'Tipo de conexión desconocido';
+                ? '📱 Usando datos móviles'
+                : 'Tipo de conexión desconocido';
           logEvent('NETWORK', msg);
         }
         wasOffline.current = false;

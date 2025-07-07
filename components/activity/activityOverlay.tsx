@@ -1,12 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-  Animated,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Animated } from 'react-native';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useEmoji } from '../../context/EmojiContext';
 
@@ -27,7 +20,7 @@ export default function ActivityOverlay({ distance, timeFormatted, onEnd, disabl
       Animated.sequence([
         Animated.timing(scale, { toValue: 1.2, duration: 600, useNativeDriver: true }),
         Animated.timing(scale, { toValue: 1, duration: 600, useNativeDriver: true }),
-      ])
+      ]),
     ).start();
   }, [scale]);
 
@@ -37,7 +30,10 @@ export default function ActivityOverlay({ distance, timeFormatted, onEnd, disabl
       <View style={styles.header}>
         <Animated.Text style={[styles.emoji, { transform: [{ scale }] }]}>{emoji}</Animated.Text>
         <Text style={styles.distance}>{distance.toFixed(2)} km</Text>
-        <Text style={styles.time}>Duração: {timeFormatted}</Text>
+        <Text style={styles.time}>
+          Duração:
+          {timeFormatted}
+        </Text>
       </View>
       <View style={styles.footer} pointerEvents="box-none">
         <TouchableOpacity style={styles.button} onPress={onEnd} disabled={disabled}>
@@ -56,9 +52,8 @@ const createStyles = (theme: any) =>
       alignSelf: 'center',
       paddingVertical: 10,
       paddingHorizontal: 20,
-      backgroundColor: theme.colors.white === '#000000'
-        ? 'rgba(0,0,0,0.6)'
-        : 'rgba(255,255,255,0.9)',
+      backgroundColor:
+        theme.colors.white === '#000000' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.9)',
       borderRadius: 12,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
@@ -86,8 +81,7 @@ const createStyles = (theme: any) =>
       bottom: 0,
       left: 0,
       right: 0,
-      backgroundColor:
-        theme.colors.white === '#000000' ? '#1e1e1e' : '#fff',
+      backgroundColor: theme.colors.white === '#000000' ? '#1e1e1e' : '#fff',
       borderTopLeftRadius: 16,
       borderTopRightRadius: 16,
       paddingVertical: 12,

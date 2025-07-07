@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, SafeAreaView, ActivityIndicator, Alert, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  SafeAreaView,
+  ActivityIndicator,
+  Alert,
+  Platform,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
@@ -126,15 +136,9 @@ export default function AdminPanel() {
               }}
             >
               <Text style={{ fontWeight: 'bold', color: theme.colors.text }}>{item.month}</Text>
-              <Text style={{ color: theme.colors.text }}>
-                Atividades: {item.totalActivities}
-              </Text>
-              <Text style={{ color: theme.colors.text }}>
-                Distância: {item.totalDistance} km
-              </Text>
-              <Text style={{ color: theme.colors.text }}>
-                Tempo: {formatTime(item.totalTime)}
-              </Text>
+              <Text style={{ color: theme.colors.text }}>Atividades: {item.totalActivities}</Text>
+              <Text style={{ color: theme.colors.text }}>Distância: {item.totalDistance} km</Text>
+              <Text style={{ color: theme.colors.text }}>Tempo: {formatTime(item.totalTime)}</Text>
             </View>
           )}
         />

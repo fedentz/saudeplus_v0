@@ -1,6 +1,6 @@
 // src/services/authService.ts
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth }from '../firebase/firebase';
+import { auth } from '../firebase/firebase';
 
 export const loginWithEmail = (email: string, password: string) =>
   signInWithEmailAndPassword(auth, email, password);
