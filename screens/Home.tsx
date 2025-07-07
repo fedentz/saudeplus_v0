@@ -55,7 +55,11 @@ export default function Home({ navigation }: any) {
         <PlayButton onPress={() => navigation.navigate('Activity')} />
         {user && (
           <View style={styles.progressWrapper}>
-            <ProgressDisplay distance={totalKm} goal={monthlyGoalKm} />
+            <ProgressDisplay
+              distance={totalKm}
+              goal={monthlyGoalKm}
+              benefit="20 km → 10% de descuento"
+            />
           </View>
         )}
         <TipMessage text="¡Sigue moviéndote cada día!" />

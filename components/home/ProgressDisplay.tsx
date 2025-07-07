@@ -5,9 +5,10 @@ import { useAppTheme } from '../../hooks/useAppTheme';
 interface Props {
   distance: number;
   goal: number;
+  benefit?: string;
 }
 
-export default function ProgressDisplay({ distance, goal }: Props) {
+export default function ProgressDisplay({ distance, goal, benefit }: Props) {
   const theme = useAppTheme();
   const ratio = Math.min(distance / goal, 1);
 
@@ -28,6 +29,9 @@ export default function ProgressDisplay({ distance, goal }: Props) {
         />
       </View>
       <Text style={[styles.message, { color: theme.colors.primary }]}>{message}</Text>
+      {benefit ? (
+        <Text style={[styles.benefit, { color: theme.colors.darkGray }]}>{benefit}</Text>
+      ) : null}
     </View>
   );
 }
@@ -38,4 +42,5 @@ const styles = StyleSheet.create({
   barBackground: { width: '100%', height: 10, borderRadius: 5, overflow: 'hidden' },
   bar: { height: 10 },
   message: { marginTop: 8, fontSize: 16 },
+  benefit: { marginTop: 4, fontSize: 14 },
 });
