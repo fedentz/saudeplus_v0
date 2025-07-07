@@ -3,10 +3,7 @@ import { Alert, AppState } from 'react-native';
 import * as Location from 'expo-location';
 import type { LocationObjectCoords } from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
 import useNetworkListener from './useNetworkListener';
-import { logEvent } from '../utils/logger';
-import { getAuth } from 'firebase/auth';
 
 
 export interface TrackData {
@@ -18,36 +15,11 @@ export interface TrackData {
 
 
 const CURRENT_KEY = 'TRACKING_CURRENT';
-const PENDING_KEY = 'TRACKING_PENDING';
 
-const enviarAFirebase = async (data: TrackData) => {
-  console.log('📤 Intentando enviar actividad...', data);
-  const userId = getAuth().currentUser?.uid;
-  if (!userId) throw new Error('Usuario no autenticado');
-
-  const response = await fetch(
-    'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId,
-        date: new Date().toISOString(),
-        distance: data.distance,
-        duration: data.time,
-      }),
-    }
-  );
-
-  console.log('🔁 Respuesta de servidor:', response.status);
-  if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
-
-  logEvent('UPLOAD', `✅ Subido: ${data.distance.toFixed(2)} km`);
-};
 
 export default function useTracking() {
   // Obtenemos el estado de red a través de nuestro hook personalizado.
-  const { isOffline } = useNetworkListener();
+  useNetworkListener();
 
   const [location, setLocation] = useState<LocationObjectCoords | null>(null);
   const [route, setRoute] = useState<LocationObjectCoords[]>([]);
@@ -106,89 +78,8 @@ export default function useTracking() {
     gpsTimeoutRef.current = setTimeout(() => setGpsLost(true), 10000);
   };
 
-  // Agrega datos pendientes a la cola en AsyncStorage.
-  const addPending = async (data: TrackData) => {
-    console.log('\uD83D\uDCE5 Agregando a TRACKING_PENDING...');
-    const stored = await AsyncStorage.getItem(PENDING_KEY);
-    const pending: TrackData[] = stored ? JSON.parse(stored) : [];
-    pending.push(data);
-    await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
-  };
-
-  // Reintenta enviar los datos pendientes al servidor.
-const sendPending = async () => {
-  console.log('\uD83D\uDD17 Ejecutando sendPending()');
-  const stored = await AsyncStorage.getItem(PENDING_KEY);
-  if (!stored) {
-    console.log('No hay pendientes por enviar');
-    return;
-  }
-  const pending: TrackData[] = JSON.parse(stored);
-  const remaining: TrackData[] = [];
-
-  console.log('\uD83D\uDCE6 Enviando actividades pendientes...');
-  const userId = getAuth().currentUser?.uid;
-  if (!userId) {
-    console.log('❌ No hay usuario autenticado, no se pueden subir pendientes');
-    return;
-  }
-
-  for (const item of pending) {
-    try {
-      console.log('🚀 Intentando subir actividad:', item);
-
-      const response = await fetch(
-        'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId,
-            date: new Date().toISOString(),
-            distance: item.distance,
-            duration: item.time,
-          }),
-        }
-      );
-
-      console.log('🔁 Respuesta de servidor:', response.status);
-      if (!response.ok) {
-        throw new Error(`Error HTTP ${response.status}`);
-      }
-
-      logEvent('UPLOAD', `✅ Subido: ${item.distance.toFixed(2)} km`);
-    } catch (e) {
-      console.error('❌ Error al subir actividad:', e);
-      remaining.push(item);
-    }
-  }
-
-  console.log('📦 Actividades restantes sin subir:', remaining.length);
-
-  if (remaining.length === 0) {
-    await AsyncStorage.removeItem(PENDING_KEY);
-  } else {
-    await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
-  }
-  console.log('\u2705 Finaliza sendPending. Restantes:', remaining.length);
-};
-
-
-  // Cuando cambia la conectividad intentamos guardar o subir pendientes
-  useEffect(() => {
-    if (isOffline) {
-      const data: TrackData = {
-        route,
-        distance: totalDistance,
-        time: elapsedTime,
-      };
-      console.log('📥 Guardando pendiente por estar offline');
-      addPending(data).catch(() => undefined);
-    } else {
-      console.log('🌐 Online: intentando subir pendientes...');
-      sendPending().catch(() => undefined);
-    }
-  }, [isOffline]);
+  // Este hook solía manejar una cola interna de pendientes pero se
+  // simplificó en favor del contexto de actividades pendientes.
 
   const startTracking = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -263,26 +154,7 @@ const sendPending = async () => {
       gpsTimeoutRef.current = null;
     }
 
-    const data: TrackData = {
-      route,
-      distance: totalDistance,
-      time: elapsedTime,
-    };
     await AsyncStorage.removeItem(CURRENT_KEY);
-
-    try {
-      const state = await NetInfo.fetch();
-      const offlineNow = !state.isConnected || state.isInternetReachable === false;
-      if (offlineNow) throw new Error('offline');
-      await enviarAFirebase(data);
-    } catch {
-      // Si falla el envío (o estamos offline), agregamos el dato a la cola.
-      const stored = await AsyncStorage.getItem(PENDING_KEY);
-      const pending: TrackData[] = stored ? JSON.parse(stored) : [];
-      pending.push(data);
-      console.log('\uD83D\uDCE5 Agregando a TRACKING_PENDING...');
-      await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
-    }
   };
 
   const formatElapsedTime = (seconds: number) => {
@@ -305,14 +177,10 @@ const sendPending = async () => {
 
   return {
     gpsLost,
-    isOffline,
     startTracking,
     stopTracking,
-    forceSendPending: sendPending,
-    logPending: async () => {
-      const stored = await AsyncStorage.getItem(PENDING_KEY);
-      console.log('📂 Contenido de TRACKING_PENDING:', stored);
-    },
+    // Las funciones de manejo de pendientes fueron eliminadas en favor del
+    // contexto global de actividades.
     route,
     location,
     totalDistance,
