@@ -58,39 +58,37 @@ export default function ActivityMap({
         }}
         onMapReady={handleMapReady}
       >
-<Marker
-  coordinate={{
-    latitude: location.latitude,
-    longitude: location.longitude,
-  }}
-  anchor={{ x: 0.5, y: 0.5 }}
->
-      <View
+        <Marker
+          coordinate={{
+        latitude: location.latitude,
+        longitude: location.longitude,
+          }}
+          anchor={{ x: 0.5, y: 0.5 }}
+        >
+          <View
         style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'transparent',
-          overflow: 'hidden',
-          width: 50,
-          height: 50,
-          borderRadius: 25,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "transparent",
+          overflow: "hidden",
+          width: 48,
+          height: 48,
+          borderRadius: 24,
         }}
-      >
+          >
         <Text
           style={{
-            fontSize: 40,
-            lineHeight: 50,
-            textAlign: 'center',
-            width: 50,
-            height: 50,
-            overflow: 'hidden',
+            fontSize: 26,
+            lineHeight: 44,
+            textAlign: "center",
+            width: 48,
+            height: 48,
           }}
         >
           {emoji}
         </Text>
-      </View>
-</Marker>
-
+          </View>
+        </Marker>
       </MapView>
       {/* Placeholder to avoid Google logo overlap handled by footer */}
     </View>
