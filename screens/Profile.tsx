@@ -1,20 +1,13 @@
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebase/firebase';
 import React from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Modal,
-} from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Modal } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAppTheme } from '../hooks/useAppTheme';
 import { useUser } from '../hooks/useUser';
 import { useEmoji } from '../context/EmojiContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth } from '../firebase/firebase';
 
 export default function Profile() {
   const navigation = useNavigation<any>();
@@ -107,13 +100,17 @@ export default function Profile() {
 
         <TouchableOpacity
           style={[
-        styles.logoutButton,
-        { backgroundColor: theme.colors.white, borderWidth: 1, borderColor: theme.colors.primary }
+            styles.logoutButton,
+            {
+              backgroundColor: theme.colors.white,
+              borderWidth: 1,
+              borderColor: theme.colors.primary,
+            },
           ]}
           onPress={() => setModalVisible(true)}
         >
           <Text style={[styles.logoutText, { color: theme.colors.primary }]}>
-        Escolher emoji de atividade
+            Escolher emoji de atividade
           </Text>
         </TouchableOpacity>
 
@@ -152,4 +149,3 @@ export default function Profile() {
     </SafeAreaView>
   );
 }
-

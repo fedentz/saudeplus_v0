@@ -9,8 +9,8 @@ import {
   Platform,
   Button,
 } from 'react-native';
-import { useAppTheme } from '../../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
+import { useAppTheme } from '../../hooks/useAppTheme';
 
 type Props = {
   visible: boolean;
@@ -26,7 +26,7 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
     <Modal
       visible={visible}
       animationType="slide"
-      transparent={true}
+      transparent
       onRequestClose={onClose} // necesario en Android para botón físico "back"
     >
       <View style={styles.modalBackground}>
@@ -52,27 +52,26 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
 
 const createStyles = (theme: any) =>
   StyleSheet.create({
-  modalBackground: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
+    modalBackground: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      justifyContent: 'center',
+      paddingHorizontal: 20,
+    },
     modalContainer: {
-      backgroundColor:
-        theme.colors.white === '#000000' ? '#1e1e1e' : '#fff',
+      backgroundColor: theme.colors.white === '#000000' ? '#1e1e1e' : '#fff',
       borderRadius: 16,
       padding: 20,
-    elevation: 6,
-    shadowColor: theme.colors.text,
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    maxHeight: '80%',
-  },
-  container: {
-    alignItems: 'center',
-  },
+      elevation: 6,
+      shadowColor: theme.colors.text,
+      shadowOpacity: 0.25,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 2 },
+      maxHeight: '80%',
+    },
+    container: {
+      alignItems: 'center',
+    },
     title: {
       fontSize: 18,
       fontWeight: 'bold',
@@ -86,17 +85,17 @@ const createStyles = (theme: any) =>
       marginBottom: 20,
       color: theme.colors.white === '#000000' ? '#ccc' : '#444',
     },
-  button: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: 25,
-    paddingVertical: 10,
-    paddingHorizontal: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: theme.colors.white,
-    fontWeight: 'bold',
-  },
-});
+    button: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: 25,
+      paddingVertical: 10,
+      paddingHorizontal: 30,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 10,
+    },
+    buttonText: {
+      color: theme.colors.white,
+      fontWeight: 'bold',
+    },
+  });

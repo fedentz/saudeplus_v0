@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import { useAppTheme } from '../hooks/useAppTheme';
 import { Ionicons } from '@expo/vector-icons';
+import { useAppTheme } from '../hooks/useAppTheme';
 import { usePendingActivities } from '../context/PendingActivitiesContext';
-
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
@@ -32,16 +31,8 @@ export default function Home({ navigation }: any) {
       )}
       <View style={styles.centerContent}>
         <Text style={styles.title}>VAMOS COMEÇAR?</Text>
-        <TouchableOpacity
-          style={styles.playButton}
-          onPress={() => navigation.navigate('Activity')}
-        >
-          <Ionicons
-        name="play"
-        size={60}
-        color={theme.colors.white}
-        style={{ marginLeft: 6 }}
-          />
+        <TouchableOpacity style={styles.playButton} onPress={() => navigation.navigate('Activity')}>
+          <Ionicons name="play" size={60} color={theme.colors.white} style={{ marginLeft: 6 }} />
         </TouchableOpacity>
         <Text style={styles.subtitle}>
           pressione o botão para iniciar uma nova atividade física

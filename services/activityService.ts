@@ -6,13 +6,13 @@ import {
   query,
   where,
   orderBy,
-  getDocs
+  getDocs,
 } from 'firebase/firestore';
 
 import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../firebase/firebase';
 import db from '../firebase/db';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logEvent } from '../utils/logger';
 
 export interface LocalActivity {
@@ -26,8 +26,7 @@ export interface LocalActivity {
 
 const PENDING_KEY = 'PENDING_ACTIVITIES_V2';
 
-const generateId = () =>
-  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
 export const uploadActivity = async (activity: LocalActivity) => {
   try {
@@ -45,7 +44,7 @@ export const uploadActivity = async (activity: LocalActivity) => {
       duration: activity.duration,
       distance: activity.distance,
       date: Timestamp.fromDate(new Date(activity.startTime)),
-      conexion_al_guardar: activity.conexion_al_guardar
+      conexion_al_guardar: activity.conexion_al_guardar,
     });
 
     logEvent('UPLOAD', 'Actividad guardada en Firebase');
@@ -56,7 +55,7 @@ export const uploadActivity = async (activity: LocalActivity) => {
 };
 
 export const saveActivityWithCache = async (
-  activity: Omit<LocalActivity, 'id' | 'conexion_al_guardar'>
+  activity: Omit<LocalActivity, 'id' | 'conexion_al_guardar'>,
 ) => {
   const netInfo = await NetInfo.fetch();
   const conexion = netInfo.isConnected ? netInfo.type : 'none';
@@ -71,7 +70,7 @@ export const saveActivityWithCache = async (
     logEvent('UPLOAD', `Error al guardar, se guarda localmente: ${error}`);
     const stored = await AsyncStorage.getItem(PENDING_KEY);
     const pending: LocalActivity[] = stored ? JSON.parse(stored) : [];
-    if (!pending.find(p => p.id === data.id)) {
+    if (!pending.find((p) => p.id === data.id)) {
       pending.push(data);
       await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
     }
@@ -111,14 +110,14 @@ export const getActivitiesByUser = async (userId: string) => {
   const q = query(
     collection(db, 'activities'),
     where('userId', '==', userId),
-    orderBy('date', 'desc')
+    orderBy('date', 'desc'),
   );
 
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map(doc => ({
+  return snapshot.docs.map((doc) => ({
     id: doc.id,
-    ...doc.data()
+    ...doc.data(),
   }));
 };
 
@@ -133,13 +132,16 @@ export const getUserActivitiesSummary = async (userId: string): Promise<MonthlyS
   const q = query(
     collection(db, 'activities'),
     where('userId', '==', userId),
-    orderBy('date', 'asc')
+    orderBy('date', 'asc'),
   );
   const snapshot = await getDocs(q);
 
-  const map = new Map<string, { totalActivities: number; totalDistance: number; totalTime: number }>();
+  const map = new Map<
+    string,
+    { totalActivities: number; totalDistance: number; totalTime: number }
+  >();
 
-  snapshot.forEach(docu => {
+  snapshot.forEach((docu) => {
     const data = docu.data() as any;
     const date: Date = data.date.toDate();
     const key = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;

@@ -2,9 +2,9 @@ import 'dotenv/config';
 
 export default ({ config }: any) => ({
   ...config,
-  name: "SaudePlus",
-  slug: "tu-saudeplus",
-  version: "1.0.0",
+  name: 'SaudePlus',
+  slug: 'tu-saudeplus',
+  version: '1.0.0',
   extra: {
     FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
     AUTH_DOMAIN: process.env.AUTH_DOMAIN,

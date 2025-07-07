@@ -1,21 +1,14 @@
 import React, { useState } from 'react';
-import {
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  SafeAreaView,
-} from 'react-native';
+import { Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView } from 'react-native';
 import {
   getAuth,
   EmailAuthProvider,
   reauthenticateWithCredential,
   updatePassword,
 } from 'firebase/auth';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useTheme } from '../context/ThemeContext';
-import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function ChangePassword({ navigation }: any) {
   const [current, setCurrent] = useState('');

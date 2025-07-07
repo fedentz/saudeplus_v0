@@ -3,16 +3,16 @@
   "compilerOptions": {
     "moduleResolution": "bundler",
     "customConditions": ["import", "require"],
+    "target": "esnext",
+    "module": "es2015",
+    "jsx": "react-native",
     "strict": true,
+    "noEmit": true,
     "paths": {
       "@/*": ["./src/*"],
       "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "exclude": ["node_modules"]
 }

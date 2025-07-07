@@ -15,4 +15,3 @@ export const getUserRole = async (uid: string): Promise<string | null> => {
   if (!snap.exists()) return null;
   return (snap.data() as any).role || null;
 };
-
