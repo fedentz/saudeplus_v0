@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Animated } from 'react-native';
+import MapView, { Marker, Polyline, AnimatedRegion } from 'react-native-maps';
 import type { LocationObjectCoords } from 'expo-location';
 import customMapStyle from '../../assets/mapStyle';
 import mapStyleDarkMode from '../../assets/mapStyleDarkMode';
@@ -15,19 +15,46 @@ type Props = {
   mapRef: React.RefObject<MapView | null>;
 };
 
-export default function ActivityMap({
-  location,
-  route,
-  mapReady,
-  setMapReady,
-  mapRef,
-}: Props) {
+export default function ActivityMap({ location, route, mapReady, setMapReady, mapRef }: Props) {
   useEffect(() => {
     console.time('MAP_LOAD');
   }, []);
 
   const { theme } = useTheme();
   const { emoji } = useEmoji();
+
+  const coordinateRef = useRef<AnimatedRegion>(
+    new AnimatedRegion({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0,
+      longitudeDelta: 0,
+    }),
+  );
+
+  useEffect(() => {
+    const { latitude, longitude } = location;
+    coordinateRef.current
+      .timing({
+        latitude,
+        longitude,
+        duration: 500,
+        useNativeDriver: false,
+      } as any) // 👈 TypeScript fix temporal
+      .start();
+
+    if (mapReady && mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude,
+          longitude,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.002,
+        },
+        500,
+      );
+    }
+  }, [location, mapReady]);
 
   const handleMapReady = () => {
     console.timeEnd('MAP_LOAD');
@@ -44,7 +71,7 @@ export default function ActivityMap({
         zoomEnabled={false}
         rotateEnabled={false}
         pitchEnabled={false}
-        followsUserLocation={true}
+        followsUserLocation
         showsUserLocation={false}
         showsBuildings={false}
         showsTraffic={false}
@@ -58,37 +85,35 @@ export default function ActivityMap({
         }}
         onMapReady={handleMapReady}
       >
-        <Marker
-          coordinate={{
-        latitude: location.latitude,
-        longitude: location.longitude,
-          }}
+        {route.length > 1 && <Polyline coordinates={route} strokeColor="#00AEEF" strokeWidth={4} />}
+        <Marker.Animated
+          coordinate={coordinateRef.current as unknown as { latitude: number; longitude: number }}
           anchor={{ x: 0.5, y: 0.5 }}
         >
           <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "transparent",
-          overflow: "hidden",
-          width: 48,
-          height: 48,
-          borderRadius: 24,
-        }}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'transparent',
+              overflow: 'hidden',
+              width: 48,
+              height: 48,
+              borderRadius: 24,
+            }}
           >
-        <Text
-          style={{
-            fontSize: 26,
-            lineHeight: 44,
-            textAlign: "center",
-            width: 48,
-            height: 48,
-          }}
-        >
-          {emoji}
-        </Text>
+            <Text
+              style={{
+                fontSize: 26,
+                lineHeight: 44,
+                textAlign: 'center',
+                width: 48,
+                height: 48,
+              }}
+            >
+              {emoji}
+            </Text>
           </View>
-        </Marker>
+        </Marker.Animated>
       </MapView>
       {/* Placeholder to avoid Google logo overlap handled by footer */}
     </View>

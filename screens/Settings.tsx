@@ -1,9 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, SafeAreaView, Platform } from 'react-native';
-import { useTheme } from '../context/ThemeContext';
-import { useAppTheme } from '../hooks/useAppTheme';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  TouchableOpacity,
+  SafeAreaView,
+  Platform,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useTheme } from '../context/ThemeContext';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 export default function Settings() {
   const navigation = useNavigation<any>();
