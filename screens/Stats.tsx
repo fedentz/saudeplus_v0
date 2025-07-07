@@ -1,12 +1,18 @@
-import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, SafeAreaView, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
-import ActivityRecord from '../components/ActivityRecord';
+import { getUserActivitiesSummary, MonthlySummary } from '../services/activityService';
+import { useUser } from '../hooks/useUser';
+import { format } from 'date-fns';
+import es from 'date-fns/locale/es';
 
 export default function Stats() {
   const navigation = useNavigation<any>();
+  const { user } = useUser();
+  const [summary, setSummary] = useState<MonthlySummary[]>([]);
+  const [loadingSummary, setLoadingSummary] = useState(true);
   const theme = useAppTheme();
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.background, paddingTop: 40 },
@@ -22,7 +28,41 @@ export default function Stats() {
       fontSize: 16,
       fontWeight: 'bold',
     },
+    item: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 16,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.gray,
+    },
+    itemMonth: { color: theme.colors.text, fontWeight: 'bold' },
+    itemKm: { color: theme.colors.primary },
   });
+  useEffect(() => {
+    const load = async () => {
+      if (!user) return;
+      try {
+        const data = await getUserActivitiesSummary(user.uid);
+        setSummary(data);
+      } finally {
+        setLoadingSummary(false);
+      }
+    };
+    load();
+  }, [user]);
+
+  const renderItem = ({ item }: { item: MonthlySummary }) => {
+    const [m, y] = item.month.split('/');
+    const date = new Date(Number(y), Number(m) - 1, 1);
+    const label = format(date, 'MMMM yyyy', { locale: es });
+    return (
+      <View style={styles.item}>
+        <Text style={styles.itemMonth}>{label}</Text>
+        <Text style={styles.itemKm}>{item.totalDistance.toFixed(2)} km</Text>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -32,7 +72,18 @@ export default function Stats() {
         <Text style={styles.title}>Registro de Atividades</Text>
         <View style={{ width: 24 }} />
       </View>
-      <ActivityRecord />
+      {loadingSummary ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={summary}
+          keyExtractor={(item) => item.month}
+          renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: 40 }}
+        />
+      )}
     </SafeAreaView>
   );
 }
