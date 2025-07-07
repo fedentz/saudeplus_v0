@@ -1,6 +1,10 @@
-import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Animated } from 'react-native';
+import MapView, {
+  Marker,
+  Polyline,
+  AnimatedRegion,
+} from 'react-native-maps';
 import type { LocationObjectCoords } from 'expo-location';
 import customMapStyle from '../../assets/mapStyle';
 import mapStyleDarkMode from '../../assets/mapStyleDarkMode';
@@ -28,6 +32,34 @@ export default function ActivityMap({
 
   const { theme } = useTheme();
   const { emoji } = useEmoji();
+
+  const coordinateRef = useRef(
+    new AnimatedRegion({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0,
+      longitudeDelta: 0,
+    })
+  );
+
+  useEffect(() => {
+    const { latitude, longitude } = location;
+    coordinateRef.current
+      .timing({ latitude, longitude, useNativeDriver: false, duration: 500 })
+      .start();
+
+    if (mapReady && mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude,
+          longitude,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.002,
+        },
+        500
+      );
+    }
+  }, [location, mapReady]);
 
   const handleMapReady = () => {
     console.timeEnd('MAP_LOAD');
@@ -58,11 +90,15 @@ export default function ActivityMap({
         }}
         onMapReady={handleMapReady}
       >
-        <Marker
-          coordinate={{
-        latitude: location.latitude,
-        longitude: location.longitude,
-          }}
+        {route.length > 1 && (
+          <Polyline
+            coordinates={route}
+            strokeColor="#00AEEF"
+            strokeWidth={4}
+          />
+        )}
+        <Marker.Animated
+          coordinate={coordinateRef.current}
           anchor={{ x: 0.5, y: 0.5 }}
         >
           <View
@@ -88,7 +124,7 @@ export default function ActivityMap({
           {emoji}
         </Text>
           </View>
-        </Marker>
+        </Marker.Animated>
       </MapView>
       {/* Placeholder to avoid Google logo overlap handled by footer */}
     </View>
