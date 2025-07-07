@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { getUserActivitiesSummary, MonthlySummary } from '../services/activityService';
+import ProgressDisplay from '../components/home/ProgressDisplay';
 import { useUser } from '../hooks/useUser';
 import { format } from 'date-fns';
 import es from 'date-fns/locale/es';
@@ -14,6 +15,10 @@ export default function Stats() {
   const [summary, setSummary] = useState<MonthlySummary[]>([]);
   const [loadingSummary, setLoadingSummary] = useState(true);
   const theme = useAppTheme();
+  const monthlyGoal = 30;
+  const currentMonthKey = format(new Date(), 'MM/yyyy');
+  const current = summary.find((s) => s.month === currentMonthKey);
+  const currentKm = current ? current.totalDistance : 0;
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.background, paddingTop: 40 },
     header: {
@@ -37,6 +42,8 @@ export default function Stats() {
     },
     itemMonth: { color: theme.colors.text, fontWeight: 'bold' },
     itemKm: { color: theme.colors.primary },
+    itemInfo: { color: theme.colors.text, fontSize: 12 },
+    progressWrapper: { paddingHorizontal: 16, marginBottom: 20 },
   });
   useEffect(() => {
     const load = async () => {
@@ -57,8 +64,14 @@ export default function Stats() {
     const label = format(date, 'MMMM yyyy', { locale: es });
     return (
       <View style={styles.item}>
-        <Text style={styles.itemMonth}>{label}</Text>
-        <Text style={styles.itemKm}>{item.totalDistance.toFixed(2)} km</Text>
+        <View>
+          <Text style={styles.itemMonth}>{label}</Text>
+          <Text style={styles.itemInfo}>{item.totalActivities} actividades</Text>
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={styles.itemKm}>{item.totalDistance.toFixed(2)} km</Text>
+          <Text style={styles.itemInfo}>{Math.round(item.totalTime / 60)} min</Text>
+        </View>
       </View>
     );
   };
@@ -77,12 +90,17 @@ export default function Stats() {
           <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : (
-        <FlatList
-          data={summary}
-          keyExtractor={(item) => item.month}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 40 }}
-        />
+        <>
+          <View style={styles.progressWrapper}>
+            <ProgressDisplay distance={currentKm} goal={monthlyGoal} />
+          </View>
+          <FlatList
+            data={summary}
+            keyExtractor={(item) => item.month}
+            renderItem={renderItem}
+            contentContainerStyle={{ paddingBottom: 40 }}
+          />
+        </>
       )}
     </SafeAreaView>
   );
