@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, SafeAreaView } from 'react-native';
-import { useAppTheme } from '../hooks/useAppTheme';
-import ActivityRecord from '../components/ActivityRecord';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useAppTheme } from '../hooks/useAppTheme';
+import ActivityRecord from '../components/ActivityRecord';
 
 export default function Stats() {
   const navigation = useNavigation<any>();
@@ -15,7 +15,13 @@ export default function Stats() {
       alignItems: 'center',
       padding: 15,
     },
-    title: { flex: 1, textAlign: 'center', color: theme.colors.text, fontSize: 16, fontWeight: 'bold' },
+    title: {
+      flex: 1,
+      textAlign: 'center',
+      color: theme.colors.text,
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
   });
   return (
     <SafeAreaView style={styles.container}>

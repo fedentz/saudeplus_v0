@@ -5,17 +5,13 @@ import type { LocationObjectCoords } from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useNetworkListener from './useNetworkListener';
 
-
 export interface TrackData {
   route: LocationObjectCoords[];
   distance: number;
   time: number;
 }
 
-
-
 const CURRENT_KEY = 'TRACKING_CURRENT';
-
 
 export default function useTracking() {
   // Obtenemos el estado de red a través de nuestro hook personalizado.
@@ -42,8 +38,7 @@ export default function useTracking() {
     const lat2 = toRad(b.latitude);
     const aCalc =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.sin(dLon / 2) * Math.sin(dLon / 2) *
-        Math.cos(lat1) * Math.cos(lat2);
+      Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
     const c = 2 * Math.atan2(Math.sqrt(aCalc), Math.sqrt(1 - aCalc));
     return R * c;
   };
@@ -100,18 +95,18 @@ export default function useTracking() {
         distanceInterval: 5,
         timeInterval: 1000,
       },
-      async loc => {
-        const coords = loc.coords;
+      async (loc) => {
+        const { coords } = loc;
         if (coords.accuracy && coords.accuracy > 25) return;
         resetGpsTimer();
         setGpsLost(false);
         setLocation(coords);
-        setRoute(prev => {
+        setRoute((prev) => {
           if (prev.length > 0) {
             const last = prev[prev.length - 1];
             const dist = getDistance(last, coords);
             if (dist < 0.03) return prev;
-            setTotalDistance(d => d + dist);
+            setTotalDistance((d) => d + dist);
             const newRoute = [...prev, coords];
             persistCurrent({ route: newRoute });
             return newRoute;
@@ -158,13 +153,15 @@ export default function useTracking() {
   };
 
   const formatElapsedTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const mins = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, '0');
     const secs = (seconds % 60).toString().padStart(2, '0');
     return `${mins}:${secs}`;
   };
 
   useEffect(() => {
-    const sub = AppState.addEventListener('change', state => {
+    const sub = AppState.addEventListener('change', (state) => {
       if (state === 'active' && startTimeRef.current) {
         setElapsedTime(Math.floor((Date.now() - startTimeRef.current) / 1000));
       }

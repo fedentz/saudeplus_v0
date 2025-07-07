@@ -16,13 +16,13 @@ import {
 import MapView from 'react-native-maps';
 import NetInfo from '@react-native-community/netinfo';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { logEvent } from '../utils/logger';
 import { useTheme } from '../context/ThemeContext';
 
 import useTracking from '../hooks/useTracking';
 
 import { usePendingActivities } from '../context/PendingActivitiesContext';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import ActivityMap from '../components/activity/activityMap';
 import ActivityOverlay from '../components/activity/activityOverlay';
@@ -37,7 +37,7 @@ export default function Activity() {
     startTracking,
     stopTracking,
     formatElapsedTime,
-    startTime, 
+    startTime,
   } = useTracking();
 
   const mapRef = useRef<MapView>(null);
@@ -68,58 +68,54 @@ export default function Activity() {
     navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
   };
 
-const handleEndActivity = async () => {
-  if (activityEnded) return;
+  const handleEndActivity = async () => {
+    if (activityEnded) return;
 
-  setActivityEnded(true);
-  await stopTracking();
+    setActivityEnded(true);
+    await stopTracking();
 
-  const summary = `🟢 Actividad completada\n\n📏 Distancia: ${totalDistance.toFixed(2)} km\n⏱️ Duración: ${formatElapsedTime(elapsedTime)}`;
-  setActivitySummary(summary);
-  setSummaryVisible(true);
- 
-  if (!startTime) {
-    logEvent('ACTIVITY', 'No se puede guardar actividad: startTime es null');
-    return;
-  }
-  const end = new Date();
-  const net = await NetInfo.fetch();
-  const connection =
-    net.isConnected && net.isInternetReachable !== false
-      ? net.type || 'unknown'
-      : 'offline';
+    const summary = `🟢 Actividad completada\n\n📏 Distancia: ${totalDistance.toFixed(2)} km\n⏱️ Duración: ${formatElapsedTime(elapsedTime)}`;
+    setActivitySummary(summary);
+    setSummaryVisible(true);
 
-  add({
-    route,
-    distance: totalDistance,
-    duration: elapsedTime,
-    date: end.toISOString(),
-    conexion_al_guardar: connection,
-  });
+    if (!startTime) {
+      logEvent('ACTIVITY', 'No se puede guardar actividad: startTime es null');
+      return;
+    }
+    const end = new Date();
+    const net = await NetInfo.fetch();
+    const connection =
+      net.isConnected && net.isInternetReachable !== false ? net.type || 'unknown' : 'offline';
 
-  if (connection !== 'offline') {
-    await sync();
-  }
+    add({
+      route,
+      distance: totalDistance,
+      duration: elapsedTime,
+      date: end.toISOString(),
+      conexion_al_guardar: connection,
+    });
 
-  Vibration.vibrate(500);
-}; 
+    if (connection !== 'offline') {
+      await sync();
+    }
 
-const handleExit = () => {
-  setExitModalVisible(true);
-};
+    Vibration.vibrate(500);
+  };
 
-useFocusEffect(
-  useCallback(() => {
-    const onBack = () => {
-      handleExit();
-      return true;
-    };
-    const subscription = BackHandler.addEventListener('hardwareBackPress', onBack);
-    return () => subscription.remove();
-  }, [activityEnded, elapsedTime])
-);
+  const handleExit = () => {
+    setExitModalVisible(true);
+  };
 
-
+  useFocusEffect(
+    useCallback(() => {
+      const onBack = () => {
+        handleExit();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBack);
+      return () => subscription.remove();
+    }, [activityEnded, elapsedTime]),
+  );
 
   useEffect(() => {
     let prev = true;
@@ -152,7 +148,7 @@ useFocusEffect(
       Alert.alert(
         'Atividade finalizada',
         'Detectamos que você está em um veículo. A atividade foi encerrada automaticamente.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
       stopActivityWithoutSaving();
     }
@@ -175,7 +171,6 @@ useFocusEffect(
   }, []);
 
   if (!locationReady) {
-
     return (
       <View
         style={{
@@ -186,9 +181,7 @@ useFocusEffect(
         }}
       >
         <ActivityIndicator size="large" color="#00AEEF" />
-        <Text
-          style={{ marginTop: 10, color: theme === 'dark' ? '#eee' : '#333' }}
-        >
+        <Text style={{ marginTop: 10, color: theme === 'dark' ? '#eee' : '#333' }}>
           Carregando mapa...
         </Text>
       </View>
@@ -196,9 +189,7 @@ useFocusEffect(
   }
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme === 'dark' ? '#000' : '#fff' }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme === 'dark' ? '#000' : '#fff' }}>
       <StatusBar
         barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor="transparent"
@@ -213,11 +204,7 @@ useFocusEffect(
           zIndex: 10,
         }}
       >
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color={theme === 'dark' ? '#fff' : '#000'}
-        />
+        <Ionicons name="arrow-back" size={24} color={theme === 'dark' ? '#fff' : '#000'} />
       </TouchableOpacity>
 
       {!mapReady && (
@@ -309,15 +296,8 @@ useFocusEffect(
               Deseja encerrar ou salvar antes de sair?
             </Text>
             <View style={{ marginTop: 24 }}>
-              <Button
-                title="Salvar e sair"
-                color="#1d3557"
-                onPress={handleSaveAndExit}
-              />
-              <Button
-                title="Cancelar"
-                onPress={() => setExitModalVisible(false)}
-              />
+              <Button title="Salvar e sair" color="#1d3557" onPress={handleSaveAndExit} />
+              <Button title="Cancelar" onPress={() => setExitModalVisible(false)} />
             </View>
           </View>
         </View>

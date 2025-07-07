@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ActivityIndicator, View } from 'react-native';
 import Splash from './screens/Splash';
 import Login from './screens/Login';
 import Register from './screens/Register';
@@ -13,7 +14,6 @@ import { EmojiProvider } from './context/EmojiContext';
 import { PendingActivityProvider } from './context/PendingActivitiesContext';
 import { useUser } from './hooks/useUser';
 import useGlobalNetwork from './hooks/useGlobalNetwork';
-import { ActivityIndicator, View } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,12 +22,13 @@ export default function App() {
   const { user, loading } = useUser();
   const initialRoute = user ? 'MainTabs' : 'Splash';
 
-  if (loading)
+  if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
       </View>
     );
+  }
 
   return (
     <ThemeProvider>
@@ -37,9 +38,9 @@ export default function App() {
             <Stack.Navigator
               initialRouteName={initialRoute}
               screenOptions={{
-              headerShown: false,
-              animation: 'fade_from_bottom',
-              gestureEnabled: true,
+                headerShown: false,
+                animation: 'fade_from_bottom',
+                gestureEnabled: true,
               }}
             >
               <Stack.Screen name="Splash" component={Splash} />

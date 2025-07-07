@@ -1,8 +1,8 @@
 // hooks/useUser.ts
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '../firebase/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth } from '../firebase/firebase';
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -13,7 +13,7 @@ export function useUser() {
       if (firebaseUser) {
         AsyncStorage.setItem(
           'user',
-          JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email })
+          JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email }),
         );
       } else {
         AsyncStorage.removeItem('user');

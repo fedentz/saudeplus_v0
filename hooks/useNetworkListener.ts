@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { logEvent } from '../utils/logger';
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
+import { logEvent } from '../utils/logger';
 
 export default function useNetworkListener() {
   const [isOffline, setIsOffline] = useState(false);
@@ -14,8 +14,7 @@ export default function useNetworkListener() {
       isInternetReachable?: boolean | null;
     }) => {
       const type = state.type ?? 'unknown';
-      const offline =
-        !state.isConnected || state.isInternetReachable === false;
+      const offline = !state.isConnected || state.isInternetReachable === false;
 
       setNetType(type);
       setIsOffline(offline);
