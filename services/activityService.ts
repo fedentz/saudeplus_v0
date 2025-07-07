@@ -32,10 +32,6 @@ export const uploadActivity = async (activity: LocalActivity) => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error('Usuario no autenticado');
-    if (activity.duration < 300) {
-      logEvent('UPLOAD', 'Actividad descartada: menos de 5 minutos');
-      return;
-    }
 
     await addDoc(collection(db, 'activities'), {
       userId: user.uid,
