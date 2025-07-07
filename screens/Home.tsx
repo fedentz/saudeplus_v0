@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, Text } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { usePendingActivities } from '../context/PendingActivitiesContext';
 import { useUser } from '../hooks/useUser';
 import { getMonthlyProgress } from '../services/walkService';
-import MonthlyProgress from '../components/MonthlyProgress';
+import HeaderInfo from '../components/home/HeaderInfo';
+import PlayButton from '../components/home/PlayButton';
+import ProgressDisplay from '../components/home/ProgressDisplay';
+import TipMessage from '../components/home/TipMessage';
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
@@ -49,18 +51,14 @@ export default function Home({ navigation }: any) {
         </View>
       )}
       <View style={styles.centerContent}>
-        <Text style={styles.title}>VAMOS COMEÇAR?</Text>
-        <TouchableOpacity style={styles.playButton} onPress={() => navigation.navigate('Activity')}>
-          <Ionicons name="play" size={60} color={theme.colors.white} style={{ marginLeft: 6 }} />
-        </TouchableOpacity>
-        <Text style={styles.subtitle}>
-          pressione o botão para iniciar uma nova atividade física
-        </Text>
+        <HeaderInfo date={new Date()} />
+        <PlayButton onPress={() => navigation.navigate('Activity')} />
         {user && (
           <View style={styles.progressWrapper}>
-            <MonthlyProgress totalKm={totalKm} goalKm={monthlyGoalKm} />
+            <ProgressDisplay distance={totalKm} goal={monthlyGoalKm} />
           </View>
         )}
+        <TipMessage text="¡Sigue moviéndote cada día!" />
       </View>
     </SafeAreaView>
   );
@@ -77,33 +75,6 @@ const createStyles = (theme: any) =>
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 24,
-    },
-    title: {
-      fontSize: 32,
-      fontWeight: 'bold',
-      color: theme.colors.primary,
-      textAlign: 'center',
-      marginBottom: 24,
-    },
-    playButton: {
-      backgroundColor: theme.colors.primary,
-      borderRadius: 100,
-      width: 120,
-      height: 120,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginVertical: 24,
-      elevation: 4,
-    },
-    playIcon: {
-      fontSize: 60,
-      color: theme.colors.white,
-    },
-    subtitle: {
-      fontSize: 16,
-      color: theme.colors.darkGray,
-      textAlign: 'center',
-      paddingHorizontal: 20,
     },
     pendingBadge: {
       position: 'absolute',
