@@ -1,14 +1,35 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { Ionicons } from '@expo/vector-icons';
+import { usePendingActivities } from '../context/PendingActivitiesContext';
 
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
+  const { sync, logPending, pendingCount } = usePendingActivities();
   const styles = createStyles(theme);
+
+  useEffect(() => {
+    const check = async () => {
+      const state = await NetInfo.fetch();
+      if (state.isConnected && state.isInternetReachable !== false) {
+        await sync();
+      }
+      logPending();
+      (global as any).forceSync = sync;
+      (global as any).logPendings = logPending;
+    };
+    check();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
+      {pendingCount > 0 && (
+        <View style={styles.pendingBadge}>
+          <Text style={styles.pendingText}>{pendingCount}</Text>
+        </View>
+      )}
       <View style={styles.centerContent}>
         <Text style={styles.title}>VAMOS COMEÇAR?</Text>
         <TouchableOpacity
@@ -68,5 +89,21 @@ const createStyles = (theme: any) =>
       color: theme.colors.darkGray,
       textAlign: 'center',
       paddingHorizontal: 20,
+    },
+    pendingBadge: {
+      position: 'absolute',
+      top: 8,
+      right: 16,
+      backgroundColor: 'red',
+      borderRadius: 12,
+      minWidth: 24,
+      height: 24,
+      paddingHorizontal: 6,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    pendingText: {
+      color: '#fff',
+      fontWeight: 'bold',
     },
   });

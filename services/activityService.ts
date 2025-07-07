@@ -1,14 +1,15 @@
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  Timestamp, 
-  query, 
-  where, 
-  orderBy, 
-  getDocs 
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  Timestamp,
+  query,
+  where,
+  orderBy,
+  getDocs
 } from 'firebase/firestore';
 
+import NetInfo from '@react-native-community/netinfo';
 import { auth } from '../firebase/firebase';
 import db from '../firebase/db';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,6 +21,7 @@ export interface LocalActivity {
   endTime: string;
   distance: number;
   duration: number;
+  conexion_al_guardar: string;
 }
 
 const PENDING_KEY = 'PENDING_ACTIVITIES_V2';
@@ -42,24 +44,37 @@ export const uploadActivity = async (activity: LocalActivity) => {
       endTime: Timestamp.fromDate(new Date(activity.endTime)),
       duration: activity.duration,
       distance: activity.distance,
+      date: Timestamp.fromDate(new Date(activity.startTime)),
+      conexion_al_guardar: activity.conexion_al_guardar
     });
 
     logEvent('UPLOAD', 'Actividad guardada en Firebase');
   } catch (error) {
     logEvent('UPLOAD', `Error al guardar: ${error}`);
+    throw error;
   }
 };
 
-export const saveActivityWithCache = async (activity: Omit<LocalActivity, 'id'>) => {
-  const data: LocalActivity = { ...activity, id: generateId() };
+export const saveActivityWithCache = async (
+  activity: Omit<LocalActivity, 'id' | 'conexion_al_guardar'>
+) => {
+  const netInfo = await NetInfo.fetch();
+  const conexion = netInfo.isConnected ? netInfo.type : 'none';
+  const data: LocalActivity = {
+    ...activity,
+    id: generateId(),
+    conexion_al_guardar: conexion,
+  };
   try {
     await uploadActivity(data);
   } catch (error) {
     logEvent('UPLOAD', `Error al guardar, se guarda localmente: ${error}`);
     const stored = await AsyncStorage.getItem(PENDING_KEY);
     const pending: LocalActivity[] = stored ? JSON.parse(stored) : [];
-    pending.push(data);
-    await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+    if (!pending.find(p => p.id === data.id)) {
+      pending.push(data);
+      await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+    }
   }
 };
 
@@ -142,4 +157,3 @@ export const getUserActivitiesSummary = async (userId: string): Promise<MonthlyS
     totalTime: stats.totalTime,
   }));
 };
-
