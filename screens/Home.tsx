@@ -1,13 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { usePendingActivities } from '../context/PendingActivitiesContext';
+import { useUser } from '../hooks/useUser';
+import { getMonthlyProgress } from '../services/walkService';
+import MonthlyProgress from '../components/MonthlyProgress';
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
   const { sync, logPending, pendingCount } = usePendingActivities();
+  const { user } = useUser();
+  const [totalKm, setTotalKm] = useState(0);
+  const monthlyGoalKm = 20;
   const styles = createStyles(theme);
 
   useEffect(() => {
@@ -22,6 +28,19 @@ export default function Home({ navigation }: any) {
     };
     check();
   }, []);
+
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (!user) return;
+      try {
+        const res = await getMonthlyProgress(user.uid, monthlyGoalKm);
+        setTotalKm(res.totalKm);
+      } catch {
+        // ignore errors for now
+      }
+    };
+    loadProgress();
+  }, [user]);
   return (
     <SafeAreaView style={styles.container}>
       {pendingCount > 0 && (
@@ -37,6 +56,11 @@ export default function Home({ navigation }: any) {
         <Text style={styles.subtitle}>
           pressione o botão para iniciar uma nova atividade física
         </Text>
+        {user && (
+          <View style={styles.progressWrapper}>
+            <MonthlyProgress totalKm={totalKm} goalKm={monthlyGoalKm} />
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -96,5 +120,9 @@ const createStyles = (theme: any) =>
     pendingText: {
       color: '#fff',
       fontWeight: 'bold',
+    },
+    progressWrapper: {
+      marginTop: 40,
+      alignItems: 'center',
     },
   });
