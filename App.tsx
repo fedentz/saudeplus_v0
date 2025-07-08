@@ -14,11 +14,13 @@ import { EmojiProvider } from './context/EmojiContext';
 import { PendingActivityProvider } from './context/PendingActivitiesContext';
 import { useUser } from './hooks/useUser';
 import useGlobalNetwork from './hooks/useGlobalNetwork';
+import useActivitySync from './hooks/useActivitySync';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   useGlobalNetwork();
+  useActivitySync();
   const { user, loading } = useUser();
   const initialRoute = user ? 'MainTabs' : 'Splash';
 

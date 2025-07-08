@@ -1,21 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, SafeAreaView, Text } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { usePendingActivities } from '../context/PendingActivitiesContext';
-import { useUser } from '../hooks/useUser';
-import { getMonthlyProgress } from '../services/walkService';
 import HeaderInfo from '../components/home/HeaderInfo';
 import PlayButton from '../components/home/PlayButton';
-import ProgressDisplay from '../components/home/ProgressDisplay';
-import TipMessage from '../components/home/TipMessage';
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
   const { sync, logPending, pendingCount } = usePendingActivities();
-  const { user } = useUser();
-  const [totalKm, setTotalKm] = useState(0);
-  const monthlyGoalKm = 20;
   const styles = createStyles(theme);
 
   useEffect(() => {
@@ -31,18 +24,9 @@ export default function Home({ navigation }: any) {
     check();
   }, []);
 
-  useEffect(() => {
-    const loadProgress = async () => {
-      if (!user) return;
-      try {
-        const res = await getMonthlyProgress(user.uid, monthlyGoalKm);
-        setTotalKm(res.totalKm);
-      } catch {
-        // ignore errors for now
-      }
-    };
-    loadProgress();
-  }, [user]);
+  const kmCaminados = 4.2;
+  const descuento = kmCaminados * 0.05;
+
   return (
     <SafeAreaView style={styles.container}>
       {pendingCount > 0 && (
@@ -50,19 +34,14 @@ export default function Home({ navigation }: any) {
           <Text style={styles.pendingText}>{pendingCount}</Text>
         </View>
       )}
+      <HeaderInfo date={new Date()} />
       <View style={styles.centerContent}>
-        <HeaderInfo date={new Date()} />
+        <Text style={styles.startText}>¿Vamos comenzar?</Text>
         <PlayButton onPress={() => navigation.navigate('Activity')} />
-        {user && (
-          <View style={styles.progressWrapper}>
-            <ProgressDisplay
-              distance={totalKm}
-              goal={monthlyGoalKm}
-              benefit="20 km → 10% de descuento"
-            />
-          </View>
-        )}
-        <TipMessage text="¡Sigue moviéndote cada día!" />
+        <Text style={styles.infoText}>KM caminados: {kmCaminados.toFixed(1)}</Text>
+        <Text style={styles.infoText}>
+          Descuento obtenido: R$ {descuento.toFixed(2)}
+        </Text>
       </View>
     </SafeAreaView>
   );
@@ -96,8 +75,11 @@ const createStyles = (theme: any) =>
       color: '#fff',
       fontWeight: 'bold',
     },
-    progressWrapper: {
-      marginTop: 40,
-      alignItems: 'center',
+    startText: {
+      fontSize: 20,
+      marginBottom: 16,
+      textAlign: 'center',
+      color: theme.colors.text,
     },
+    infoText: { marginTop: 8, color: theme.colors.text },
   });
