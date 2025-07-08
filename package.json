@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@react-native-community/cli": "^18.0.0",
     "@types/date-fns": "^2.5.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.10",
