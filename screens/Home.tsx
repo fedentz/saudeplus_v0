@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, Text } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { usePendingActivities } from '../context/PendingActivitiesContext';
+import React, { useEffect } from 'react';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import HeaderInfo from '../components/home/HeaderInfo';
 import PlayButton from '../components/home/PlayButton';
+import { usePendingActivities } from '../context/PendingActivitiesContext';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
@@ -24,7 +24,7 @@ export default function Home({ navigation }: any) {
     check();
   }, []);
 
-  const kmCaminados = 4.2;
+  const kmCaminados = 29.4;
   const descuento = kmCaminados * 0.05;
 
   return (
@@ -34,14 +34,20 @@ export default function Home({ navigation }: any) {
           <Text style={styles.pendingText}>{pendingCount}</Text>
         </View>
       )}
-      <HeaderInfo date={new Date()} />
+      <View style={styles.headerContainer}>
+        <HeaderInfo date={new Date()} />
+        </View>
       <View style={styles.centerContent}>
-        <Text style={styles.startText}>¿Vamos comenzar?</Text>
+        <Text style={styles.startText}>Vamos começar?</Text>
         <PlayButton onPress={() => navigation.navigate('Activity')} />
-        <Text style={styles.infoText}>KM caminados: {kmCaminados.toFixed(1)}</Text>
-        <Text style={styles.infoText}>
-          Descuento obtenido: R$ {descuento.toFixed(2)}
-        </Text>
+      </View>
+        <View style={styles.infoBox}>
+          <Text style={styles.label}>
+          KM caminados: <Text style={styles.value}>{kmCaminados.toFixed(1)}</Text>
+          </Text>
+          <Text style={styles.label}>
+          Descuento obtenido: <Text style={styles.value}>R$ {descuento.toFixed(2)}</Text>
+          </Text>
       </View>
     </SafeAreaView>
   );
@@ -53,6 +59,12 @@ const createStyles = (theme: any) =>
       flex: 1,
       backgroundColor: theme.colors.background,
     },
+    headerContainer: {
+      marginTop: 35, // Margen superior para alejar del borde
+      paddingHorizontal: 20, // Padding horizontal para centrar
+      justifyContent: 'center',
+
+    },
     centerContent: {
       flex: 1,
       justifyContent: 'center',
@@ -61,7 +73,7 @@ const createStyles = (theme: any) =>
     },
     pendingBadge: {
       position: 'absolute',
-      top: 8,
+      top: 28, // Ajustado por el nuevo margen del header
       right: 16,
       backgroundColor: 'red',
       borderRadius: 12,
@@ -76,10 +88,36 @@ const createStyles = (theme: any) =>
       fontWeight: 'bold',
     },
     startText: {
-      fontSize: 20,
+      fontSize: 40,
       marginBottom: 16,
       textAlign: 'center',
-      color: theme.colors.text,
+      color: theme.colors.primary, // mismo color que el botón
+      fontWeight: 'bold',
     },
-    infoText: { marginTop: 8, color: theme.colors.text },
+    infoText: { 
+      marginTop: 8, 
+      color: theme.colors.text 
+    },
+    infoBox: {
+  backgroundColor: '#fff',
+  borderRadius: 16,
+  padding: 16,
+  marginVertical: 12,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+},
+
+label: {
+  fontSize: 16,
+  color: '#333',
+  marginBottom: 8,
+},
+
+value: {
+  fontWeight: 'bold',
+  color: '#007AFF',
+},
   });
