@@ -46,18 +46,7 @@ const sendToFirebase = async (activity: PendingActivity): Promise<void> => {
   const userId = getAuth().currentUser?.uid;
   if (!userId) throw new Error('no-auth');
 
-  const payload = {
-    userId,
-    date: activity.date,
-    distance: activity.distance,
-    duration: activity.duration,
-    conexion: activity.conexion,
-    metodoGuardado: activity.metodoGuardado,
-    status: activity.status,
-    invalidReason: activity.invalidReason,
-    velocidadPromedio: activity.velocidadPromedio,
-    id: activity.id,
-  };
+  const payload = { ...activity, userId };
 
   console.log(`🚀 Subiendo actividad: ${activity.id} para usuario ${userId} →`, payload);
 
@@ -84,25 +73,33 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   const uploadedRef = useRef<string[]>([]);
   const pendingRef = useRef<PendingActivity[]>([]);
 
+  const isSyncingRef = useRef(false);
+
 const sync = async () => {
-  console.log('🔄 [SYNC] Iniciando sincronización de actividades...');
-
-  const state = await NetInfo.fetch();
-  const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
-
-  if (!online) {
-    console.log('🚫 [SYNC] No hay conexión, abortando sincronización');
+  if (isSyncingRef.current) {
+    console.log('⏳ [SYNC] Ya se está ejecutando una sincronización');
     return;
   }
+  isSyncingRef.current = true;
+  try {
+    console.log('🔄 [SYNC] Iniciando sincronización de actividades...');
 
-  const userId = getAuth().currentUser?.uid;
-  if (!userId) {
-    console.log('🚫 [SYNC] Usuario no autenticado, abortando sincronización');
-    return;
-  }
+    const state = await NetInfo.fetch();
+    const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
 
-  console.log(`✅ [SYNC] Conectado a internet, tipo: ${state.type}`);
-  console.log(`📦 [SYNC] Actividades pendientes: ${pendingRef.current.length}`);
+    if (!online) {
+      console.log('🚫 [SYNC] No hay conexión, abortando sincronización');
+      return;
+    }
+
+    const userId = getAuth().currentUser?.uid;
+    if (!userId) {
+      console.log('🚫 [SYNC] Usuario no autenticado, abortando sincronización');
+      return;
+    }
+
+    console.log(`✅ [SYNC] Conectado a internet, tipo: ${state.type}`);
+    console.log(`📦 [SYNC] Actividades pendientes: ${pendingRef.current.length}`);
 
   const remaining: PendingActivity[] = [];
 
@@ -133,6 +130,9 @@ const sync = async () => {
   await AsyncStorage.setItem(keyRef.current, JSON.stringify(remaining)).catch(() => undefined);
 
   console.log('✅ [SYNC] Sincronización finalizada');
+  } finally {
+    isSyncingRef.current = false;
+  }
 };
 
 
