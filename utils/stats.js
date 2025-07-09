@@ -16,4 +16,20 @@ function groupByMonth(activities) {
   }));
 }
 
-module.exports = { groupByMonth };
+function calculateAverageSpeed(distanceKm, durationSec) {
+  if (!durationSec) return 0;
+  return Number(((distanceKm / (durationSec / 3600)).toFixed(2)));
+}
+
+function evaluateActivityStatus(distanceKm, durationSec) {
+  const velocidadPromedio = calculateAverageSpeed(distanceKm, durationSec);
+  if (velocidadPromedio > 20) {
+    return { status: 'invalida', invalidReason: 'vehiculo', velocidadPromedio };
+  }
+  if (durationSec < 300) {
+    return { status: 'invalida', invalidReason: 'no_es_usuario', velocidadPromedio };
+  }
+  return { status: 'valida', velocidadPromedio };
+}
+
+module.exports = { groupByMonth, calculateAverageSpeed, evaluateActivityStatus };
