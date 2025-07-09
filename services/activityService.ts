@@ -1,5 +1,4 @@
 import {
-  getFirestore,
   collection,
   addDoc,
   Timestamp,
@@ -14,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../firebase/firebase';
 import db from '../firebase/db';
 import { logEvent } from '../utils/logger';
+import { evaluateActivityStatus } from '../utils/stats';
 
 export interface LocalActivity {
   id: string;
@@ -21,7 +21,11 @@ export interface LocalActivity {
   endTime: string;
   distance: number;
   duration: number;
-  conexion_al_guardar: string;
+  conexion: 'wifi' | 'datos_moviles' | 'offline';
+  metodoGuardado: 'online' | 'offline_post_sync';
+  status: 'pendiente' | 'valida' | 'invalida';
+  invalidReason?: 'vehiculo' | 'no_es_usuario';
+  velocidadPromedio: number;
 }
 
 const PENDING_KEY = 'PENDING_ACTIVITIES_V2';
@@ -40,7 +44,11 @@ export const uploadActivity = async (activity: LocalActivity) => {
       duration: activity.duration,
       distance: activity.distance,
       date: Timestamp.fromDate(new Date(activity.startTime)),
-      conexion_al_guardar: activity.conexion_al_guardar,
+      conexion: activity.conexion,
+      metodoGuardado: activity.metodoGuardado,
+      status: activity.status,
+      invalidReason: activity.invalidReason,
+      velocidadPromedio: activity.velocidadPromedio,
     });
 
     logEvent('UPLOAD', 'Actividad guardada en Firebase');
@@ -51,15 +59,20 @@ export const uploadActivity = async (activity: LocalActivity) => {
 };
 
 export const saveActivityWithCache = async (
-  activity: Omit<LocalActivity, 'id' | 'conexion_al_guardar'>,
+  activity: Omit<LocalActivity, 'id' | 'conexion' | 'metodoGuardado' | 'status' | 'invalidReason' | 'velocidadPromedio'>,
 ) => {
   const netInfo = await NetInfo.fetch();
   const online = Boolean(netInfo.isConnected) && netInfo.isInternetReachable !== false;
-  const conexion = online ? netInfo.type : 'offline';
+  const conexion = online ? (netInfo.type === 'wifi' ? 'wifi' : 'datos_moviles') : 'offline';
+  const evalRes = evaluateActivityStatus(activity.distance, activity.duration);
   const data: LocalActivity = {
     ...activity,
     id: generateId(),
-    conexion_al_guardar: conexion,
+    conexion,
+    metodoGuardado: online ? 'online' : 'offline_post_sync',
+    status: evalRes.status,
+    invalidReason: evalRes.invalidReason,
+    velocidadPromedio: evalRes.velocidadPromedio,
   };
   if (online) {
     try {
