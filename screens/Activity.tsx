@@ -74,9 +74,7 @@ export default function Activity() {
     setActivityEnded(true);
     await stopTracking();
 
-    const summary = `🟢 Actividad completada\n\n📏 Distancia: ${totalDistance.toFixed(2)} km\n⏱️ Duración: ${formatElapsedTime(elapsedTime)}`;
-    setActivitySummary(summary);
-    setSummaryVisible(true);
+    let summary = `🟢 Actividad completada\n\n📏 Distancia: ${totalDistance.toFixed(2)} km\n⏱️ Duración: ${formatElapsedTime(elapsedTime)}`;
 
     if (!startTime) {
       logEvent('ACTIVITY', 'No se puede guardar actividad: startTime es null');
@@ -97,8 +95,13 @@ export default function Activity() {
 
     if (connection !== 'offline') {
       await sync();
+      summary += '\n\n✅ Actividad guardada y sincronizada.';
+    } else {
+      summary += '\n\n✅ Actividad guardada. Se subirá cuando tengas conexión.';
     }
 
+    setActivitySummary(summary);
+    setSummaryVisible(true);
     Vibration.vibrate(500);
   };
 

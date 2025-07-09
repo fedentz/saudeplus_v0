@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { Modal, View, Text, Button } from 'react-native';
+
 import NetInfo from '@react-native-community/netinfo';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import type { LocationObjectCoords } from 'expo-location';
@@ -23,9 +23,6 @@ interface PendingCtx {
   sync(): Promise<void>;
   logPending(): void;
   pendingCount: number;
-  askSync: boolean;
-  confirmSync(): void;
-  dismissSync(): void;
 }
 
 const PendingActivityContext = createContext<PendingCtx | undefined>(undefined);
@@ -61,7 +58,6 @@ const sendToFirebase = async (activity: PendingActivity): Promise<void> => {
 
 export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pending, setPending] = useState<PendingActivity[]>([]);
-  const [askSync, setAskSync] = useState(false);
   const wasOffline = useRef(false);
 
   const keyRef = useRef('');
@@ -117,13 +113,13 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
       const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
-      if (online && wasOffline.current && pending.length > 0 && !askSync) {
-        setAskSync(true);
+      if (online && wasOffline.current && pending.length > 0) {
+        sync().catch(() => undefined);
       }
       wasOffline.current = !online;
     });
     return () => unsubscribe();
-  }, [pending, askSync]);
+  }, [pending]);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(getAuth(), async (user) => {
@@ -157,13 +153,6 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
     return () => unsub();
   }, []);
 
-  const confirmSync = async () => {
-    setAskSync(false);
-    await sync();
-  };
-
-  const dismissSync = () => setAskSync(false);
-
   return (
     <PendingActivityContext.Provider
       value={{
@@ -172,41 +161,9 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
         sync,
         logPending,
         pendingCount: pending.length,
-        askSync,
-        confirmSync,
-        dismissSync,
       }}
     >
       {children}
-      <Modal transparent visible={askSync} animationType="fade" onRequestClose={dismissSync}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: '#fff',
-              padding: 24,
-              borderRadius: 12,
-              width: '80%',
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ fontSize: 16, marginBottom: 16, textAlign: 'center' }}>
-              Quedaron actividades pendientes de guardar, ¿desea guardarlas?
-            </Text>
-            <View style={{ flexDirection: 'row' }}>
-              <Button title="Sí" onPress={confirmSync} />
-              <View style={{ width: 16 }} />
-              <Button title="No" onPress={dismissSync} />
-            </View>
-          </View>
-        </View>
-      </Modal>
     </PendingActivityContext.Provider>
   );
 };
