@@ -17,6 +17,7 @@ export interface PendingActivity {
   status: 'pendiente' | 'valida' | 'invalida';
   invalidReason?: 'vehiculo' | 'no_es_usuario';
   velocidadPromedio: number;
+  aceleracionPromedio: number;
 }
 
 export type PendingActivityInput = Omit<PendingActivity, 'id'>;
@@ -46,9 +47,35 @@ const sendToFirebase = async (activity: PendingActivity): Promise<void> => {
   const userId = getAuth().currentUser?.uid;
   if (!userId) throw new Error('no-auth');
 
-  const payload = { ...activity, userId };
+  // Solo enviar los campos requeridos, excluyendo `route`
+  const {
+    id,
+    date,
+    distance,
+    duration,
+    status,
+    invalidReason,
+    metodoGuardado,
+    velocidadPromedio,
+    conexion,
+    aceleracionPromedio,
+  } = activity;
 
-  console.log(`🚀 Subiendo actividad: ${activity.id} para usuario ${userId} →`, payload);
+  const payload = {
+    id,
+    userId,
+    date,
+    distance,
+    duration,
+    status,
+    invalidReason,
+    metodoGuardado,
+    velocidadPromedio,
+    conexion,
+    aceleracionPromedio,
+  };
+
+  console.log(`🚀 Subiendo actividad: ${id} para usuario ${userId} →`, payload);
 
   const response = await fetch(
     'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',
@@ -72,7 +99,6 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   const uploadedKeyRef = useRef('');
   const uploadedRef = useRef<string[]>([]);
   const pendingRef = useRef<PendingActivity[]>([]);
-
   const isSyncingRef = useRef(false);
 
 const sync = async () => {
