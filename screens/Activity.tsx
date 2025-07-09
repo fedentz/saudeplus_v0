@@ -106,6 +106,7 @@ export default function Activity() {
       status,
       invalidReason,
       velocidadPromedio,
+      aceleracionPromedio: 0,
     });
 
     if (conexion !== 'offline') {
