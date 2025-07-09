@@ -9,6 +9,7 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let unsub: () => void;
     const loadStored = async () => {
       try {
         const stored = await AsyncStorage.getItem('user');
@@ -18,14 +19,12 @@ export function useUser() {
         }
       } catch {
         // ignore parse errors
-      } finally {
-        setLoading(false);
       }
     };
 
     loadStored();
 
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    unsub = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         AsyncStorage.setItem(
           'user',
@@ -35,9 +34,12 @@ export function useUser() {
         AsyncStorage.removeItem('user');
       }
       setUser(firebaseUser);
+      setLoading(false);
     });
 
-    return () => unsubscribe(); // Limpia el listener
+    return () => {
+      if (unsub) unsub();
+    };
   }, []);
 
   return { user, loading };
