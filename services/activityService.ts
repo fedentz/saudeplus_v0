@@ -37,7 +37,7 @@ export const uploadActivity = async (activity: LocalActivity) => {
     const user = auth.currentUser;
     if (!user) throw new Error('Usuario no autenticado');
 
-    await addDoc(collection(db, 'activities'), {
+    const payload = {
       userId: user.uid,
       startTime: Timestamp.fromDate(new Date(activity.startTime)),
       endTime: Timestamp.fromDate(new Date(activity.endTime)),
@@ -49,7 +49,14 @@ export const uploadActivity = async (activity: LocalActivity) => {
       status: activity.status,
       invalidReason: activity.invalidReason,
       velocidadPromedio: activity.velocidadPromedio,
-    });
+
+    };
+    console.log(
+      `\uD83D\uDE80 Subiendo actividad: ${activity.id} para usuario ${user.uid} \u2192`,
+      payload,
+    );
+    await addDoc(collection(db, 'activities'), payload);
+
 
     logEvent('UPLOAD', 'Actividad guardada en Firebase');
   } catch (error) {
