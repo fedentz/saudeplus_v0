@@ -72,6 +72,7 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   const uploadedKeyRef = useRef('');
   const uploadedRef = useRef<string[]>([]);
   const pendingRef = useRef<PendingActivity[]>([]);
+
   const isSyncingRef = useRef(false);
 
 const sync = async () => {
