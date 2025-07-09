@@ -5,13 +5,13 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppTheme } from '../hooks/useAppTheme';
-import { useUser } from '../hooks/useUser';
+import useAuthUser from '../hooks/useAuthUser';
 import { useEmoji } from '../context/EmojiContext';
 import { auth } from '../firebase/firebase';
 
 export default function Profile() {
   const navigation = useNavigation<any>();
-  const { user } = useUser();
+  const { user: authUser, initializing } = useAuthUser();
   const { emoji, setEmoji } = useEmoji();
   const theme = useAppTheme();
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -96,7 +96,11 @@ export default function Profile() {
         <View style={styles.avatar}>
           <Text style={styles.emojiAvatar}>{emoji}</Text>
         </View>
-        <Text style={styles.email}>{user?.email}</Text>
+        {initializing ? (
+          <Text style={styles.email}>Cargando usuario...</Text>
+        ) : (
+          <Text style={styles.email}>{authUser?.email}</Text>
+        )}
 
         <TouchableOpacity
           style={[

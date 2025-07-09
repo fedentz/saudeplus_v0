@@ -1,21 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, SafeAreaView, Text } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { usePendingActivities } from '../context/PendingActivitiesContext';
-import { useUser } from '../hooks/useUser';
-import { getMonthlyProgress } from '../services/walkService';
+import React, { useEffect } from 'react';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import HeaderInfo from '../components/home/HeaderInfo';
 import PlayButton from '../components/home/PlayButton';
-import ProgressDisplay from '../components/home/ProgressDisplay';
-import TipMessage from '../components/home/TipMessage';
+import { usePendingActivities } from '../context/PendingActivitiesContext';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
   const { sync, logPending, pendingCount } = usePendingActivities();
-  const { user } = useUser();
-  const [totalKm, setTotalKm] = useState(0);
-  const monthlyGoalKm = 20;
   const styles = createStyles(theme);
 
   useEffect(() => {
@@ -31,18 +24,9 @@ export default function Home({ navigation }: any) {
     check();
   }, []);
 
-  useEffect(() => {
-    const loadProgress = async () => {
-      if (!user) return;
-      try {
-        const res = await getMonthlyProgress(user.uid, monthlyGoalKm);
-        setTotalKm(res.totalKm);
-      } catch {
-        // ignore errors for now
-      }
-    };
-    loadProgress();
-  }, [user]);
+  const kmCaminados = 29.4;
+  const descuento = kmCaminados * 0.05;
+
   return (
     <SafeAreaView style={styles.container}>
       {pendingCount > 0 && (
@@ -50,15 +34,20 @@ export default function Home({ navigation }: any) {
           <Text style={styles.pendingText}>{pendingCount}</Text>
         </View>
       )}
-      <View style={styles.centerContent}>
+      <View style={styles.headerContainer}>
         <HeaderInfo date={new Date()} />
+        </View>
+      <View style={styles.centerContent}>
+        <Text style={styles.startText}>Vamos começar?</Text>
         <PlayButton onPress={() => navigation.navigate('Activity')} />
-        {user && (
-          <View style={styles.progressWrapper}>
-            <ProgressDisplay distance={totalKm} goal={monthlyGoalKm} />
-          </View>
-        )}
-        <TipMessage text="¡Sigue moviéndote cada día!" />
+      </View>
+        <View style={styles.infoBox}>
+          <Text style={styles.label}>
+          KM caminados: <Text style={styles.value}>{kmCaminados.toFixed(1)}</Text>
+          </Text>
+          <Text style={styles.label}>
+          Descuento obtenido: <Text style={styles.value}>R$ {descuento.toFixed(2)}</Text>
+          </Text>
       </View>
     </SafeAreaView>
   );
@@ -70,6 +59,12 @@ const createStyles = (theme: any) =>
       flex: 1,
       backgroundColor: theme.colors.background,
     },
+    headerContainer: {
+      marginTop: 35, // Margen superior para alejar del borde
+      paddingHorizontal: 20, // Padding horizontal para centrar
+      justifyContent: 'center',
+
+    },
     centerContent: {
       flex: 1,
       justifyContent: 'center',
@@ -78,7 +73,7 @@ const createStyles = (theme: any) =>
     },
     pendingBadge: {
       position: 'absolute',
-      top: 8,
+      top: 28, // Ajustado por el nuevo margen del header
       right: 16,
       backgroundColor: 'red',
       borderRadius: 12,
@@ -92,8 +87,37 @@ const createStyles = (theme: any) =>
       color: '#fff',
       fontWeight: 'bold',
     },
-    progressWrapper: {
-      marginTop: 40,
-      alignItems: 'center',
+    startText: {
+      fontSize: 40,
+      marginBottom: 16,
+      textAlign: 'center',
+      color: theme.colors.primary, // mismo color que el botón
+      fontWeight: 'bold',
     },
+    infoText: { 
+      marginTop: 8, 
+      color: theme.colors.text 
+    },
+    infoBox: {
+  backgroundColor: '#fff',
+  borderRadius: 16,
+  padding: 16,
+  marginVertical: 12,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+},
+
+label: {
+  fontSize: 16,
+  color: '#333',
+  marginBottom: 8,
+},
+
+value: {
+  fontWeight: 'bold',
+  color: '#007AFF',
+},
   });

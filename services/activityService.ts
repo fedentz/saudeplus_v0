@@ -32,10 +32,6 @@ export const uploadActivity = async (activity: LocalActivity) => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error('Usuario no autenticado');
-    if (activity.duration < 300) {
-      logEvent('UPLOAD', 'Actividad descartada: menos de 5 minutos');
-      return;
-    }
 
     await addDoc(collection(db, 'activities'), {
       userId: user.uid,
@@ -58,23 +54,25 @@ export const saveActivityWithCache = async (
   activity: Omit<LocalActivity, 'id' | 'conexion_al_guardar'>,
 ) => {
   const netInfo = await NetInfo.fetch();
-  const conexion = netInfo.isConnected ? netInfo.type : 'none';
+  const online = Boolean(netInfo.isConnected) && netInfo.isInternetReachable !== false;
+  const conexion = online ? netInfo.type : 'offline';
   const data: LocalActivity = {
     ...activity,
     id: generateId(),
     conexion_al_guardar: conexion,
   };
-  try {
-    await uploadActivity(data);
-  } catch (error) {
-    logEvent('UPLOAD', `Error al guardar, se guarda localmente: ${error}`);
-    const stored = await AsyncStorage.getItem(PENDING_KEY);
-    const pending: LocalActivity[] = stored ? JSON.parse(stored) : [];
-    if (!pending.find((p) => p.id === data.id)) {
-      pending.push(data);
-      await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+  if (online) {
+    try {
+      await uploadActivity(data);
+      return;
+    } catch (error) {
+      logEvent('UPLOAD', `Error al guardar online: ${error}`);
     }
   }
+  const stored = await AsyncStorage.getItem(PENDING_KEY);
+  const pending: LocalActivity[] = stored ? JSON.parse(stored) : [];
+  pending.push(data);
+  await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(pending));
 };
 
 export const syncPendingActivities = async () => {
@@ -104,6 +102,21 @@ export const syncPendingActivities = async () => {
     await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
     console.log(`\uD83E\uDEA5 [SYNC] Quedaron ${remaining.length} pendientes`);
   }
+};
+
+let listenerAdded = false;
+export const setupActivitySync = async () => {
+  if (listenerAdded) return;
+  listenerAdded = true;
+  const state = await NetInfo.fetch();
+  if (state.isConnected && state.isInternetReachable !== false) {
+    syncPendingActivities().catch(() => undefined);
+  }
+  NetInfo.addEventListener((info) => {
+    if (info.isConnected && info.isInternetReachable !== false) {
+      syncPendingActivities().catch(() => undefined);
+    }
+  });
 };
 
 export const getActivitiesByUser = async (userId: string) => {
