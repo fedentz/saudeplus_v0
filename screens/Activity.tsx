@@ -19,6 +19,7 @@ import {
 import MapView from 'react-native-maps';
 import { useTheme } from '../context/ThemeContext';
 import { logEvent } from '../utils/logger';
+import { evaluateActivityStatus } from '../utils/stats';
 
 import useTracking from '../hooks/useTracking';
 
@@ -84,18 +85,30 @@ export default function Activity() {
     }
     const end = new Date();
     const net = await NetInfo.fetch();
-    const connection =
+    const rawConnection =
       net.isConnected && net.isInternetReachable !== false ? net.type || 'unknown' : 'offline';
+
+    const conexion = rawConnection === 'wifi' ? 'wifi' : rawConnection === 'cellular' ? 'datos_moviles' : 'offline';
+    const metodoGuardado = conexion === 'offline' ? 'offline_post_sync' : 'online';
+
+    const { status, invalidReason, velocidadPromedio } = evaluateActivityStatus(
+      totalDistance,
+      elapsedTime,
+    );
 
     add({
       route,
       distance: totalDistance,
       duration: elapsedTime,
       date: end.toISOString(),
-      conexion_al_guardar: connection,
+      conexion,
+      metodoGuardado,
+      status,
+      invalidReason,
+      velocidadPromedio,
     });
 
-    if (connection !== 'offline') {
+    if (conexion !== 'offline') {
       await sync();
     }
 
