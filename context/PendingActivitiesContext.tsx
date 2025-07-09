@@ -45,27 +45,34 @@ const generateId = () => `${Date.now()}_${Math.random().toString(36).slice(2, 8)
 const sendToFirebase = async (activity: PendingActivity): Promise<void> => {
   const userId = getAuth().currentUser?.uid;
   if (!userId) throw new Error('no-auth');
+
+  const payload = {
+    userId,
+    date: activity.date,
+    distance: activity.distance,
+    duration: activity.duration,
+    conexion: activity.conexion,
+    metodoGuardado: activity.metodoGuardado,
+    status: activity.status,
+    invalidReason: activity.invalidReason,
+    velocidadPromedio: activity.velocidadPromedio,
+    id: activity.id,
+  };
+
+  console.log(`🚀 Subiendo actividad: ${activity.id} para usuario ${userId} →`, payload);
+
   const response = await fetch(
     'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId,
-        date: activity.date,
-        distance: activity.distance,
-        duration: activity.duration,
-        conexion: activity.conexion,
-        metodoGuardado: activity.metodoGuardado,
-        status: activity.status,
-        invalidReason: activity.invalidReason,
-        velocidadPromedio: activity.velocidadPromedio,
-        id: activity.id,
-      }),
+      body: JSON.stringify(payload),
     },
   );
+
   if (!response.ok) throw new Error(`http-${response.status}`);
 };
+
 
 export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pending, setPending] = useState<PendingActivity[]>([]);
@@ -76,41 +83,87 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   const uploadedKeyRef = useRef('');
   const uploadedRef = useRef<string[]>([]);
 
-  const sync = async () => {
-    const state = await NetInfo.fetch();
-    const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
-    if (!online) return;
+const sync = async () => {
+  console.log('🔄 [SYNC] Iniciando sincronización de actividades...');
 
-    const remaining: PendingActivity[] = [];
-    for (const act of pending) {
-      if (uploadedRef.current.includes(act.id)) continue;
-      try {
-        await sendToFirebase(act);
-        uploadedRef.current.push(act.id);
-        AsyncStorage.setItem(uploadedKeyRef.current, JSON.stringify(uploadedRef.current)).catch(
-          () => undefined,
-        );
-        logEvent('ACTIVITY_UPLOADED', act.id);
-      } catch {
-        logEvent('UPLOAD_FAILED', act.id);
-        remaining.push(act);
-      }
+  const state = await NetInfo.fetch();
+  const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
+
+  if (!online) {
+    console.log('🚫 [SYNC] No hay conexión, abortando sincronización');
+    return;
+  }
+
+  console.log(`✅ [SYNC] Conectado a internet, tipo: ${state.type}`);
+  console.log(`📦 [SYNC] Actividades pendientes: ${pending.length}`);
+
+  const remaining: PendingActivity[] = [];
+
+  for (const act of pending) {
+    if (uploadedRef.current.includes(act.id)) {
+      console.log(`⏩ [SYNC] Actividad ${act.id} ya fue subida, la salto`);
+      continue;
     }
-    setPending(() => {
-      AsyncStorage.setItem(keyRef.current, JSON.stringify(remaining)).catch(() => undefined);
-      return remaining;
-    });
-  };
+
+    try {
+      console.log(`🚀 [SYNC] Subiendo actividad ${act.id}...`);
+      await sendToFirebase(act);
+      console.log(`✅ [SYNC] Actividad ${act.id} subida correctamente`);
+
+      uploadedRef.current.push(act.id);
+      await AsyncStorage.setItem(uploadedKeyRef.current, JSON.stringify(uploadedRef.current));
+      logEvent('ACTIVITY_UPLOADED', act.id);
+    } catch (error) {
+      console.log(`❌ [SYNC] Falló la subida de ${act.id}:`, error);
+      logEvent('UPLOAD_FAILED', act.id);
+      remaining.push(act);
+    }
+  }
+
+  setPending(() => {
+    AsyncStorage.setItem(keyRef.current, JSON.stringify(remaining)).catch(() => undefined);
+    return remaining;
+  });
+
+  console.log('✅ [SYNC] Sincronización finalizada');
+};
+
 
   const add = (activity: PendingActivityInput) => {
-    const withId: PendingActivity = { ...activity, id: generateId() };
-    setPending((prev) => {
-      const updated = [...prev, withId];
-      AsyncStorage.setItem(keyRef.current, JSON.stringify(updated)).catch(() => undefined);
-      return updated;
-    });
-    logEvent('ACTIVITY_SAVED_LOCALLY', JSON.stringify(withId));
+  const userId = getAuth().currentUser?.uid;
+  if (!userId || !keyRef.current) {
+    console.error("🚨 [PENDING] No se puede agregar actividad: usuario no autenticado o key vacía");
+    return;
+  }
+
+  const withId: PendingActivity = {
+    ...activity,
+    id: generateId(),
   };
+
+  console.log('➕ [PENDING] Agregando actividad local:', withId);
+
+  setPending((prev) => {
+    const updated = [...prev, withId];
+    AsyncStorage.setItem(keyRef.current!, JSON.stringify(updated))
+      .then(() => console.log("💾 [PENDING] Actividad guardada en AsyncStorage"))
+      .catch((e) => console.error("❌ [PENDING] Error guardando en AsyncStorage", e));
+    return updated;
+  });
+
+  logEvent('ACTIVITY_SAVED_LOCALLY', JSON.stringify(withId));
+
+  setTimeout(async () => {
+  const stored = await AsyncStorage.getItem(keyRef.current!);
+  const parsed = stored ? JSON.parse(stored) : [];
+  console.log("🔁 [PENDING] Releyendo desde AsyncStorage:", parsed.length);
+  setPending(parsed);
+}, 500);
+
+};
+
+
+
 
   const logPending = () => {
     console.log(`\uD83D\uDC65 Pendientes: ${pending.length}`);
@@ -136,11 +189,14 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   useEffect(() => {
     const unsub = onAuthStateChanged(getAuth(), async (user) => {
       if (user) {
+        console.log('👤 [AUTH] Usuario autenticado:', user.uid);
         keyRef.current = getKey(user.uid);
         uploadedKeyRef.current = getUploadedKey(user.uid);
         try {
           const stored = await AsyncStorage.getItem(keyRef.current);
           if (stored) {
+            const parsed = JSON.parse(stored);
+            console.log('📥 [AUTH] Cargando actividades previas:', parsed.length);
             setPending(JSON.parse(stored));
           }
           const uploaded = await AsyncStorage.getItem(uploadedKeyRef.current);
@@ -156,6 +212,7 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
           // ignore parse errors
         }
       } else {
+        console.log('🚫 [AUTH] Usuario deslogueado');
         keyRef.current = '';
         uploadedKeyRef.current = '';
         setPending([]);
@@ -164,6 +221,11 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
     });
     return () => unsub();
   }, []);
+
+  useEffect(() => {
+    console.log('📥 [PENDING] Estado actualizado:', pending.length);
+  }, [pending]);
+
 
   const confirmSync = async () => {
     setAskSync(false);
