@@ -42,6 +42,7 @@ export const uploadActivity = async (activity: LocalActivity) => {
       `\uD83D\uDE80 Subiendo actividad: ${activity.id} para usuario ${user.uid} \u2192`,
       payload,
     );
+    console.log('[UPLOAD] Payload a Firebase:', payload);
     await addDoc(collection(db, 'activities'), payload);
 
 
