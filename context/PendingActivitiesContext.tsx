@@ -12,7 +12,11 @@ export interface PendingActivity {
   duration: number;
   route: LocationObjectCoords[];
   date: string;
-  conexion_al_guardar: string;
+  conexion: 'wifi' | 'datos_moviles' | 'offline';
+  metodoGuardado: 'online' | 'offline_post_sync';
+  status: 'pendiente' | 'valida' | 'invalida';
+  invalidReason?: 'vehiculo' | 'no_es_usuario';
+  velocidadPromedio: number;
 }
 
 export type PendingActivityInput = Omit<PendingActivity, 'id'>;
@@ -51,7 +55,11 @@ const sendToFirebase = async (activity: PendingActivity): Promise<void> => {
         date: activity.date,
         distance: activity.distance,
         duration: activity.duration,
-        conexion_al_guardar: activity.conexion_al_guardar,
+        conexion: activity.conexion,
+        metodoGuardado: activity.metodoGuardado,
+        status: activity.status,
+        invalidReason: activity.invalidReason,
+        velocidadPromedio: activity.velocidadPromedio,
         id: activity.id,
       }),
     },

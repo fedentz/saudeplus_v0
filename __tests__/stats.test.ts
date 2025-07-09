@@ -1,4 +1,4 @@
-const { groupByMonth } = require('../utils/stats');
+const { groupByMonth, calculateAverageSpeed, evaluateActivityStatus } = require('../utils/stats');
 
 describe('groupByMonth', () => {
   it('aggregates activities by month', () => {
@@ -22,5 +22,25 @@ describe('groupByMonth', () => {
         totalTime: 60,
       },
     ]);
+  });
+});
+
+describe('calculateAverageSpeed', () => {
+  it('computes km/h correctly', () => {
+    const speed = calculateAverageSpeed(2, 1800); // 2 km in 30 min
+    expect(speed).toBe(4);
+  });
+});
+
+describe('evaluateActivityStatus', () => {
+  it('marks activity valid if checks pass', () => {
+    const res = evaluateActivityStatus(1, 600); // 1 km in 10 min -> 6 km/h
+    expect(res).toEqual({ status: 'valida', velocidadPromedio: 6 });
+  });
+
+  it('detects vehicle usage by speed', () => {
+    const res = evaluateActivityStatus(10, 1200); // 10 km in 20 min -> 30 km/h
+    expect(res.status).toBe('invalida');
+    expect(res.invalidReason).toBe('vehiculo');
   });
 });
