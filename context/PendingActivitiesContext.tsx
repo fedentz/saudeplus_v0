@@ -76,6 +76,7 @@ const sendToFirebase = async (activity: PendingActivity): Promise<void> => {
   };
 
   console.log(`🚀 Subiendo actividad: ${id} para usuario ${userId} →`, payload);
+  console.log('[UPLOAD] Payload a Firebase:', payload);
 
   const response = await fetch(
     'https://us-central1-prueba1fedentz.cloudfunctions.net/saveActivity',

@@ -82,7 +82,11 @@ export default function Stats() {
 
 const renderActivity = ({ item }: { item: any }) => {
   try {
-    const activityDate = new Date(item.date);
+    const activityDate =
+    item.date?.seconds && typeof item.date.seconds === 'number'
+      ? new Date(item.date.seconds * 1000)
+      : new Date(item.date);
+
     const formattedDate = format(activityDate, "eeee d 'de' MMMM yyyy");
     const formattedTime = format(activityDate, 'HH:mm');
     
@@ -90,7 +94,9 @@ const renderActivity = ({ item }: { item: any }) => {
       <View style={styles.activityCard}>
         <Text style={styles.activityTitle}>{formattedDate}</Text>
         <Text style={styles.activityInfo}>Hora: {formattedTime} hs</Text>
-        <Text style={styles.activityInfo}>Duración: {item.duration} min</Text>
+        <Text style={styles.activityInfo}>
+        Duración: {Math.floor(item.duration / 60)} min {item.duration % 60} s
+        </Text>
         <Text style={styles.activityInfo}>Distancia: {item.distance?.toFixed(2) || '0'} km</Text>
       </View>
     );

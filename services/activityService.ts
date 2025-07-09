@@ -1,7 +1,6 @@
 import {
   collection,
   addDoc,
-  Timestamp,
   query,
   where,
   orderBy,
@@ -14,6 +13,7 @@ import { auth } from '../firebase/firebase';
 import db from '../firebase/db';
 import { logEvent } from '../utils/logger';
 import { evaluateActivityStatus } from '../utils/stats';
+import ActivityModel from '../models/ActivityModel';
 
 export interface LocalActivity {
   id: string;
@@ -37,24 +37,12 @@ export const uploadActivity = async (activity: LocalActivity) => {
     const user = auth.currentUser;
     if (!user) throw new Error('Usuario no autenticado');
 
-    const payload = {
-      userId: user.uid,
-      startTime: Timestamp.fromDate(new Date(activity.startTime)),
-      endTime: Timestamp.fromDate(new Date(activity.endTime)),
-      duration: activity.duration,
-      distance: activity.distance,
-      date: Timestamp.fromDate(new Date(activity.startTime)),
-      conexion: activity.conexion,
-      metodoGuardado: activity.metodoGuardado,
-      status: activity.status,
-      invalidReason: activity.invalidReason,
-      velocidadPromedio: activity.velocidadPromedio,
-
-    };
+    const payload = ActivityModel.fromLocalActivity(activity, user.uid).toFirestore();
     console.log(
       `\uD83D\uDE80 Subiendo actividad: ${activity.id} para usuario ${user.uid} \u2192`,
       payload,
     );
+    console.log('[UPLOAD] Payload a Firebase:', payload);
     await addDoc(collection(db, 'activities'), payload);
 
 
