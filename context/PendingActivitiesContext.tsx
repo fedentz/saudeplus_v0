@@ -23,7 +23,7 @@ export type PendingActivityInput = Omit<PendingActivity, 'id'>;
 
 interface PendingCtx {
   pending: PendingActivity[];
-  add(activity: PendingActivityInput): void;
+  add(activity: PendingActivityInput): Promise<void>;
   sync(): Promise<void>;
   logPending(): void;
   pendingCount: number;
@@ -82,6 +82,7 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   const keyRef = useRef('');
   const uploadedKeyRef = useRef('');
   const uploadedRef = useRef<string[]>([]);
+  const pendingRef = useRef<PendingActivity[]>([]);
 
 const sync = async () => {
   console.log('🔄 [SYNC] Iniciando sincronización de actividades...');
@@ -94,12 +95,19 @@ const sync = async () => {
     return;
   }
 
+  const userId = getAuth().currentUser?.uid;
+  if (!userId) {
+    console.log('🚫 [SYNC] Usuario no autenticado, abortando sincronización');
+    return;
+  }
+
   console.log(`✅ [SYNC] Conectado a internet, tipo: ${state.type}`);
-  console.log(`📦 [SYNC] Actividades pendientes: ${pending.length}`);
+  console.log(`📦 [SYNC] Actividades pendientes: ${pendingRef.current.length}`);
 
   const remaining: PendingActivity[] = [];
 
-  for (const act of pending) {
+  const currentPending = pendingRef.current.slice();
+  for (const act of currentPending) {
     if (uploadedRef.current.includes(act.id)) {
       console.log(`⏩ [SYNC] Actividad ${act.id} ya fue subida, la salto`);
       continue;
@@ -120,19 +128,18 @@ const sync = async () => {
     }
   }
 
-  setPending(() => {
-    AsyncStorage.setItem(keyRef.current, JSON.stringify(remaining)).catch(() => undefined);
-    return remaining;
-  });
+  pendingRef.current = remaining;
+  setPending(remaining);
+  await AsyncStorage.setItem(keyRef.current, JSON.stringify(remaining)).catch(() => undefined);
 
   console.log('✅ [SYNC] Sincronización finalizada');
 };
 
 
-  const add = (activity: PendingActivityInput) => {
+  const add = async (activity: PendingActivityInput) => {
   const userId = getAuth().currentUser?.uid;
   if (!userId || !keyRef.current) {
-    console.error("🚨 [PENDING] No se puede agregar actividad: usuario no autenticado o key vacía");
+    console.error('🚨 [PENDING] No se puede agregar actividad: usuario no autenticado o key vacía');
     return;
   }
 
@@ -143,22 +150,20 @@ const sync = async () => {
 
   console.log('➕ [PENDING] Agregando actividad local:', withId);
 
-  setPending((prev) => {
-    const updated = [...prev, withId];
-    AsyncStorage.setItem(keyRef.current!, JSON.stringify(updated))
-      .then(() => console.log("💾 [PENDING] Actividad guardada en AsyncStorage"))
-      .catch((e) => console.error("❌ [PENDING] Error guardando en AsyncStorage", e));
-    return updated;
-  });
+  const updated = [...pendingRef.current, withId];
+  pendingRef.current = updated;
+  setPending(updated);
+  await AsyncStorage.setItem(keyRef.current, JSON.stringify(updated))
+    .then(() => console.log('💾 [PENDING] Actividad guardada en AsyncStorage'))
+    .catch((e) => console.error('❌ [PENDING] Error guardando en AsyncStorage', e));
 
   logEvent('ACTIVITY_SAVED_LOCALLY', JSON.stringify(withId));
 
-  setTimeout(async () => {
-  const stored = await AsyncStorage.getItem(keyRef.current!);
-  const parsed = stored ? JSON.parse(stored) : [];
-  console.log("🔁 [PENDING] Releyendo desde AsyncStorage:", parsed.length);
-  setPending(parsed);
-}, 500);
+  const state = await NetInfo.fetch();
+  const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
+  if (online) {
+    await sync();
+  }
 
 };
 
@@ -197,7 +202,8 @@ const sync = async () => {
           if (stored) {
             const parsed = JSON.parse(stored);
             console.log('📥 [AUTH] Cargando actividades previas:', parsed.length);
-            setPending(JSON.parse(stored));
+            pendingRef.current = parsed;
+            setPending(parsed);
           }
           const uploaded = await AsyncStorage.getItem(uploadedKeyRef.current);
           if (uploaded) {
@@ -216,6 +222,7 @@ const sync = async () => {
         keyRef.current = '';
         uploadedKeyRef.current = '';
         setPending([]);
+        pendingRef.current = [];
         uploadedRef.current = [];
       }
     });
@@ -223,6 +230,7 @@ const sync = async () => {
   }, []);
 
   useEffect(() => {
+    pendingRef.current = pending;
     console.log('📥 [PENDING] Estado actualizado:', pending.length);
   }, [pending]);
 
