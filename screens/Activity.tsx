@@ -1,24 +1,24 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import NetInfo from '@react-native-community/netinfo';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Vibration,
+  ActivityIndicator,
+  Alert,
+  BackHandler,
+  Button,
+  Modal,
   Platform,
   SafeAreaView,
-  TouchableOpacity,
-  BackHandler,
-  Modal,
-  Text,
-  Button,
-  Alert,
   StatusBar,
-  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  Vibration,
+  View,
 } from 'react-native';
 import MapView from 'react-native-maps';
-import NetInfo from '@react-native-community/netinfo';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { logEvent } from '../utils/logger';
 import { useTheme } from '../context/ThemeContext';
+import { logEvent } from '../utils/logger';
 
 import useTracking from '../hooks/useTracking';
 
