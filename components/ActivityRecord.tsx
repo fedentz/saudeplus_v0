@@ -13,7 +13,7 @@ type Activity = {
 };
 
 export default function Stats() {
-  const { user, loading } = useUser();
+  const { user, authInitialized } = useUser();
   const appTheme = useAppTheme();
   const { theme } = useTheme();
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -21,7 +21,7 @@ export default function Stats() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!authInitialized || !user) return;
 
     const fetchActivities = async () => {
       try {
@@ -37,11 +37,11 @@ export default function Stats() {
     };
 
     fetchActivities();
-  }, [user]);
+  }, [user, authInitialized]);
 
   const s = styles(appTheme, theme);
 
-  if (loading || loadingActivities) {
+  if (!authInitialized || loadingActivities) {
     return (
       <View style={s.centered}>
         <ActivityIndicator size="large" color="#333" />
