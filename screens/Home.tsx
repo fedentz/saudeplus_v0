@@ -43,7 +43,8 @@ export default function Home({ navigation }: any) {
       </View>
       <View style={styles.centerContent}>
         <Text style={styles.startText}>Vamos começar?</Text>
-        <PlayButton onPress={() => navigation.navigate('Activity')} />
+        <PlayButton onPress={() => console.log('Actividad iniciada')} />
+        <Text style={styles.buttonLabel}>Comenzar actividad</Text>
       </View>
         <View style={[styles.infoBox, { position: 'absolute', bottom: 80, alignSelf: 'center' }]}>
           <Text style={styles.label}>
@@ -131,5 +132,11 @@ const createStyles = (theme: any) =>
     value: {
       fontWeight: 'bold',
       color: '#007AFF',
+    },
+
+    buttonLabel: {
+      marginTop: 8,
+      fontSize: 16,
+      color: theme.colors.text,
     },
   });
