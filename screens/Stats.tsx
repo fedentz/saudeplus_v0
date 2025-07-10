@@ -18,13 +18,13 @@ import { getActivitiesByUser } from '../services/activityService';
 
 export default function Stats() {
   const navigation = useNavigation<any>();
-  const { user, loading: authLoading } = useUser();
+  const { user, authInitialized } = useUser();
   const [activities, setActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
   const theme = useAppTheme();
 
   useEffect(() => {
-    if (authLoading) return;
+    if (!authInitialized) return;
     const loadActivities = async () => {
       if (!user) {
         setActivities([]);
@@ -40,7 +40,7 @@ export default function Stats() {
     };
     setLoadingActivities(true);
     loadActivities();
-  }, [user, authLoading]);
+  }, [user, authInitialized]);
 
 
 const renderActivity = ({ item }: { item: any }) => {
@@ -101,7 +101,7 @@ const renderActivity = ({ item }: { item: any }) => {
         <View style={{ width: 24 }} />
       </View>
 
-      {loadingActivities || authLoading ? (
+      {loadingActivities || !authInitialized ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
