@@ -14,6 +14,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { registerWithEmail } from '../services/authService';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../hooks/useUser';
+import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types'; // Ajustá el path si está en otro lado
@@ -23,6 +24,7 @@ export default function Register() {
   const theme = useAppTheme();
   const { theme: mode } = useTheme();
   const { user } = useUser();
+  const { t } = useTranslation();
   const styles = createStyles(theme, mode);
 
   const [email, setEmail] = useState('');
@@ -42,19 +44,19 @@ export default function Register() {
 
   const handleRegister = async () => {
     if (!email || !password) {
-      Alert.alert('Atenção', 'Preencha todos os campos');
+      Alert.alert(t('register.fillAll'));
       return;
     }
 
     const emailRegex = /.+@.+\..+/;
     if (!emailRegex.test(email)) {
-      setEmailError('Formato de e-mail inválido');
+      setEmailError(t('register.invalidEmail'));
       return;
     }
     setEmailError('');
 
     if (password.length < 6) {
-      setPasswordError('A senha deve ter no mínimo 6 caracteres');
+      setPasswordError(t('register.minLength'));
       return;
     }
     setPasswordError('');
@@ -62,10 +64,10 @@ export default function Register() {
     try {
       setLoading(true);
       await registerWithEmail(email, password);
-      Alert.alert('Cadastro realizado com sucesso!');
+      Alert.alert(t('register.success'));
       navigation.goBack();
     } catch (error: any) {
-      Alert.alert('Erro ao fazer registro, verifique seus dados');
+      Alert.alert(t('register.error'));
     } finally {
       setLoading(false);
     }
@@ -77,10 +79,10 @@ export default function Register() {
         <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Criar conta</Text>
+      <Text style={styles.title}>{t('register.title')}</Text>
 
       <TextInput
-        placeholder="E-mail"
+        placeholder={t('register.email')}
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
         keyboardType="email-address"
@@ -91,7 +93,7 @@ export default function Register() {
       {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
 
       <TextInput
-        placeholder="Senha"
+        placeholder={t('register.password')}
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
         secureTextEntry
@@ -104,12 +106,12 @@ export default function Register() {
         {loading ? (
           <ActivityIndicator color={theme.colors.white} />
         ) : (
-          <Text style={styles.buttonText}>Registrar-se</Text>
+          <Text style={styles.buttonText}>{t('register.register')}</Text>
         )}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.loginLink}>Já tem conta? Entrar</Text>
+        <Text style={styles.loginLink}>{t('register.loginLink')}</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

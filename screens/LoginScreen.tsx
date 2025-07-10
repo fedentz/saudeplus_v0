@@ -11,8 +11,8 @@ export default function LoginScreen() {
 
   return (
     <View>
-      <Text>{t('welcome')}</Text>
-      <Button title={t('login')} onPress={handleLogin} />
+      <Text>{t('loginScreen.welcome')}</Text>
+      <Button title={t('loginScreen.login')} onPress={handleLogin} />
     </View>
   );
 }

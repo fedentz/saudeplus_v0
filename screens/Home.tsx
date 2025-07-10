@@ -14,9 +14,11 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { usePendingActivities } from '../context/PendingActivitiesContext';
 import { auth } from '../firebase/firebase';
 import { useKilometers } from '../context/KmContext';
+import { useTranslation } from 'react-i18next';
 
 export default function Home({ navigation }: any) {
   const theme = useAppTheme();
+  const { t } = useTranslation();
   const { sync, logPending, pendingCount } = usePendingActivities();
   const { kilometers } = useKilometers();
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -66,7 +68,7 @@ export default function Home({ navigation }: any) {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.greeting}>¡Hola, {username}!</Text>
+        <Text style={styles.greeting}>{t('home.greeting', { username })}</Text>
         <View style={styles.dateBadge}>
           <Ionicons name="calendar" size={16} color={theme.colors.primary} />
           <Text style={styles.dateText}>
@@ -80,7 +82,7 @@ export default function Home({ navigation }: any) {
       </View>
 
       <View style={styles.titleContainer}>
-        <Text style={styles.mainTitle}>¿VAMOS A COMENZAR?</Text>
+        <Text style={styles.mainTitle}>{t('home.start')}</Text>
       </View>
 
       {/* Centered Button */}
@@ -103,12 +105,12 @@ export default function Home({ navigation }: any) {
       <View style={styles.bottomSection}>
         <View style={styles.statsCard}>
           <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Kilómetros recorridos</Text>
+            <Text style={styles.statLabel}>{t('home.kilometers')}</Text>
             <Text style={styles.statValue}>{kilometers.toFixed(1)} km</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Descuento obtenido</Text>
+            <Text style={styles.statLabel}>{t('home.discount')}</Text>
             <Text style={styles.statValue}>R$ {discount.toFixed(2)}</Text>
           </View>
         </View>
