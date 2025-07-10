@@ -10,6 +10,16 @@
     "discount": "Desconto obtido"
   },
   "activity": {
+    "title": "Registro de Atividades",
+    "finishButton": "Finalizar",
+    "status": {
+      "pending": "pendente",
+      "valid": "válida",
+      "invalid": "inválida"
+    },
+    "duration": "{{minutes}} min {{seconds}} seg",
+    "distance": "{{distance}} km",
+    "date": "{{day}} {{date}} de {{month}} de {{year}}",
     "autoStopTitle": "Atividade finalizada",
     "autoStopMessage": "Detectamos que você está em um veículo. A atividade foi encerrada automaticamente.",
     "loadingMap": "Carregando mapa...",
@@ -20,8 +30,7 @@
     "cancel": "Cancelar",
     "close": "FECHAR",
     "summary": "🟢 Atividade completada\n\n📏 Distância: {{distance}} km\n⏱️ Duração: {{duration}}",
-    "finish": "FINALIZAR",
-    "duration": "Duração:",
+    "durationLabel": "Duração:",
     "summaryTitle": "Resumo da atividade:"
   },
   "admin": {
@@ -62,7 +71,7 @@
     "registerLink": "Não tem conta? Criar uma"
   },
   "profile": {
-    "loading": "Cargando usuario...",
+    "loading": "Carregando usuário...",
     "chooseEmoji": "Escolher emoji de atividade",
     "logout": "Sair"
   },
@@ -91,12 +100,6 @@
     "footer": "© 2025 Saúde+. Todos os direitos reservados."
   },
   "stats": {
-    "title": "Registro de Actividades",
-    "invalidActivity": "Actividad no válida",
-    "status": {
-      "pending": "pendente",
-      "valid": "válida",
-      "invalid": "inválida"
-    }
+    "invalidActivity": "Atividade inválida"
   }
 }
