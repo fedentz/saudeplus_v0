@@ -31,15 +31,17 @@ export default function ActivityOverlay({ distance, timeFormatted, onEnd, disabl
     <>
       <View style={styles.header}>
         <Animated.Text style={[styles.emoji, { transform: [{ scale }] }]}>{emoji}</Animated.Text>
-        <Text style={styles.distance}>{distance.toFixed(2)} km</Text>
+        <Text style={styles.distance}>
+          {t('activity.distance', { distance: distance.toFixed(2) })}
+        </Text>
         <Text style={styles.time}>
-          {t('activity.duration')}
+          {t('activity.durationLabel')}
           {timeFormatted}
         </Text>
       </View>
       <View style={styles.footer} pointerEvents="box-none">
         <TouchableOpacity style={styles.button} onPress={onEnd} disabled={disabled}>
-          <Text style={styles.buttonText}>{t('activity.finish')}</Text>
+          <Text style={styles.buttonText}>{t('activity.finishButton')}</Text>
         </TouchableOpacity>
       </View>
     </>

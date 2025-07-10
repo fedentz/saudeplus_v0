@@ -50,23 +50,29 @@ export default function Stats() {
           ? new Date(item.date.seconds * 1000)
           : new Date(item.date);
 
-      const formattedDate = format(
-        activityDate,
-        "eeee d 'de' MMMM 'de' yyyy",
-      );
+      const weekday = new Intl.DateTimeFormat('pt', { weekday: 'long' }).format(activityDate);
+      const month = new Intl.DateTimeFormat('pt', { month: 'long' }).format(activityDate);
+      const day = activityDate.getDate();
+      const year = activityDate.getFullYear();
+      const formattedDate = t('activity.date', {
+        day: weekday,
+        date: day,
+        month,
+        year,
+      });
       const formattedTime = format(activityDate, 'HH:mm');
 
       const durationMin = Math.floor(item.duration / 60);
       const durationSec = item.duration % 60;
       const distance = item.distance ? item.distance.toFixed(2) : '0.00';
 
-      let statusText = t('stats.status.pending');
+      let statusText = t('activity.status.pending');
       let statusColor = '#e67e22';
       if (item.status === 'valida') {
-        statusText = t('stats.status.valid');
+        statusText = t('activity.status.valid');
         statusColor = '#2ecc71';
       } else if (item.status === 'invalida') {
-        statusText = t('stats.status.invalid');
+        statusText = t('activity.status.invalid');
         statusColor = '#e74c3c';
       }
 
@@ -75,9 +81,9 @@ export default function Stats() {
           <Text style={styles.activityTitle}>📆 {formattedDate}</Text>
           <Text style={styles.activityInfo}>🕒 {formattedTime}</Text>
           <Text style={styles.activityInfo}>
-            ⏱️ {durationMin} min {durationSec} seg
+            ⏱️ {t('activity.duration', { minutes: durationMin, seconds: durationSec })}
           </Text>
-          <Text style={styles.activityInfo}>📏 {distance} km</Text>
+          <Text style={styles.activityInfo}>📏 {t('activity.distance', { distance })}</Text>
           <Text style={[styles.activityInfo, { color: statusColor }]}>✅ {statusText}</Text>
         </View>
       );
@@ -94,7 +100,7 @@ export default function Stats() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('stats.title')}</Text>
+        <Text style={styles.title}>{t('activity.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -114,58 +120,59 @@ export default function Stats() {
   );
 }
 
-const createStyles = (theme: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-    paddingTop: 40,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
-    backgroundColor: theme.colors.background,
-  },
-  title: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-  },
-  listContent: {
-    paddingBottom: 60,
-    backgroundColor: theme.colors.background,
-  },
-  activityCard: {
-    backgroundColor: theme.colors.cardBackground || 
-                   (theme.colors.background === '#121212' ? '#1e1e1e' : '#fff'),
-    borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    elevation: 1,
-    shadowColor: theme.colors.shadow || '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-  },
-  activityTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 6,
-    color: theme.colors.text,
-  },
-  activityInfo: {
-    fontSize: 14,
-    color: theme.colors.text,
-    marginBottom: 2,
-    opacity: 0.9,
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      paddingTop: 40,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 15,
+      backgroundColor: theme.colors.background,
+    },
+    title: {
+      flex: 1,
+      textAlign: 'center',
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background,
+    },
+    listContent: {
+      paddingBottom: 60,
+      backgroundColor: theme.colors.background,
+    },
+    activityCard: {
+      backgroundColor:
+        theme.colors.cardBackground || (theme.colors.background === '#121212' ? '#1e1e1e' : '#fff'),
+      borderRadius: 12,
+      padding: 16,
+      marginHorizontal: 16,
+      marginVertical: 8,
+      elevation: 1,
+      shadowColor: theme.colors.shadow || '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 3,
+    },
+    activityTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginBottom: 6,
+      color: theme.colors.text,
+    },
+    activityInfo: {
+      fontSize: 14,
+      color: theme.colors.text,
+      marginBottom: 2,
+      opacity: 0.9,
+    },
+  });

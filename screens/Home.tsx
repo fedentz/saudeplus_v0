@@ -72,11 +72,12 @@ export default function Home({ navigation }: any) {
         <View style={styles.dateBadge}>
           <Ionicons name="calendar" size={16} color={theme.colors.primary} />
           <Text style={styles.dateText}>
-            {new Date().toLocaleDateString('es-ES', {
+            {new Intl.DateTimeFormat('pt', {
               weekday: 'short',
               day: 'numeric',
               month: 'short',
-            })}
+            })
+              .format(new Date())}
           </Text>
         </View>
       </View>
@@ -106,7 +107,9 @@ export default function Home({ navigation }: any) {
         <View style={styles.statsCard}>
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>{t('home.kilometers')}</Text>
-            <Text style={styles.statValue}>{kilometers.toFixed(1)} km</Text>
+            <Text style={styles.statValue}>
+              {t('activity.distance', { distance: kilometers.toFixed(1) })}
+            </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.statItem}>
