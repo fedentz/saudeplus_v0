@@ -42,8 +42,8 @@ export default function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Stats" component={Stats} />
+      <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );

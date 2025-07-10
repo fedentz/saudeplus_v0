@@ -45,7 +45,7 @@ export default function Home({ navigation }: any) {
         <Text style={styles.startText}>Vamos começar?</Text>
         <PlayButton onPress={() => navigation.navigate('Activity')} />
       </View>
-        <View style={styles.infoBox}>
+        <View style={[styles.infoBox, { position: 'absolute', bottom: 80, alignSelf: 'center' }]}>
           <Text style={styles.label}>
             Kilómetros recorridos:{' '}
             <Text style={styles.value}>{kilometers.toFixed(1)} km</Text>
@@ -115,7 +115,7 @@ const createStyles = (theme: any) =>
       borderRadius: 16,
       padding: 16,
       marginVertical: 12,
-      shadowColor: '#000',
+      shadowColor: '	#F2F2F2',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
