@@ -6,7 +6,7 @@ import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 import type { LocationObjectCoords } from 'expo-location';
 import { getAuth } from 'firebase/auth';
 import { useUser } from './useUser';
-import { logEvent, logDebug } from '../utils/logger';
+import { log } from '../utils/logger';
 
 export interface TrackData {
   route: LocationObjectCoords[];
@@ -17,7 +17,7 @@ export interface TrackData {
 const PENDING_KEY = 'TRACKING_PENDING';
 
 const enviarAFirebase = async (data: TrackData): Promise<void> => {
-  console.log('📤 Intentando enviar a Firebase...', data);
+  log('hooks/useGlobalNetwork.ts', 'enviarAFirebase', 'NETWORK', 'Intentando enviar a Firebase...');
   const userId = getAuth().currentUser?.uid;
   if (!userId) throw new Error('Usuario no autenticado');
 
@@ -35,10 +35,14 @@ const enviarAFirebase = async (data: TrackData): Promise<void> => {
     },
   );
 
-  console.log('🔁 Respuesta de servidor:', response.status);
+  log(
+    'hooks/useGlobalNetwork.ts',
+    'enviarAFirebase',
+    'NETWORK',
+    `Respuesta de servidor: ${response.status}`,
+  );
   if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
-
-  console.log('✅ Envío exitoso');
+  log('hooks/useGlobalNetwork.ts', 'enviarAFirebase', 'NETWORK', 'Envío exitoso');
 };
 
 export default function useGlobalNetwork() {
@@ -52,20 +56,25 @@ export default function useGlobalNetwork() {
     if (!authInitialized) return;
     // Prueba mínima para verificar NetInfo
     NetInfo.fetch().then((state) =>
-      logDebug(`[GLOBAL NETWORK] Estado inicial: ${state.isConnected ? state.type : 'offline'}`),
+      log(
+        'hooks/useGlobalNetwork.ts',
+        'useGlobalNetwork',
+        'NETWORK',
+        `Estado inicial: ${state.isConnected ? state.type : 'offline'}`,
+      ),
     );
 
     const sendPending = async () => {
       if (processing.current) return;
       processing.current = true;
 
-      console.log('🔄 Procesando pendientes...');
-      logDebug('[GLOBAL NETWORK] Conexión restablecida: enviando pendientes');
+      log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', 'Procesando pendientes...');
+      log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', 'Conexión restablecida: enviando pendientes');
 
       try {
         const stored = await AsyncStorage.getItem(PENDING_KEY);
         if (!stored) {
-          console.log('No hay actividades pendientes');
+          log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', 'No hay actividades pendientes');
           return;
         }
 
@@ -73,42 +82,42 @@ export default function useGlobalNetwork() {
         try {
           pending = JSON.parse(stored);
         } catch {
-          console.log('Error al leer datos guardados');
+          log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', 'Error al leer datos guardados');
           return;
         }
 
         // Filtramos datos inválidos
         pending = pending.filter((p) => p.distance > 0);
 
-        console.log(`Pendientes encontrados: ${pending.length}`);
+        log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', `Pendientes encontrados: ${pending.length}`);
         if (pending.length === 0) {
           await AsyncStorage.removeItem(PENDING_KEY);
           processing.current = false;
-          console.log('No hay pendientes válidos');
+          log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', 'No hay pendientes válidos');
           return;
         }
 
         const remaining: TrackData[] = [];
         for (const item of pending) {
           try {
-            console.log('Enviando pendiente...');
+            log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', 'Enviando pendiente...');
             await enviarAFirebase(item);
-            console.log('Envío exitoso');
+            log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', 'Envío exitoso');
           } catch (err) {
-            console.log('Error al enviar, se mantendrá en la lista');
+            log('hooks/useGlobalNetwork.ts', 'sendPending', 'ERROR', 'Error al enviar, se mantendrá en la lista');
             remaining.push(item);
           }
         }
 
         if (remaining.length === 0) {
           await AsyncStorage.removeItem(PENDING_KEY);
-          console.log('Todos los pendientes fueron enviados');
+          log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', 'Todos los pendientes fueron enviados');
         } else {
           await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
-          console.log(`Quedan ${remaining.length} pendientes por enviar`);
+          log('hooks/useGlobalNetwork.ts', 'sendPending', 'NETWORK', `Quedan ${remaining.length} pendientes por enviar`);
         }
       } catch (err) {
-        console.log('Error procesando pendientes', err);
+        log('hooks/useGlobalNetwork.ts', 'sendPending', 'ERROR', `Error procesando pendientes: ${err}`);
       } finally {
         processing.current = false;
       }
@@ -117,19 +126,18 @@ export default function useGlobalNetwork() {
     const unsubscribe = NetInfo.addEventListener((state) => {
       const type = state.type ?? 'unknown';
       const connected = Boolean(state.isConnected);
-      console.log('[GLOBAL NETWORK] Tipo de conexión:', connected ? type : 'offline');
+      log('hooks/useGlobalNetwork.ts', 'listener', 'NETWORK', `Tipo de conexión: ${connected ? type : 'offline'}`);
 
       if (!connected) {
         wasOffline.current = true;
         reintentando.current = false;
-        console.log('🚫 Sin conexión');
-        logEvent('NETWORK', 'Sin conexión');
+        log('hooks/useGlobalNetwork.ts', 'listener', 'NETWORK', '🚫 Sin conexión');
       } else {
         if (wasOffline.current) {
-          logEvent('NETWORK', 'Conexión restablecida');
+          log('hooks/useGlobalNetwork.ts', 'listener', 'NETWORK', 'Conexión restablecida');
           if (!reintentando.current) {
             reintentando.current = true;
-            console.log('[GLOBAL NETWORK] Conexión restablecida: enviando pendientes');
+            log('hooks/useGlobalNetwork.ts', 'listener', 'NETWORK', 'Conexión restablecida: enviando pendientes');
             sendPending().finally(() => {
               reintentando.current = false;
             });
@@ -141,7 +149,7 @@ export default function useGlobalNetwork() {
               : type === 'cellular'
                 ? '📱 Usando datos móviles'
                 : 'Tipo de conexión desconocido';
-          logEvent('NETWORK', msg);
+          log('hooks/useGlobalNetwork.ts', 'listener', 'NETWORK', msg);
         }
         wasOffline.current = false;
       }

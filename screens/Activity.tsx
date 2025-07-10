@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import MapView from 'react-native-maps';
 import { useTheme } from '../context/ThemeContext';
-import { logEvent } from '../utils/logger';
+import { log } from '../utils/logger';
 import { evaluateActivityStatus } from '../utils/stats';
 
 import useTracking from '../hooks/useTracking';
@@ -80,7 +80,7 @@ export default function Activity() {
     setSummaryVisible(true);
 
     if (!startTime) {
-      logEvent('ACTIVITY', 'No se puede guardar actividad: startTime es null');
+      log('screens/Activity.tsx', 'handleEndActivity', 'ACTIVITY', 'No se puede guardar actividad: startTime es null');
       return;
     }
     const end = new Date();
@@ -137,7 +137,7 @@ export default function Activity() {
       const state = await NetInfo.fetch();
       const connected = Boolean(state.isConnected);
       prev = connected;
-      logEvent('NETWORK', connected ? 'Conectado' : 'Sin conexión');
+      log('screens/Activity.tsx', 'checkInitial', 'NETWORK', connected ? 'Conectado' : 'Sin conexión');
       if (connected) {
         sync();
       }
@@ -179,7 +179,7 @@ export default function Activity() {
           longitudeDelta: 0.1,
         });
       } catch (err) {
-        logEvent('MAP', `preloadMapArea no soportado: ${err}`);
+        log('screens/Activity.tsx', 'preloadMapArea', 'MAP', `preloadMapArea no soportado: ${err}`);
       }
     }
   }, []);

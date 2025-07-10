@@ -1,7 +1,16 @@
-export const logEvent = (tag: string, message: string) => {
-  console.log(`\uD83E\uDEA5 [${tag}] ${message}`);
+export const log = (
+  file: string,
+  method: string,
+  tag: string,
+  message: string,
+) => {
+  console.log(`
+-------------------- (${file} > ${method}) --------------------
+[${tag}] ${message}
+-----------------------------------------------------------------------
+`);
 };
 
-export const logDebug = (message: string) => {
-  console.log(`\uD83D\uDD27 ${message}`);
-};
+export const createLogger = (file: string) =>
+  (method: string, tag: string, message: string) =>
+    log(file, method, tag, message);

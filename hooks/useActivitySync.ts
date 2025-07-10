@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { setupActivitySync } from '../services/activityService';
 import { useUser } from './useUser';
+import { log } from '../utils/logger';
 
 let initialized = false;
 
@@ -9,7 +10,7 @@ export default function useActivitySync() {
 
   useEffect(() => {
     if (!authInitialized || !user) {
-      console.log('[AUTH] Esperando autenticación...');
+      log('hooks/useActivitySync.ts', 'useActivitySync', 'AUTH', 'Esperando autenticación...');
       return;
     }
     if (initialized) return;

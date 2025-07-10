@@ -15,6 +15,7 @@ import {
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useUser } from '../hooks/useUser';
 import { getActivitiesByUser } from '../services/activityService';
+import { log } from '../utils/logger';
 
 export default function Stats() {
   const navigation = useNavigation<any>();
@@ -82,7 +83,7 @@ const renderActivity = ({ item }: { item: any }) => {
       </View>
     );
   } catch (error) {
-    console.error('Error rendering activity:', error, item);
+    log('screens/Stats.tsx', 'renderActivity', 'ERROR', `Error rendering activity: ${error}`);
     return (
       <View style={styles.activityCard}>
         <Text style={styles.activityTitle}>Actividad no válida</Text>

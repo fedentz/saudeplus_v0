@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../firebase/firebase';
+import { log } from '../utils/logger';
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -9,11 +10,13 @@ export function useUser() {
   const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
-    console.log('[useUser] Registrando listener de auth...');
+    log('hooks/useUser.ts', 'useUser', 'AUTH', 'Registrando listener de auth...');
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log(
-        '[useUser] Usuario recibido:',
-        firebaseUser?.uid || 'sin usuario',
+      log(
+        'hooks/useUser.ts',
+        'onAuthStateChanged',
+        'AUTH',
+        `Usuario recibido: ${firebaseUser?.uid || 'sin usuario'}`,
       );
       setUser(firebaseUser);
       setLoading(false);

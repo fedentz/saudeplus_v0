@@ -4,6 +4,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../hooks/useUser';
 import { getActivitiesByUser } from '../services/activityService';
+import { log } from '../utils/logger';
 
 type Activity = {
   id: string;
@@ -29,7 +30,7 @@ export default function Stats() {
         const data = await getActivitiesByUser(user.uid);
         setActivities(data as Activity[]);
       } catch (err: any) {
-        console.error('❌ Error al traer actividades:', err);
+        log('components/ActivityRecord.tsx', 'fetchActivities', 'ERROR', `Error al traer actividades: ${err}`);
         setError('Não foi possível carregar as atividades.');
       } finally {
         setLoadingActivities(false);
