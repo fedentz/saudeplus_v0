@@ -11,6 +11,7 @@ const Tab = createBottomTabNavigator();
 
 export default function MainTabs() {
   const theme = useAppTheme();
+  const isDark = theme.colors.background === '#121212';
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -18,23 +19,22 @@ export default function MainTabs() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor:
-          theme.colors.background === '#121212' ? '#aaa' : '#444',
+        tabBarInactiveTintColor: theme.colors.background === '#121212' ? '#aaa' : '#444',
         tabBarStyle: {
-            position: 'absolute',
-            alignSelf: 'center', // 👈 centra horizontalmente sin usar left/right
-            bottom: 20,
-            width: '90%',
-            height: 60,
-            borderRadius: 30,
-            backgroundColor: theme.colors.white === '#000000' ? '#1e1e1e' : theme.colors.white,
-            shadowColor: '#e0e0e0',
-            shadowOffset: { width: 0, height: 3 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            elevation: 5,
-            paddingBottom: 0,
-            paddingTop: 0, // 👈 esto evita desalinear íconos verticalmente    
+          position: 'absolute',
+          alignSelf: 'center',
+          bottom: 20,
+          width: '90%',
+          height: 60,
+          borderRadius: 30,
+          backgroundColor: isDark ? '#1e1e1e' : '#fff',
+          shadowColor: isDark ? '#111' : '#e0e0e0',
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+          elevation: 5,
+          paddingBottom: 0,
+          paddingTop: 0,
         },
         tabBarIcon: ({ color, size }) => {
           let icon = 'home';
@@ -54,4 +54,3 @@ export default function MainTabs() {
     </Tab.Navigator>
   );
 }
-

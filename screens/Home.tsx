@@ -44,18 +44,16 @@ export default function Home({ navigation }: any) {
       <View style={styles.centerContent}>
         <Text style={styles.startText}>Vamos começar?</Text>
         <PlayButton onPress={() => console.log('Actividad iniciada')} />
-      </View>
-        <View style={[styles.infoBox, { position: 'absolute', bottom: 80, alignSelf: 'center' }]}>
+        <View style={styles.infoBox}>
           <Text style={styles.label}>
-            Kilómetros recorridos:{' '}
-            <Text style={styles.value}>{kilometers.toFixed(1)} km</Text>
+            Kilómetros recorridos: <Text style={styles.value}>{kilometers.toFixed(1)} km</Text>
           </Text>
           <Text style={styles.label}>
-            Descuento obtenido:{' '}
-            <Text style={styles.value}>R$ {descuento.toFixed(2)}</Text>
+            Descuento obtenido: <Text style={styles.value}>R$ {descuento.toFixed(2)}</Text>
           </Text>
         </View>
-      </SafeAreaView>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -66,10 +64,9 @@ const createStyles = (theme: any) =>
       backgroundColor: theme.colors.background,
     },
     headerContainer: {
-      marginTop: 35, // Margen superior para alejar del borde
-      paddingHorizontal: 20, // Padding horizontal para centrar
+      marginTop: 20,
+      paddingHorizontal: 20,
       justifyContent: 'center',
-
     },
     greeting: {
       fontSize: 24,
@@ -78,10 +75,9 @@ const createStyles = (theme: any) =>
       color: theme.colors.text,
     },
     centerContent: {
-        flex: 1,
-        justifyContent: 'flex-start', // 👈 lo sube
-        alignItems: 'center',
-        paddingTop: 80, // 👈 agrega espacio desde el top
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     pendingBadge: {
       position: 'absolute',
@@ -102,26 +98,26 @@ const createStyles = (theme: any) =>
     startText: {
       width: '85%',
       fontSize: 30,
-      marginBottom: 24,
+      marginBottom: 20,
       textAlign: 'center',
       color: theme.colors.primary,
       fontWeight: 'bold',
-      shadowColor: '#e0e0e0',
+      textShadowColor: theme.colors.background === '#121212' ? '#000' : '#ccc',
       textShadowOffset: { width: 1, height: 1 },
       textShadowRadius: 2,
     },
 
-    infoText: { 
-      marginTop: 8, 
-      color: theme.colors.text 
+    infoText: {
+      marginTop: 8,
+      color: theme.colors.text,
     },
     infoBox: {
-      width: '85%',
-      backgroundColor: '#fff',
+      width: '88%',
+      backgroundColor: theme.colors.background === '#121212' ? '#1e1e1e' : '#fff',
       borderRadius: 16,
       padding: 16,
-      marginVertical: 12,
-      shadowColor: '#e0e0e0',
+      marginTop: 16,
+      shadowColor: theme.colors.background === '#121212' ? '#111' : '#e0e0e0',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
@@ -130,13 +126,13 @@ const createStyles = (theme: any) =>
 
     label: {
       fontSize: 16,
-      color: '#333',
+      color: theme.colors.text,
       marginBottom: 8,
     },
 
     value: {
       fontWeight: 'bold',
-      color: '#007AFF',
+      color: theme.colors.primary,
     },
 
     buttonLabel: {
