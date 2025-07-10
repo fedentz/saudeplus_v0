@@ -17,29 +17,32 @@ const firebaseConfig = {
   googleClientId: Constants.expoConfig?.extra?.GOOGLE_CLIENT_ID || 'TU_GOOGLE_CLIENT_ID',
 };
 
-log('firebase/firebase.ts', 'init', 'FIREBASE', 'Verificando si hay apps de Firebase inicializadas...');
+log(
+  'firebase/firebase.ts',
+  'init',
+  'FIREBASE',
+  'Verificando si hay apps de Firebase inicializadas...',
+);
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 log(
   'firebase/firebase.ts',
   'init',
   'FIREBASE',
-  getApps().length
-    ? 'Firebase app existente encontrada.'
-    : 'Nueva app de Firebase inicializada.',
+  getApps().length ? 'Firebase app existente encontrada.' : 'Nueva app de Firebase inicializada.',
 );
 
 // Inicialización segura de Auth con persistencia
 let auth: Auth;
 try {
-  // Si ya fue inicializado, reutiliza
-  auth = getAuth(app);
-  log('firebase/firebase.ts', 'init', 'FIREBASE', 'Firebase Auth ya estaba inicializado.');
-} catch (e) {
-  log('firebase/firebase.ts', 'init', 'FIREBASE', 'Inicializando Firebase Auth con persistencia...');
   auth = initializeAuth(app, {
     persistence: getReactNativePersistence(AsyncStorage),
   });
   log('firebase/firebase.ts', 'init', 'FIREBASE', 'Firebase Auth inicializado con persistencia.');
+} catch (e) {
+  auth = getAuth(app);
+  log('firebase/firebase.ts', 'init', 'FIREBASE', 'Firebase Auth ya estaba inicializado.');
 }
+
+console.log('[DEBUG] auth.currentUser al iniciar:', auth.currentUser);
 
 export { app, auth };

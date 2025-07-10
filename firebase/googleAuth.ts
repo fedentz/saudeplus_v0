@@ -1,14 +1,12 @@
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect } from 'react';
-import { getAuth, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
 import Constants from 'expo-constants';
-import { app } from './firebase'; // Tu configuración Firebase
+import { app, auth } from './firebase'; // Tu configuración Firebase
 import { log } from '../utils/logger';
 
 WebBrowser.maybeCompleteAuthSession(); // Cierra correctamente la sesión en iOS
-
-const auth = getAuth(app);
 
 const clientId = Constants.expoConfig?.extra?.GOOGLE_CLIENT_ID; // tomado desde .env
 
@@ -22,7 +20,12 @@ export const useGoogleAuth = () => {
     if (response?.type === 'success') {
       const idToken = (response.authentication as any).id_token; // 👈 fix de TypeScript
       if (!idToken) {
-        log('firebase/googleAuth.ts', 'useGoogleAuth', 'WARN', 'No se recibió id_token en la respuesta de autenticación');
+        log(
+          'firebase/googleAuth.ts',
+          'useGoogleAuth',
+          'WARN',
+          'No se recibió id_token en la respuesta de autenticación',
+        );
         return;
       }
 
