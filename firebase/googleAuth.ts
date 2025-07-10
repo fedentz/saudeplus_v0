@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { getAuth, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
 import Constants from 'expo-constants';
 import { app } from './firebase'; // Tu configuración Firebase
+import { log } from '../utils/logger';
 
 WebBrowser.maybeCompleteAuthSession(); // Cierra correctamente la sesión en iOS
 
@@ -21,17 +22,27 @@ export const useGoogleAuth = () => {
     if (response?.type === 'success') {
       const idToken = (response.authentication as any).id_token; // 👈 fix de TypeScript
       if (!idToken) {
-        console.warn('⚠️ No se recibió id_token en la respuesta de autenticación');
+        log('firebase/googleAuth.ts', 'useGoogleAuth', 'WARN', 'No se recibió id_token en la respuesta de autenticación');
         return;
       }
 
       const credential = GoogleAuthProvider.credential(idToken);
       signInWithCredential(auth, credential)
         .then((userCred) => {
-          console.log('✅ Usuario autenticado con Google:', userCred.user.email);
+          log(
+            'firebase/googleAuth.ts',
+            'useGoogleAuth',
+            'AUTH',
+            `Usuario autenticado con Google: ${userCred.user.email}`,
+          );
         })
         .catch((error) => {
-          console.log('❌ Error al autenticar con Google:', error.message);
+          log(
+            'firebase/googleAuth.ts',
+            'useGoogleAuth',
+            'ERROR',
+            `Error al autenticar con Google: ${error.message}`,
+          );
         });
     }
   }, [response]);

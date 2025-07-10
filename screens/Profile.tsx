@@ -7,6 +7,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { useUser } from '../hooks/useUser';
 import { useEmoji } from '../context/EmojiContext';
 import { auth } from '../firebase/firebase';
+import { log } from '../utils/logger';
 
 export default function Profile() {
   const navigation = useNavigation<any>();
@@ -73,7 +74,7 @@ export default function Profile() {
       await signOut(auth);
       navigation.replace('Login');
     } catch (error) {
-      console.error('Erro ao sair:', error);
+      log('screens/Profile.tsx', 'handleLogout', 'ERROR', `Erro ao sair: ${error}`);
     }
   };
 

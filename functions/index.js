@@ -4,6 +4,10 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
+function log(file, method, tag, message) {
+  console.log(`\n-------------------- (${file} > ${method}) --------------------\n[${tag}] ${message}\n-----------------------------------------------------------------------\n`);
+}
+
 exports.saveActivity = functions.https.onRequest(async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).send('Method Not Allowed');
@@ -41,13 +45,13 @@ exports.saveActivity = functions.https.onRequest(async (req, res) => {
     aceleracionPromedio: aceleracionPromedio ?? 0,
   };
 
-  console.log('[🔥 FIREBASE PAYLOAD]', docData);
+  log('functions/index.js', 'saveActivity', 'FIREBASE', JSON.stringify(docData));
 
   try {
     await db.collection('activities').add(docData);
     return res.status(200).send('Activity saved successfully');
   } catch (err) {
-    console.error('❌ Error saving activity:', err);
+    log('functions/index.js', 'saveActivity', 'ERROR', `Error saving activity: ${err}`);
     return res.status(500).send('Internal Server Error');
   }
 });

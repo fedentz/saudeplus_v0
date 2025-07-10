@@ -15,6 +15,7 @@ import { PendingActivityProvider } from './context/PendingActivitiesContext';
 import { useUser } from './hooks/useUser';
 import useGlobalNetwork from './hooks/useGlobalNetwork';
 import useActivitySync from './hooks/useActivitySync';
+import { log } from './utils/logger';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,7 +25,7 @@ export default function App() {
   const { user, loading, authInitialized } = useUser();
 
   if (!authInitialized) {
-    console.log('[AUTH] Esperando autenticación...');
+    log('App.tsx', 'App', 'AUTH', 'Esperando autenticación...');
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
@@ -33,7 +34,7 @@ export default function App() {
   }
 
   const initialRoute = user ? 'MainTabs' : 'Splash';
-  console.log('[App] Ruta inicial seleccionada:', initialRoute);
+  log('App.tsx', 'App', 'APP', `Ruta inicial seleccionada: ${initialRoute}`);
 
   if (loading) {
     return (
