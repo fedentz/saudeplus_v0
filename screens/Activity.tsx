@@ -197,7 +197,7 @@ export default function Activity() {
           backgroundColor: theme === 'dark' ? '#000' : '#fff',
         }}
       >
-        <ActivityIndicator size="large" color="#00AEEF" />
+        <ActivityIndicator size="large" color="#0099ff" />
         <Text style={{ marginTop: 10, color: theme === 'dark' ? '#eee' : '#333' }}>
           Carregando mapa...
         </Text>
@@ -238,7 +238,7 @@ export default function Activity() {
             zIndex: 5,
           }}
         >
-          <ActivityIndicator size="large" color="#00AEEF" />
+          <ActivityIndicator size="large" color="#0099ff" />
           <Text style={{ color: '#ccc', marginTop: 16 }}>Carregando o mapa...</Text>
         </View>
       )}

@@ -91,7 +91,7 @@ const createStyles = (theme: any) =>
       elevation: 6,
     },
     button: {
-      backgroundColor: '#00AEEF',
+      backgroundColor: '#0099ff',
       borderRadius: 32,
       paddingVertical: 14,
       paddingHorizontal: 32,

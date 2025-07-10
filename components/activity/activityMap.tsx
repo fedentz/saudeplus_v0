@@ -85,7 +85,9 @@ export default function ActivityMap({ location, route, mapReady, setMapReady, ma
         }}
         onMapReady={handleMapReady}
       >
-        {route.length > 1 && <Polyline coordinates={route} strokeColor="#00AEEF" strokeWidth={4} />}
+        {route.length > 1 && (
+          <Polyline coordinates={route} strokeColor="#0099ff" strokeWidth={4} />
+        )}
         <Marker.Animated
           coordinate={coordinateRef.current as unknown as { latitude: number; longitude: number }}
           anchor={{ x: 0.5, y: 0.5 }}
