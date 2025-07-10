@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { loginWithEmail } from '../services/authService';
@@ -56,7 +55,6 @@ export default function Login({ navigation }: any) {
     try {
       setLoading(true);
       await loginWithEmail(email, password);
-      await AsyncStorage.setItem('user', JSON.stringify(auth.currentUser));
       navigation.replace('MainTabs');
     } catch (error: any) {
       if (error.code === 'auth/user-not-found') {

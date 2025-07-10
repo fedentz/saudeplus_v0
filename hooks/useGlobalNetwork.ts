@@ -5,6 +5,7 @@ import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 
 import type { LocationObjectCoords } from 'expo-location';
 import { getAuth } from 'firebase/auth';
+import { useUser } from './useUser';
 import { logEvent, logDebug } from '../utils/logger';
 
 export interface TrackData {
@@ -45,8 +46,10 @@ export default function useGlobalNetwork() {
   const processing = useRef(false);
   const reintentando = useRef(false);
   const prevType = useRef<NetInfoStateType | 'none' | 'unknown'>('unknown');
+  const { authInitialized } = useUser();
 
   useEffect(() => {
+    if (!authInitialized) return;
     // Prueba mínima para verificar NetInfo
     NetInfo.fetch().then((state) =>
       logDebug(`[GLOBAL NETWORK] Estado inicial: ${state.isConnected ? state.type : 'offline'}`),
@@ -147,7 +150,7 @@ export default function useGlobalNetwork() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [authInitialized]);
 
   return null;
 }

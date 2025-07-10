@@ -1,40 +1,18 @@
 // hooks/useUser.ts
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../firebase/firebase';
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
-    let unsub: () => void;
-    const loadStored = async () => {
-      try {
-        const stored = await AsyncStorage.getItem('user');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          setUser(parsed as User);
-        }
-      } catch {
-        // ignore parse errors
-      }
-    };
-
-    loadStored();
-
-    unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        AsyncStorage.setItem(
-          'user',
-          JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email }),
-        );
-      } else {
-        AsyncStorage.removeItem('user');
-      }
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
+      setAuthInitialized(true);
     });
 
     return () => {
@@ -42,5 +20,5 @@ export function useUser() {
     };
   }, []);
 
-  return { user, loading };
+  return { user, loading, authInitialized };
 }
