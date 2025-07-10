@@ -69,9 +69,6 @@ export default function Login({ navigation }: any) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
-      </TouchableOpacity>
       <Text style={styles.logo}>Saúde+</Text>
       <Text style={styles.subtitle}>Entre para continuar</Text>
 
@@ -151,11 +148,6 @@ const createStyles = (theme: any, mode: string) =>
       color: theme.colors.white,
       textAlign: 'center',
       fontWeight: 'bold',
-    },
-    backButton: {
-      position: 'absolute',
-      top: 10,
-      left: 10,
     },
     registerLink: {
       textAlign: 'center',
