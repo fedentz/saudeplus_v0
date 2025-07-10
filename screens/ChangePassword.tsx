@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView } from 'react-native';
-import {
-  getAuth,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  updatePassword,
-} from 'firebase/auth';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import { auth } from '../firebase/firebase';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useTheme } from '../context/ThemeContext';
@@ -34,7 +30,7 @@ export default function ChangePassword({ navigation }: any) {
       return;
     }
     try {
-      const user = getAuth().currentUser;
+      const user = auth.currentUser;
       if (!user || !user.email) throw new Error('Usuário não autenticado');
       const cred = EmailAuthProvider.credential(user.email, current);
       await reauthenticateWithCredential(user, cred);
