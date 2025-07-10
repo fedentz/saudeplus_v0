@@ -89,7 +89,7 @@ export default function Home({ navigation }: any) {
           <TouchableWithoutFeedback
             onPressIn={animatePressIn}
             onPressOut={animatePressOut}
-            onPress={() => console.log('Actividad iniciada')}>
+            onPress={() => navigation.navigate('Activity')}>
             <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
               <View style={styles.playButton}>
                 <Ionicons style={styles.play} name="play" size={82} color={theme.colors.background} />
