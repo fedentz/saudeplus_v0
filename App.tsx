@@ -21,7 +21,16 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   useGlobalNetwork();
   useActivitySync();
-  const { user, loading } = useUser();
+  const { user, loading, authInitialized } = useUser();
+
+  if (!authInitialized) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   const initialRoute = user ? 'MainTabs' : 'Splash';
 
   if (loading) {

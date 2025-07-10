@@ -3,7 +3,6 @@ import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Modal } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppTheme } from '../hooks/useAppTheme';
 import useAuthUser from '../hooks/useAuthUser';
 import { useEmoji } from '../context/EmojiContext';
@@ -72,7 +71,6 @@ export default function Profile() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      await AsyncStorage.removeItem('user');
       navigation.replace('Login');
     } catch (error) {
       console.error('Erro ao sair:', error);
