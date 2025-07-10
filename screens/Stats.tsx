@@ -14,12 +14,14 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { useUser } from '../hooks/useUser';
 import { getActivitiesByUser } from '../services/activityService';
 import { log } from '../utils/logger';
+import { useTranslation } from 'react-i18next';
 
 export default function Stats() {
   const { user, authInitialized } = useUser();
   const [activities, setActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
   const theme = useAppTheme();
+  const { t } = useTranslation();
   const styles = createStyles(theme);
 
   useEffect(() => {
@@ -58,13 +60,13 @@ export default function Stats() {
       const durationSec = item.duration % 60;
       const distance = item.distance ? item.distance.toFixed(2) : '0.00';
 
-      let statusText = 'pendente';
+      let statusText = t('stats.status.pending');
       let statusColor = '#e67e22';
       if (item.status === 'valida') {
-        statusText = 'válida';
+        statusText = t('stats.status.valid');
         statusColor = '#2ecc71';
       } else if (item.status === 'invalida') {
-        statusText = 'inválida';
+        statusText = t('stats.status.invalid');
         statusColor = '#e74c3c';
       }
 
@@ -83,7 +85,7 @@ export default function Stats() {
       log('screens/Stats.tsx', 'renderActivity', 'ERROR', `Error rendering activity: ${error}`);
       return (
         <View style={styles.activityCard}>
-          <Text style={styles.activityTitle}>Actividad no válida</Text>
+          <Text style={styles.activityTitle}>{t('stats.invalidActivity')}</Text>
         </View>
       );
     }
@@ -92,7 +94,7 @@ export default function Stats() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Registro de Actividades</Text>
+        <Text style={styles.title}>{t('stats.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 

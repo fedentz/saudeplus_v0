@@ -12,11 +12,13 @@ import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { useAppTheme } from '../hooks/useAppTheme';
+import { useTranslation } from 'react-i18next';
 
 export default function Settings() {
   const navigation = useNavigation<any>();
   const { theme, toggleTheme } = useTheme();
   const appTheme = useAppTheme();
+  const { t } = useTranslation();
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -56,19 +58,19 @@ export default function Settings() {
             color: theme === 'dark' ? '#fff' : '#000',
           }}
         >
-          Settings
+          {t('settings.title')}
         </Text>
         <View style={{ width: 24 }} />
       </View>
       <View style={styles.settingItem}>
-        <Text style={styles.label}>Modo escuro</Text>
+        <Text style={styles.label}>{t('settings.darkMode')}</Text>
         <Switch value={theme === 'dark'} onValueChange={toggleTheme} />
       </View>
       <TouchableOpacity
         style={styles.settingItem}
         onPress={() => navigation.navigate('ChangePassword')}
       >
-        <Text style={styles.link}>Mudar senha</Text>
+        <Text style={styles.link}>{t('settings.changePassword')}</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

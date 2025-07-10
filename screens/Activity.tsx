@@ -29,6 +29,7 @@ import ActivityMap from '../components/activity/activityMap';
 import ActivityOverlay from '../components/activity/activityOverlay';
 import ActivitySummaryModal from '../components/activity/activitySummaryModal';
 import { useKilometers } from '../context/KmContext';
+import { useTranslation } from 'react-i18next';
 
 export default function Activity() {
   const {
@@ -53,6 +54,7 @@ export default function Activity() {
   const [activitySummary, setActivitySummary] = useState('');
   const [exitModalVisible, setExitModalVisible] = useState(false);
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   const handleSaveAndExit = async () => {
     await handleEndActivity();
@@ -77,7 +79,10 @@ export default function Activity() {
     setActivityEnded(true);
     await stopTracking();
 
-    const summary = `🟢 Actividad completada\n\n📏 Distancia: ${totalDistance.toFixed(2)} km\n⏱️ Duración: ${formatElapsedTime(elapsedTime)}`;
+    const summary = t('activity.summary', {
+      distance: totalDistance.toFixed(2),
+      duration: formatElapsedTime(elapsedTime),
+    });
     setActivitySummary(summary);
     setSummaryVisible(true);
 
@@ -163,8 +168,8 @@ export default function Activity() {
   useEffect(() => {
     if (location?.speed !== null && location?.speed !== undefined && location.speed > 6) {
       Alert.alert(
-        'Atividade finalizada',
-        'Detectamos que você está em um veículo. A atividade foi encerrada automaticamente.',
+        t('activity.autoStopTitle'),
+        t('activity.autoStopMessage'),
         [{ text: 'OK' }],
       );
       stopActivityWithoutSaving();
@@ -199,7 +204,7 @@ export default function Activity() {
       >
         <ActivityIndicator size="large" color="#0099ff" />
         <Text style={{ marginTop: 10, color: theme === 'dark' ? '#eee' : '#333' }}>
-          Carregando mapa...
+          {t('activity.loadingMap')}
         </Text>
       </View>
     );
@@ -239,7 +244,7 @@ export default function Activity() {
           }}
         >
           <ActivityIndicator size="large" color="#0099ff" />
-          <Text style={{ color: '#ccc', marginTop: 16 }}>Carregando o mapa...</Text>
+          <Text style={{ color: '#ccc', marginTop: 16 }}>{t('activity.loadingMapGeneric')}</Text>
         </View>
       )}
 
@@ -302,7 +307,7 @@ export default function Activity() {
                 marginBottom: 12,
               }}
             >
-              Você está em uma atividade
+              {t('activity.exitTitle')}
             </Text>
             <Text
               style={{
@@ -310,11 +315,11 @@ export default function Activity() {
                 color: theme === 'dark' ? '#aaa' : '#333',
               }}
             >
-              Deseja encerrar ou salvar antes de sair?
+              {t('activity.exitQuestion')}
             </Text>
             <View style={{ marginTop: 24 }}>
-              <Button title="Salvar e sair" color="#1d3557" onPress={handleSaveAndExit} />
-              <Button title="Cancelar" onPress={() => setExitModalVisible(false)} />
+              <Button title={t('activity.saveAndExit')} color="#1d3557" onPress={handleSaveAndExit} />
+              <Button title={t('activity.cancel')} onPress={() => setExitModalVisible(false)} />
             </View>
           </View>
         </View>

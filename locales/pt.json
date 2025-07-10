@@ -1,4 +1,102 @@
 {
-  "welcome": "Bem-vindo",
-  "login": "Entrar"
+  "loginScreen": {
+    "welcome": "Bem-vindo",
+    "login": "Entrar"
+  },
+  "home": {
+    "greeting": "Olá, {{username}}!",
+    "start": "VAMOS COMEÇAR?",
+    "kilometers": "Kilômetros percorridos",
+    "discount": "Desconto obtido"
+  },
+  "activity": {
+    "autoStopTitle": "Atividade finalizada",
+    "autoStopMessage": "Detectamos que você está em um veículo. A atividade foi encerrada automaticamente.",
+    "loadingMap": "Carregando mapa...",
+    "loadingMapGeneric": "Carregando o mapa...",
+    "exitTitle": "Você está em uma atividade",
+    "exitQuestion": "Deseja encerrar ou salvar antes de sair?",
+    "saveAndExit": "Salvar e sair",
+    "cancel": "Cancelar",
+    "close": "FECHAR",
+    "summary": "🟢 Atividade completada\n\n📏 Distância: {{distance}} km\n⏱️ Duração: {{duration}}",
+    "finish": "FINALIZAR",
+    "duration": "Duração:",
+    "summaryTitle": "Resumo da atividade:"
+  },
+  "admin": {
+    "panel": "Painel Admin",
+    "searchPlaceholder": "Buscar por e-mail",
+    "search": "Buscar",
+    "emailRequired": "Digite um e-mail para buscar",
+    "userNotFound": "Usuário não encontrado",
+    "searchError": "Erro ao buscar dados",
+    "restricted": "Acesso restrito",
+    "activities": "Atividades: {{count}}",
+    "distance": "Distância: {{distance}} km",
+    "time": "Tempo: {{time}}"
+  },
+  "changePassword": {
+    "fillAll": "Preencha todos os campos",
+    "minLength": "A senha deve ter ao menos 6 caracteres",
+    "mismatch": "As senhas não coincidem",
+    "success": "Sucesso",
+    "updated": "Senha atualizada",
+    "error": "Erro ao atualizar",
+    "current": "Senha atual",
+    "new": "Nova senha",
+    "confirm": "Confirmar senha",
+    "save": "Salvar alterações"
+  },
+  "login": {
+    "title": "Saúde+",
+    "subtitle": "Entre para continuar",
+    "email": "E-mail",
+    "password": "Senha",
+    "fillAll": "Preencha todos os campos",
+    "invalidEmail": "Formato de e-mail inválido",
+    "minLength": "A senha deve ter no mínimo 6 caracteres",
+    "userNotFound": "Usuário não encontrado",
+    "loginError": "Erro ao fazer login, verifique seus dados",
+    "enter": "Entrar",
+    "registerLink": "Não tem conta? Criar uma"
+  },
+  "profile": {
+    "loading": "Cargando usuario...",
+    "chooseEmoji": "Escolher emoji de atividade",
+    "logout": "Sair"
+  },
+  "register": {
+    "title": "Criar conta",
+    "email": "E-mail",
+    "password": "Senha",
+    "fillAll": "Preencha todos os campos",
+    "invalidEmail": "Formato de e-mail inválido",
+    "minLength": "A senha deve ter no mínimo 6 caracteres",
+    "success": "Cadastro realizado com sucesso!",
+    "error": "Erro ao fazer registro, verifique seus dados",
+    "register": "Registrar-se",
+    "loginLink": "Já tem conta? Entrar"
+  },
+  "settings": {
+    "title": "Settings",
+    "darkMode": "Modo escuro",
+    "changePassword": "Mudar senha"
+  },
+  "splash": {
+    "title": "Saúde+",
+    "subtitle": "Transforme passos em economia",
+    "createAccount": "CRIAR CONTA",
+    "haveAccount": "JÁ POSSUO CONTA",
+    "footer": "© 2025 Saúde+. Todos os direitos reservados."
+  },
+  "stats": {
+    "title": "Registro de Actividades",
+    "invalidActivity": "Actividad no válida",
+    "status": {
+      "pending": "pendente",
+      "valid": "válida",
+      "invalid": "inválida"
+    }
+  }
 }

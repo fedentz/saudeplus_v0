@@ -15,6 +15,7 @@ import { loginWithEmail } from '../services/authService';
 import { auth } from '../firebase/firebase';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../hooks/useUser';
+import { useTranslation } from 'react-i18next';
 
 export default function Login({ navigation }: any) {
   const [email, setEmail] = useState('');
@@ -25,6 +26,7 @@ export default function Login({ navigation }: any) {
   const theme = useAppTheme();
   const { theme: mode } = useTheme();
   const { user } = useUser();
+  const { t } = useTranslation();
   const styles = createStyles(theme, mode);
 
   useEffect(() => {
@@ -35,19 +37,19 @@ export default function Login({ navigation }: any) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Atenção', 'Preencha todos os campos');
+      Alert.alert(t('login.fillAll'));
       return;
     }
 
     const emailRegex = /.+@.+\..+/;
     if (!emailRegex.test(email)) {
-      setEmailError('Formato de e-mail inválido');
+      setEmailError(t('login.invalidEmail'));
       return;
     }
     setEmailError('');
 
     if (password.length < 6) {
-      setPasswordError('A senha deve ter no mínimo 6 caracteres');
+      setPasswordError(t('login.minLength'));
       return;
     }
     setPasswordError('');
@@ -58,9 +60,9 @@ export default function Login({ navigation }: any) {
       navigation.replace('MainTabs');
     } catch (error: any) {
       if (error.code === 'auth/user-not-found') {
-        Alert.alert('Usuário não encontrado');
+        Alert.alert(t('login.userNotFound'));
       } else {
-        Alert.alert('Erro ao fazer login, verifique seus dados');
+        Alert.alert(t('login.loginError'));
       }
     } finally {
       setLoading(false);
@@ -69,11 +71,11 @@ export default function Login({ navigation }: any) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>Saúde+</Text>
-      <Text style={styles.subtitle}>Entre para continuar</Text>
+      <Text style={styles.logo}>{t('login.title')}</Text>
+      <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
 
       <TextInput
-        placeholder="E-mail"
+        placeholder={t('login.email')}
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
         keyboardType="email-address"
@@ -83,7 +85,7 @@ export default function Login({ navigation }: any) {
       />
       {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
       <TextInput
-        placeholder="Senha"
+        placeholder={t('login.password')}
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
         secureTextEntry
@@ -96,12 +98,12 @@ export default function Login({ navigation }: any) {
         {loading ? (
           <ActivityIndicator color={theme.colors.white} />
         ) : (
-          <Text style={styles.loginText}>Entrar</Text>
+          <Text style={styles.loginText}>{t('login.enter')}</Text>
         )}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-        <Text style={styles.registerLink}>Não tem conta? Criar uma</Text>
+        <Text style={styles.registerLink}>{t('login.registerLink')}</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

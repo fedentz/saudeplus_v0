@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '../../hooks/useAppTheme';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   visible: boolean;
@@ -20,6 +21,7 @@ type Props = {
 
 export default function ActivitySummaryModal({ visible, summary, onClose }: Props) {
   const theme = useAppTheme();
+  const { t } = useTranslation();
   const styles = createStyles(theme);
   const navigation = useNavigation<any>();
   return (
@@ -32,7 +34,7 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
       <View style={styles.modalBackground}>
         <View style={styles.modalContainer}>
           <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Resumo da atividade:</Text>
+            <Text style={styles.title}>{t('activity.summaryTitle')}</Text>
             <Text style={styles.text}>{summary}</Text>
             <TouchableOpacity
               style={styles.button}
@@ -41,7 +43,7 @@ export default function ActivitySummaryModal({ visible, summary, onClose }: Prop
                 navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
               }}
             >
-              <Text style={styles.buttonText}>FECHAR</Text>
+              <Text style={styles.buttonText}>{t('activity.close')}</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
