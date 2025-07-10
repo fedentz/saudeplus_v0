@@ -42,8 +42,10 @@ export default function Home({ navigation }: any) {
         <HeaderInfo date={new Date()} />
       </View>
       <View style={styles.centerContent}>
-        <Text style={styles.startText}>Vamos começar?</Text>
-        <PlayButton onPress={() => console.log('Actividad iniciada')} />
+        <View style={styles.promptContainer}>
+          <Text style={styles.startText}>Vamos começar?</Text>
+          <PlayButton onPress={() => console.log('Actividad iniciada')} />
+        </View>
         <View style={styles.infoBox}>
           <Text style={styles.label}>
             Kilómetros recorridos: <Text style={styles.value}>{kilometers.toFixed(1)} km</Text>
@@ -76,8 +78,12 @@ const createStyles = (theme: any) =>
     },
     centerContent: {
       flex: 1,
-      justifyContent: 'center',
       alignItems: 'center',
+      justifyContent: 'flex-start',
+    },
+    promptContainer: {
+      alignItems: 'center',
+      marginTop: '40%',
     },
     pendingBadge: {
       position: 'absolute',
@@ -96,9 +102,9 @@ const createStyles = (theme: any) =>
       fontWeight: 'bold',
     },
     startText: {
-      width: '85%',
-      fontSize: 30,
-      marginBottom: 20,
+      width: '90%',
+      fontSize: 32,
+      marginBottom: 24,
       textAlign: 'center',
       color: theme.colors.primary,
       fontWeight: 'bold',
@@ -112,11 +118,12 @@ const createStyles = (theme: any) =>
       color: theme.colors.text,
     },
     infoBox: {
-      width: '88%',
+      width: '90%',
       backgroundColor: theme.colors.background === '#121212' ? '#1e1e1e' : '#fff',
-      borderRadius: 16,
-      padding: 16,
-      marginTop: 16,
+      borderRadius: 20,
+      padding: 20,
+      marginTop: 32,
+      marginBottom: 32,
       shadowColor: theme.colors.background === '#121212' ? '#111' : '#e0e0e0',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
