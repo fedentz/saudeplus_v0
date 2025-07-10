@@ -4,13 +4,13 @@ import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Modal } from 'r
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '../hooks/useAppTheme';
-import useAuthUser from '../hooks/useAuthUser';
+import { useUser } from '../hooks/useUser';
 import { useEmoji } from '../context/EmojiContext';
 import { auth } from '../firebase/firebase';
 
 export default function Profile() {
   const navigation = useNavigation<any>();
-  const { user: authUser, initializing } = useAuthUser();
+  const { user: authUser, authInitialized } = useUser();
   const { emoji, setEmoji } = useEmoji();
   const theme = useAppTheme();
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -94,7 +94,7 @@ export default function Profile() {
         <View style={styles.avatar}>
           <Text style={styles.emojiAvatar}>{emoji}</Text>
         </View>
-        {initializing ? (
+        {!authInitialized ? (
           <Text style={styles.email}>Cargando usuario...</Text>
         ) : (
           <Text style={styles.email}>{authUser?.email}</Text>

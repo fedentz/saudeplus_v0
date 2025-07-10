@@ -19,7 +19,7 @@ SaudePlus es una aplicación móvil creada con Expo y React Native que permite r
 
 ## Firebase Auth y mantenimiento de sesión
 
-La configuración se encuentra en `firebase/firebase.ts`. Se inicializa la app con los valores de `.env` y se crea `auth` con persistencia en `AsyncStorage` para que la sesión se mantenga entre reinicios. El hook `useUser` escucha `onAuthStateChanged` y guarda el usuario actual en `AsyncStorage` para restaurarlo al abrir la app.
+La configuración se encuentra en `firebase/firebase.ts`. Se inicializa la app con los valores de `.env` y se crea `auth` usando `initializeAuth` con `getReactNativePersistence(AsyncStorage)` para que la sesión se mantenga entre reinicios. El hook `useUser` escucha `onAuthStateChanged` y expone el usuario junto con un estado `authInitialized` que indica cuándo la autenticación está lista.
 
 ## Registro y guardado de actividades
 
