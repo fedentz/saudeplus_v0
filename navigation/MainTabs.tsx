@@ -12,7 +12,7 @@ const Tab = createBottomTabNavigator();
 export default function MainTabs() {
   const theme = useAppTheme();
   const isDark = theme.colors.background === '#121212';
-  
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -22,9 +22,10 @@ export default function MainTabs() {
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: isDark ? '#aaa' : '#444',
         tabBarStyle: {
+          width: '90%',
           position: 'absolute',
-          left: 20,
-          right: 20,
+          left: '5%',
+          right: '5%',
           bottom: 20,
           height: 70,
           borderRadius: 35,
@@ -35,11 +36,13 @@ export default function MainTabs() {
           shadowOffset: { width: 0, height: 3 },
           elevation: 8,
           borderTopWidth: 0,
-          paddingHorizontal: 20,
+          paddingTop: 15,
+          paddingBottom: 15,
+          marginLeft: '5%',
         },
         tabBarIcon: ({ color, size }) => {
           let iconName;
-          
+
           switch (route.name) {
             case 'Stats':
               iconName = 'bar-chart';
@@ -50,15 +53,13 @@ export default function MainTabs() {
             default:
               iconName = 'home';
           }
-          
+
           return (
-            <View style={styles.tabIconContainer}>
-              <Ionicons 
-                name={iconName as any} 
-                size={26}
-                color={color} 
-              />
-            </View>
+            <Ionicons 
+              name={iconName as any} 
+              size={26}
+              color={color} 
+            />
           );
         },
       })}
@@ -71,10 +72,5 @@ export default function MainTabs() {
 }
 
 const styles = StyleSheet.create({
-  tabIconContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-  },
+  // No styles needed now - simplified approach
 });
