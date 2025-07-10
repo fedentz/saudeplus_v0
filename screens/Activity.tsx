@@ -28,6 +28,7 @@ import { usePendingActivities } from '../context/PendingActivitiesContext';
 import ActivityMap from '../components/activity/activityMap';
 import ActivityOverlay from '../components/activity/activityOverlay';
 import ActivitySummaryModal from '../components/activity/activitySummaryModal';
+import { useKilometers } from '../context/KmContext';
 
 export default function Activity() {
   const {
@@ -44,6 +45,7 @@ export default function Activity() {
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation<any>();
   const { add, sync } = usePendingActivities();
+  const { setKilometers } = useKilometers();
   const [mapReady, setMapReady] = useState(false);
   const [locationReady, setLocationReady] = useState(false);
   const [summaryVisible, setSummaryVisible] = useState(false);
@@ -108,6 +110,7 @@ export default function Activity() {
       velocidadPromedio,
       aceleracionPromedio: 0,
     });
+    setKilometers((k) => k + totalDistance);
 
     if (conexion !== 'offline') {
       await sync();
@@ -194,7 +197,7 @@ export default function Activity() {
           backgroundColor: theme === 'dark' ? '#000' : '#fff',
         }}
       >
-        <ActivityIndicator size="large" color="#00AEEF" />
+        <ActivityIndicator size="large" color="#0099ff" />
         <Text style={{ marginTop: 10, color: theme === 'dark' ? '#eee' : '#333' }}>
           Carregando mapa...
         </Text>
@@ -235,7 +238,7 @@ export default function Activity() {
             zIndex: 5,
           }}
         >
-          <ActivityIndicator size="large" color="#00AEEF" />
+          <ActivityIndicator size="large" color="#0099ff" />
           <Text style={{ color: '#ccc', marginTop: 16 }}>Carregando o mapa...</Text>
         </View>
       )}

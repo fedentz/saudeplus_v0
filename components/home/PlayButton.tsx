@@ -9,12 +9,19 @@ interface Props {
 
 export default function PlayButton({ onPress }: Props) {
   const theme = useAppTheme();
+  const isDark = theme.colors.background === '#121212';
   return (
     <TouchableOpacity
-      style={[styles.button, { backgroundColor: theme.colors.primary }]}
+      style={[
+        styles.button,
+        {
+          backgroundColor: theme.colors.primary,
+          shadowColor: isDark ? '#111' : '#e0e0e0',
+        },
+      ]}
       onPress={onPress}
     >
-      <Ionicons name="play" size={60} color={theme.colors.white} />
+      <Ionicons name="play" size={60} color={theme.colors.white} style={{ marginLeft: 3 }} />
     </TouchableOpacity>
   );
 }
@@ -28,7 +35,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 4,
     marginVertical: 24,
-    shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },

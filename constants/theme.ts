@@ -1,6 +1,6 @@
 export const lightTheme = {
   colors: {
-    primary: '#00AEEF',
+    primary: '#0099ff',
     accent: '#03A9F4',
     background: '#f2f2f2',
     text: '#333',
@@ -12,7 +12,7 @@ export const lightTheme = {
 
 export const darkTheme = {
   colors: {
-    primary: '#00AEEF',
+    primary: '#0099ff',
     accent: '#03A9F4',
     background: '#121212',
     text: '#f2f2f2',

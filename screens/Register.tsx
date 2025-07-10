@@ -9,19 +9,22 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { registerWithEmail } from '../services/authService';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../hooks/useUser';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types'; // Ajustá el path si está en otro lado
 
 export default function Register() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useAppTheme();
   const { theme: mode } = useTheme();
   const { user } = useUser();
   const styles = createStyles(theme, mode);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -30,7 +33,10 @@ export default function Register() {
 
   useEffect(() => {
     if (user) {
-      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
     }
   }, [user]);
 
@@ -46,6 +52,7 @@ export default function Register() {
       return;
     }
     setEmailError('');
+
     if (password.length < 6) {
       setPasswordError('A senha deve ter no mínimo 6 caracteres');
       return;
@@ -69,6 +76,7 @@ export default function Register() {
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
       </TouchableOpacity>
+
       <Text style={styles.title}>Criar conta</Text>
 
       <TextInput
@@ -81,6 +89,7 @@ export default function Register() {
         onChangeText={setEmail}
       />
       {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
+
       <TextInput
         placeholder="Senha"
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
@@ -151,5 +160,8 @@ const createStyles = (theme: any, mode: string) =>
       color: theme.colors.primary,
       marginTop: 20,
     },
-    error: { color: 'red', marginBottom: 10 },
+    error: {
+      color: 'red',
+      marginBottom: 10,
+    },
   });
