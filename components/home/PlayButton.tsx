@@ -21,16 +21,16 @@ export default function PlayButton({ onPress }: Props) {
       ]}
       onPress={onPress}
     >
-      <Ionicons name="play" size={60} color={theme.colors.white} style={{ marginLeft: 3 }} />
+      <Ionicons name="play" size={70} color={theme.colors.white} style={{ marginLeft: 4 }} />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,
