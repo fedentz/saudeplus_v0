@@ -15,14 +15,26 @@ import { PendingActivityProvider } from './context/PendingActivitiesContext';
 import { useUser } from './hooks/useUser';
 import useGlobalNetwork from './hooks/useGlobalNetwork';
 import useActivitySync from './hooks/useActivitySync';
+import { log } from './utils/logger';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   useGlobalNetwork();
   useActivitySync();
-  const { user, loading } = useUser();
+  const { user, loading, authInitialized } = useUser();
+
+  if (!authInitialized) {
+    log('App.tsx', 'App', 'AUTH', 'Esperando autenticación...');
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   const initialRoute = user ? 'MainTabs' : 'Splash';
+  log('App.tsx', 'App', 'APP', `Ruta inicial seleccionada: ${initialRoute}`);
 
   if (loading) {
     return (

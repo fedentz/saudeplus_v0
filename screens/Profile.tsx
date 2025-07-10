@@ -3,15 +3,15 @@ import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Modal } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppTheme } from '../hooks/useAppTheme';
-import useAuthUser from '../hooks/useAuthUser';
+import { useUser } from '../hooks/useUser';
 import { useEmoji } from '../context/EmojiContext';
 import { auth } from '../firebase/firebase';
+import { log } from '../utils/logger';
 
 export default function Profile() {
   const navigation = useNavigation<any>();
-  const { user: authUser, initializing } = useAuthUser();
+  const { user: authUser, authInitialized } = useUser();
   const { emoji, setEmoji } = useEmoji();
   const theme = useAppTheme();
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -72,10 +72,9 @@ export default function Profile() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      await AsyncStorage.removeItem('user');
       navigation.replace('Login');
     } catch (error) {
-      console.error('Erro ao sair:', error);
+      log('screens/Profile.tsx', 'handleLogout', 'ERROR', `Erro ao sair: ${error}`);
     }
   };
 
@@ -96,7 +95,7 @@ export default function Profile() {
         <View style={styles.avatar}>
           <Text style={styles.emojiAvatar}>{emoji}</Text>
         </View>
-        {initializing ? (
+        {!authInitialized ? (
           <Text style={styles.email}>Cargando usuario...</Text>
         ) : (
           <Text style={styles.email}>{authUser?.email}</Text>

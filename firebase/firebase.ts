@@ -3,6 +3,7 @@ import { initializeAuth, getAuth, getReactNativePersistence } from 'firebase/aut
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Auth } from 'firebase/auth'; // 👈 importación del tipo
 import Constants from 'expo-constants';
+import { log } from '../utils/logger';
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -16,26 +17,32 @@ const firebaseConfig = {
   googleClientId: Constants.expoConfig?.extra?.GOOGLE_CLIENT_ID || 'TU_GOOGLE_CLIENT_ID',
 };
 
-console.log('[firebase.ts] Verificando si hay apps de Firebase inicializadas...');
+log(
+  'firebase/firebase.ts',
+  'init',
+  'FIREBASE',
+  'Verificando si hay apps de Firebase inicializadas...',
+);
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-console.log(
-  getApps().length
-    ? '[firebase.ts] Firebase app existente encontrada.'
-    : '[firebase.ts] Nueva app de Firebase inicializada.',
+log(
+  'firebase/firebase.ts',
+  'init',
+  'FIREBASE',
+  getApps().length ? 'Firebase app existente encontrada.' : 'Nueva app de Firebase inicializada.',
 );
 
 // Inicialización segura de Auth con persistencia
 let auth: Auth;
 try {
-  // Si ya fue inicializado, reutiliza
-  auth = getAuth(app);
-  console.log('[firebase.ts] Firebase Auth ya estaba inicializado.');
-} catch (e) {
-  console.log('[firebase.ts] Inicializando Firebase Auth con persistencia...');
   auth = initializeAuth(app, {
     persistence: getReactNativePersistence(AsyncStorage),
   });
-  console.log('[firebase.ts] Firebase Auth inicializado con persistencia.');
+  log('firebase/firebase.ts', 'init', 'FIREBASE', 'Firebase Auth inicializado con persistencia.');
+} catch (e) {
+  auth = getAuth(app);
+  log('firebase/firebase.ts', 'init', 'FIREBASE', 'Firebase Auth ya estaba inicializado.');
 }
+
+console.log('[DEBUG] auth.currentUser al iniciar:', auth.currentUser);
 
 export { app, auth };

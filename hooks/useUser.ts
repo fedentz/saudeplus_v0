@@ -1,44 +1,32 @@
 // hooks/useUser.ts
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../firebase/firebase';
+import { log } from '../utils/logger';
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
-    const loadStored = async () => {
-      try {
-        const stored = await AsyncStorage.getItem('user');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          setUser(parsed as User);
-        }
-      } catch {
-        // ignore parse errors
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadStored();
-
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        AsyncStorage.setItem(
-          'user',
-          JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email }),
-        );
-      } else {
-        AsyncStorage.removeItem('user');
-      }
+    log('hooks/useUser.ts', 'useUser', 'AUTH', 'Registrando listener de auth...');
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+      log(
+        'hooks/useUser.ts',
+        'onAuthStateChanged',
+        'AUTH',
+        `Usuario recibido: ${firebaseUser?.uid || 'sin usuario'}`,
+      );
       setUser(firebaseUser);
+      setLoading(false);
+      setAuthInitialized(true);
     });
 
-    return () => unsubscribe(); // Limpia el listener
+    return () => {
+      if (unsub) unsub();
+    };
   }, []);
 
-  return { user, loading };
+  return { user, loading, authInitialized };
 }

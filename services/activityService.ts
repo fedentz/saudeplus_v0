@@ -11,7 +11,7 @@ import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../firebase/firebase';
 import db from '../firebase/db';
-import { logEvent } from '../utils/logger';
+import { log } from '../utils/logger';
 import { evaluateActivityStatus } from '../utils/stats';
 import ActivityModel from '../models/ActivityModel';
 
@@ -37,18 +37,19 @@ export const uploadActivity = async (activity: LocalActivity) => {
     const user = auth.currentUser;
     if (!user) throw new Error('Usuario no autenticado');
 
-    const payload = ActivityModel.fromLocalActivity(activity, user.uid).toFirestore();
-    console.log(
-      `\uD83D\uDE80 Subiendo actividad: ${activity.id} para usuario ${user.uid} \u2192`,
-      payload,
-    );
-    console.log('[UPLOAD] Payload a Firebase:', payload);
-    await addDoc(collection(db, 'activities'), payload);
+  const payload = ActivityModel.fromLocalActivity(activity, user.uid).toFirestore();
+  log(
+    'services/activityService.ts',
+    'uploadActivity',
+    'UPLOAD',
+    `Subiendo actividad ${activity.id} para usuario ${user.uid}: ${JSON.stringify(payload)}`,
+  );
+  await addDoc(collection(db, 'activities'), payload);
 
 
-    logEvent('UPLOAD', 'Actividad guardada en Firebase');
+  log('services/activityService.ts', 'uploadActivity', 'UPLOAD', 'Actividad guardada en Firebase');
   } catch (error) {
-    logEvent('UPLOAD', `Error al guardar: ${error}`);
+    log('services/activityService.ts', 'uploadActivity', 'ERROR', `Error al guardar: ${error}`);
     throw error;
   }
 };
@@ -74,7 +75,7 @@ export const saveActivityWithCache = async (
       await uploadActivity(data);
       return;
     } catch (error) {
-      logEvent('UPLOAD', `Error al guardar online: ${error}`);
+      log('services/activityService.ts', 'saveActivityWithCache', 'ERROR', `Error al guardar online: ${error}`);
     }
   }
   const stored = await AsyncStorage.getItem(PENDING_KEY);
@@ -92,23 +93,23 @@ export const syncPendingActivities = async () => {
   } catch {
     return;
   }
-  console.log(`\uD83E\uDEA5 [SYNC] Encontradas ${pending.length} actividades pendientes`);
+  log('services/activityService.ts', 'syncPendingActivities', 'SYNC', `Encontradas ${pending.length} actividades pendientes`);
   const remaining: LocalActivity[] = [];
   for (const item of pending) {
     try {
       await uploadActivity(item);
-      console.log(`\uD83E\uDEA5 [SYNC] Actividad subida con éxito: ${item.id}`);
+      log('services/activityService.ts', 'syncPendingActivities', 'SYNC', `Actividad subida con éxito: ${item.id}`);
     } catch (e) {
-      console.log(`\uD83E\uDEA5 [SYNC] Falló la subida de ${item.id}: ${e}`);
+      log('services/activityService.ts', 'syncPendingActivities', 'ERROR', `Falló la subida de ${item.id}: ${e}`);
       remaining.push(item);
     }
   }
   if (remaining.length === 0) {
     await AsyncStorage.removeItem(PENDING_KEY);
-    console.log('\uD83E\uDEA5 [SYNC] Todas las actividades pendientes fueron subidas');
+    log('services/activityService.ts', 'syncPendingActivities', 'SYNC', 'Todas las actividades pendientes fueron subidas');
   } else {
     await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
-    console.log(`\uD83E\uDEA5 [SYNC] Quedaron ${remaining.length} pendientes`);
+    log('services/activityService.ts', 'syncPendingActivities', 'SYNC', `Quedaron ${remaining.length} pendientes`);
   }
 };
 

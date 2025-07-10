@@ -4,6 +4,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../hooks/useUser';
 import { getActivitiesByUser } from '../services/activityService';
+import { log } from '../utils/logger';
 
 type Activity = {
   id: string;
@@ -13,7 +14,7 @@ type Activity = {
 };
 
 export default function Stats() {
-  const { user, loading } = useUser();
+  const { user, authInitialized } = useUser();
   const appTheme = useAppTheme();
   const { theme } = useTheme();
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -21,7 +22,7 @@ export default function Stats() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!authInitialized || !user) return;
 
     const fetchActivities = async () => {
       try {
@@ -29,7 +30,7 @@ export default function Stats() {
         const data = await getActivitiesByUser(user.uid);
         setActivities(data as Activity[]);
       } catch (err: any) {
-        console.error('❌ Error al traer actividades:', err);
+        log('components/ActivityRecord.tsx', 'fetchActivities', 'ERROR', `Error al traer actividades: ${err}`);
         setError('Não foi possível carregar as atividades.');
       } finally {
         setLoadingActivities(false);
@@ -37,11 +38,11 @@ export default function Stats() {
     };
 
     fetchActivities();
-  }, [user]);
+  }, [user, authInitialized]);
 
   const s = styles(appTheme, theme);
 
-  if (loading || loadingActivities) {
+  if (!authInitialized || loadingActivities) {
     return (
       <View style={s.centered}>
         <ActivityIndicator size="large" color="#333" />
