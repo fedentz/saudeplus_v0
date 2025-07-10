@@ -1,50 +1,60 @@
-# Welcome to your Expo app 👋
+# SaudePlus
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación móvil desarrollada con React Native y Expo para registrar caminatas y llevar un historial de actividad física. Utiliza Firebase para autenticación y para almacenar los datos de las actividades.
 
-## Get started
+## Levantar el proyecto desde cero
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Clonar e instalar dependencias
 
 ```bash
-npm run reset-project
+git clone <repo>
+cd saudeplus_v0
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Configurar Firebase
 
-## Learn more
+1. Crea un proyecto en [Firebase](https://console.firebase.google.com/) y habilita **Authentication** (método Email/Password y Google) y **Cloud Firestore**.
+2. Genera una aplicación de Firebase para plataformas Android/iOS y obtén las credenciales.
+3. Copia el archivo `.env_example` a `.env` y completa los valores:
 
-To learn more about developing your project with Expo, look at the following resources:
+```
+FIREBASE_API_KEY=<tu_api_key>
+AUTH_DOMAIN=<tu_auth_domain>
+PROJECT_ID=<tu_project_id>
+STORAGE_BUCKET=<tu_storage_bucket>
+MESSAGING_SENDER_ID=<tu_sender_id>
+APP_ID=<tu_app_id>
+MEASUREMENT_ID=<tu_measurement_id>
+GOOGLE_CLIENT_ID=<tu_client_id_de_oauth>
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Al ejecutar la app, `app.config.ts` expone estas variables y `firebase/firebase.ts` inicializa Firebase con ellas.
 
-## Join the community
+### 3. Ejecutar en entorno local
 
-Join our community of developers creating universal apps.
+Ejecuta Expo para abrir el proyecto en el simulador o dispositivo:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+# Inicio general
+npm start
+
+# O bien comandos directos
+npm run android   # dispositivo/emulador Android
+npm run ios       # simulador iOS (solo macOS)
+npm run web       # navegador web
+```
+
+La primera vez, Expo mostrará un código QR para abrir la aplicación en Expo Go o en una build de desarrollo.
+
+### 4. Uso de la app
+
+Al iniciar se mostrará la pantalla de autenticación. Tras iniciar sesión podrás comenzar a registrar actividades, incluso sin conexión. Las caminatas se sincronizarán automáticamente cuando el dispositivo vuelva a estar en línea.
+
+## Scripts útiles
+
+```bash
+npm test    # ejecutar tests con Jest
+npm run lint # ejecutar ESLint
+npm run format # formatear con Prettier
+```
