@@ -1,7 +1,5 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -18,12 +16,11 @@ import { getActivitiesByUser } from '../services/activityService';
 import { log } from '../utils/logger';
 
 export default function Stats() {
-  const navigation = useNavigation<any>();
   const { user, authInitialized } = useUser();
   const [activities, setActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
   const theme = useAppTheme();
-  const showBackButton = navigation.canGoBack();
+
 
   useEffect(() => {
     if (!authInitialized) return;
@@ -96,13 +93,6 @@ const renderActivity = ({ item }: { item: any }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        {showBackButton ? (
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
-          </TouchableOpacity>
-        ) : (
-          <View style={{ width: 24 }} />
-        )}
         <Text style={styles.title}>Registro de Actividades</Text>
         <View style={{ width: 24 }} />
       </View>

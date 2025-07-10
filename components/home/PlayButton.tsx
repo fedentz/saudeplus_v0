@@ -14,7 +14,7 @@ export default function PlayButton({ onPress }: Props) {
       style={[styles.button, { backgroundColor: theme.colors.primary }]}
       onPress={onPress}
     >
-      <Ionicons name="play" size={60} color={theme.colors.white} />
+    <Ionicons name="play" size={60} color={theme.colors.white} style={{ marginLeft: 4 }} />
     </TouchableOpacity>
   );
 }
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 4,
     marginVertical: 24,
-    shadowColor: '#000',
+    shadowColor: '#e0e0e0',
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },

@@ -44,7 +44,6 @@ export default function Home({ navigation }: any) {
       <View style={styles.centerContent}>
         <Text style={styles.startText}>Vamos começar?</Text>
         <PlayButton onPress={() => console.log('Actividad iniciada')} />
-        <Text style={styles.buttonLabel}>Comenzar actividad</Text>
       </View>
         <View style={[styles.infoBox, { position: 'absolute', bottom: 80, alignSelf: 'center' }]}>
           <Text style={styles.label}>
@@ -79,10 +78,10 @@ const createStyles = (theme: any) =>
       color: theme.colors.text,
     },
     centerContent: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: 24,
+        flex: 1,
+        justifyContent: 'flex-start', // 👈 lo sube
+        alignItems: 'center',
+        paddingTop: 80, // 👈 agrega espacio desde el top
     },
     pendingBadge: {
       position: 'absolute',
@@ -101,22 +100,28 @@ const createStyles = (theme: any) =>
       fontWeight: 'bold',
     },
     startText: {
-      fontSize: 40,
-      marginBottom: 16,
+      width: '85%',
+      fontSize: 30,
+      marginBottom: 24,
       textAlign: 'center',
-      color: theme.colors.primary, // mismo color que el botón
+      color: theme.colors.primary,
       fontWeight: 'bold',
+      shadowColor: '#e0e0e0',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 2,
     },
+
     infoText: { 
       marginTop: 8, 
       color: theme.colors.text 
     },
     infoBox: {
+      width: '85%',
       backgroundColor: '#fff',
       borderRadius: 16,
       padding: 16,
       marginVertical: 12,
-      shadowColor: '	#F2F2F2',
+      shadowColor: '#e0e0e0',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,

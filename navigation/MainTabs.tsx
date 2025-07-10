@@ -21,27 +21,27 @@ export default function MainTabs() {
         tabBarInactiveTintColor:
           theme.colors.background === '#121212' ? '#aaa' : '#444',
         tabBarStyle: {
-          position: 'absolute',
-          left: 20,
-          right: 20,
-          bottom: 20,
-          height: 60,
-          borderRadius: 30,
-          paddingVertical: 10,
-          backgroundColor:
-            theme.colors.white === '#000000' ? '#1e1e1e' : theme.colors.white,
-          shadowColor: '#000',
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          shadowOffset: { width: 0, height: 3 },
-          elevation: 5,
+            position: 'absolute',
+            alignSelf: 'center', // 👈 centra horizontalmente sin usar left/right
+            bottom: 20,
+            width: '90%',
+            height: 60,
+            borderRadius: 30,
+            backgroundColor: theme.colors.white === '#000000' ? '#1e1e1e' : theme.colors.white,
+            shadowColor: '#e0e0e0',
+            shadowOffset: { width: 0, height: 3 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            elevation: 5,
+            paddingBottom: 0,
+            paddingTop: 0, // 👈 esto evita desalinear íconos verticalmente    
         },
         tabBarIcon: ({ color, size }) => {
           let icon = 'home';
           if (route.name === 'Stats') icon = 'bar-chart';
           if (route.name === 'Profile') icon = 'person';
           return (
-            <View style={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               <Ionicons name={icon as any} size={size} color={color} />
             </View>
           );
@@ -54,3 +54,4 @@ export default function MainTabs() {
     </Tab.Navigator>
   );
 }
+
