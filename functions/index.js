@@ -9,22 +9,45 @@ exports.saveActivity = functions.https.onRequest(async (req, res) => {
     return res.status(405).send('Method Not Allowed');
   }
 
-  const { userId, date, distance, duration } = req.body;
+  const {
+    id,
+    userId,
+    date,
+    distance,
+    duration,
+    status,
+    invalidReason,
+    metodoGuardado,
+    velocidadPromedio,
+    conexion,
+    aceleracionPromedio
+  } = req.body;
 
   if (!userId || !date || distance == null || duration == null) {
-    return res.status(400).send('Missing fields');
+    return res.status(400).send('Missing required fields');
   }
 
+  const docData = {
+    id: id ?? '',
+    userId,
+    date: new Date(date),
+    distance,
+    duration,
+    status: status ?? 'invalida',
+    invalidReason: invalidReason ?? null,
+    metodoGuardado: metodoGuardado ?? 'online',
+    velocidadPromedio: velocidadPromedio ?? 0,
+    conexion: conexion ?? 'desconocida',
+    aceleracionPromedio: aceleracionPromedio ?? 0,
+  };
+
+  console.log('[🔥 FIREBASE PAYLOAD]', docData);
+
   try {
-    await db.collection('activities').add({
-      userId,
-      date,
-      distance,
-      duration,
-    });
+    await db.collection('activities').add(docData);
     return res.status(200).send('Activity saved successfully');
   } catch (err) {
-    console.error('Error saving activity:', err);
+    console.error('❌ Error saving activity:', err);
     return res.status(500).send('Internal Server Error');
   }
 });
