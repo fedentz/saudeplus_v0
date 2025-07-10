@@ -53,9 +53,8 @@ const renderActivity = ({ item }: { item: any }) => {
     const formattedDate = format(
       activityDate,
       "eeee d 'de' MMMM 'de' yyyy",
-      { locale: ptBR },
     );
-    const formattedTime = format(activityDate, 'HH:mm', { locale: ptBR });
+    const formattedTime = format(activityDate, 'HH:mm');
 
     const durationMin = Math.floor(item.duration / 60);
     const durationSec = item.duration % 60;
