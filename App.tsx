@@ -33,6 +33,7 @@ export default function App() {
   }
 
   const initialRoute = user ? 'MainTabs' : 'Splash';
+  console.log('[App] Ruta inicial seleccionada:', initialRoute);
 
   if (loading) {
     return (
