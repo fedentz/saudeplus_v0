@@ -37,20 +37,32 @@ export default function Home({ navigation }: any) {
           <Text style={styles.pendingText}>{pendingCount}</Text>
         </View>
       )}
+      
       <View style={styles.headerContainer}>
-        <Text style={styles.greeting}>¡Hola, {username}!</Text>
-        <HeaderInfo date={new Date()} />
+        <View style={styles.headerRow}>
+          <Text style={styles.greeting}>¡Hola, {username}!</Text>
+          <HeaderInfo date={new Date()} />
+        </View>
       </View>
+
+      <View style={styles.startContainer}>
+        <Text style={styles.startText}>VAMOS COMENZAR?</Text>
+      </View>
+
       <View style={styles.centerContent}>
-        <Text style={styles.startText}>Vamos começar?</Text>
         <PlayButton onPress={() => console.log('Actividad iniciada')} />
+      </View>
+
+      <View style={styles.infoBoxContainer}>
         <View style={styles.infoBox}>
-          <Text style={styles.label}>
-            Kilómetros recorridos: <Text style={styles.value}>{kilometers.toFixed(1)} km</Text>
-          </Text>
-          <Text style={styles.label}>
-            Descuento obtenido: <Text style={styles.value}>R$ {descuento.toFixed(2)}</Text>
-          </Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Kilómetros recorridos:</Text>
+            <Text style={styles.value}>{kilometers.toFixed(1)} km</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Descuento obtenido:</Text>
+            <Text style={styles.value}>R$ {descuento.toFixed(2)}</Text>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -64,15 +76,27 @@ const createStyles = (theme: any) =>
       backgroundColor: theme.colors.background,
     },
     headerContainer: {
-      marginTop: 20,
       paddingHorizontal: 20,
-      justifyContent: 'center',
+      paddingTop: 20,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
     greeting: {
       fontSize: 24,
       fontWeight: 'bold',
-      marginBottom: 4,
       color: theme.colors.text,
+    },
+    startContainer: {
+      marginTop: 30,
+      alignItems: 'center',
+    },
+    startText: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: theme.colors.primary,
     },
     centerContent: {
       flex: 1,
@@ -81,7 +105,7 @@ const createStyles = (theme: any) =>
     },
     pendingBadge: {
       position: 'absolute',
-      top: 28, // Ajustado por el nuevo margen del header
+      top: 28,
       right: 16,
       backgroundColor: 'red',
       borderRadius: 12,
@@ -90,54 +114,40 @@ const createStyles = (theme: any) =>
       paddingHorizontal: 6,
       justifyContent: 'center',
       alignItems: 'center',
+      zIndex: 1,
     },
     pendingText: {
       color: '#fff',
       fontWeight: 'bold',
     },
-    startText: {
-      width: '85%',
-      fontSize: 30,
-      marginBottom: 20,
-      textAlign: 'center',
-      color: theme.colors.primary,
-      fontWeight: 'bold',
-      textShadowColor: theme.colors.background === '#121212' ? '#000' : '#ccc',
-      textShadowOffset: { width: 1, height: 1 },
-      textShadowRadius: 2,
-    },
-
-    infoText: {
-      marginTop: 8,
-      color: theme.colors.text,
+    infoBoxContainer: {
+      paddingHorizontal: 20,
+      marginBottom: 30,
     },
     infoBox: {
-      width: '88%',
-      backgroundColor: theme.colors.background === '#121212' ? '#1e1e1e' : '#fff',
+      width: '100%',
+      backgroundColor: theme.colors.cardBackground || 
+                     (theme.colors.background === '#121212' ? '#1e1e1e' : '#fff'),
       borderRadius: 16,
       padding: 16,
-      marginTop: 16,
-      shadowColor: theme.colors.background === '#121212' ? '#111' : '#e0e0e0',
+      shadowColor: theme.colors.shadow || '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 3,
     },
-
+    infoRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 12,
+    },
     label: {
       fontSize: 16,
       color: theme.colors.text,
-      marginBottom: 8,
     },
-
     value: {
+      fontSize: 16,
       fontWeight: 'bold',
       color: theme.colors.primary,
-    },
-
-    buttonLabel: {
-      marginTop: 8,
-      fontSize: 16,
-      color: theme.colors.text,
     },
   });

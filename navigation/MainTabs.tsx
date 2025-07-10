@@ -4,7 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Home from '../screens/Home';
 import StatsStack from './StatsStack';
 import Profile from '../screens/Profile';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
 
 const Tab = createBottomTabNavigator();
@@ -12,6 +12,7 @@ const Tab = createBottomTabNavigator();
 export default function MainTabs() {
   const theme = useAppTheme();
   const isDark = theme.colors.background === '#121212';
+  
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -19,30 +20,44 @@ export default function MainTabs() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.background === '#121212' ? '#aaa' : '#444',
+        tabBarInactiveTintColor: isDark ? '#aaa' : '#444',
         tabBarStyle: {
           position: 'absolute',
-          alignSelf: 'center',
+          left: 20,
+          right: 20,
           bottom: 20,
-          width: '90%',
-          height: 60,
-          borderRadius: 30,
-          backgroundColor: isDark ? '#1e1e1e' : '#fff',
-          shadowColor: isDark ? '#111' : '#e0e0e0',
+          height: 70,
+          borderRadius: 35,
+          backgroundColor: isDark ? '#1e1e1e' : theme.colors.white,
+          shadowColor: '#000',
+          shadowOpacity: 0.1,
+          shadowRadius: 6,
           shadowOffset: { width: 0, height: 3 },
-          shadowOpacity: 0.2,
-          shadowRadius: 4,
-          elevation: 5,
-          paddingBottom: 0,
-          paddingTop: 0,
+          elevation: 8,
+          borderTopWidth: 0,
+          paddingHorizontal: 20,
         },
         tabBarIcon: ({ color, size }) => {
-          let icon = 'home';
-          if (route.name === 'Stats') icon = 'bar-chart';
-          if (route.name === 'Profile') icon = 'person';
+          let iconName;
+          
+          switch (route.name) {
+            case 'Stats':
+              iconName = 'bar-chart';
+              break;
+            case 'Profile':
+              iconName = 'person';
+              break;
+            default:
+              iconName = 'home';
+          }
+          
           return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Ionicons name={icon as any} size={size} color={color} />
+            <View style={styles.tabIconContainer}>
+              <Ionicons 
+                name={iconName as any} 
+                size={26}
+                color={color} 
+              />
             </View>
           );
         },
@@ -54,3 +69,12 @@ export default function MainTabs() {
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  tabIconContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+  },
+});
