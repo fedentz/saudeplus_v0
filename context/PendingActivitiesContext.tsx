@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { Modal, View, Text, Button } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useUser } from '../hooks/useUser';
 import type { LocationObjectCoords } from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logEvent } from '../utils/logger';
@@ -90,11 +91,15 @@ const sendToFirebase = async (activity: PendingActivity): Promise<void> => {
   if (!response.ok) throw new Error(`http-${response.status}`);
 };
 
-
 export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pending, setPending] = useState<PendingActivity[]>([]);
   const [askSync, setAskSync] = useState(false);
   const wasOffline = useRef(false);
+  const { authInitialized } = useUser();
+  const authInitRef = useRef(authInitialized);
+  useEffect(() => {
+    authInitRef.current = authInitialized;
+  }, [authInitialized]);
 
   const keyRef = useRef('');
   const uploadedKeyRef = useRef('');
@@ -102,100 +107,97 @@ export const PendingActivityProvider: React.FC<{ children: React.ReactNode }> = 
   const pendingRef = useRef<PendingActivity[]>([]);
   const isSyncingRef = useRef(false);
 
-const sync = async () => {
-  if (isSyncingRef.current) {
-    console.log('⏳ [SYNC] Ya se está ejecutando una sincronización');
-    return;
-  }
-  isSyncingRef.current = true;
-  try {
-    console.log('🔄 [SYNC] Iniciando sincronización de actividades...');
+  const sync = async () => {
+    if (isSyncingRef.current) {
+      console.log('⏳ [SYNC] Ya se está ejecutando una sincronización');
+      return;
+    }
+    isSyncingRef.current = true;
+    try {
+      console.log('🔄 [SYNC] Iniciando sincronización de actividades...');
+
+      const state = await NetInfo.fetch();
+      const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
+
+      if (!online) {
+        console.log('🚫 [SYNC] No hay conexión, abortando sincronización');
+        return;
+      }
+
+      const userId = getAuth().currentUser?.uid;
+      if (!userId) {
+        console.log('🚫 [SYNC] Usuario no autenticado, abortando sincronización');
+        return;
+      }
+
+      console.log(`✅ [SYNC] Conectado a internet, tipo: ${state.type}`);
+      console.log(`📦 [SYNC] Actividades pendientes: ${pendingRef.current.length}`);
+
+      const remaining: PendingActivity[] = [];
+
+      const currentPending = pendingRef.current.slice();
+      for (const act of currentPending) {
+        if (uploadedRef.current.includes(act.id)) {
+          console.log(`⏩ [SYNC] Actividad ${act.id} ya fue subida, la salto`);
+          continue;
+        }
+
+        try {
+          console.log(`🚀 [SYNC] Subiendo actividad ${act.id}...`);
+          await sendToFirebase(act);
+          console.log(`✅ [SYNC] Actividad ${act.id} subida correctamente`);
+
+          uploadedRef.current.push(act.id);
+          await AsyncStorage.setItem(uploadedKeyRef.current, JSON.stringify(uploadedRef.current));
+          logEvent('ACTIVITY_UPLOADED', act.id);
+        } catch (error) {
+          console.log(`❌ [SYNC] Falló la subida de ${act.id}:`, error);
+          logEvent('UPLOAD_FAILED', act.id);
+          remaining.push(act);
+        }
+      }
+
+      pendingRef.current = remaining;
+      setPending(remaining);
+      await AsyncStorage.setItem(keyRef.current, JSON.stringify(remaining)).catch(() => undefined);
+
+      console.log('✅ [SYNC] Sincronización finalizada');
+    } finally {
+      isSyncingRef.current = false;
+    }
+  };
+
+  const add = async (activity: PendingActivityInput) => {
+    const userId = getAuth().currentUser?.uid;
+    if (!userId || !keyRef.current) {
+      console.error(
+        '🚨 [PENDING] No se puede agregar actividad: usuario no autenticado o key vacía',
+      );
+      return;
+    }
+
+    const withId: PendingActivity = {
+      ...activity,
+      id: generateId(),
+    };
+
+    console.log('➕ [PENDING] Agregando actividad local:', withId);
+
+    const updated = [...pendingRef.current, withId];
+    pendingRef.current = updated;
+    setPending(updated);
+    await AsyncStorage.setItem(keyRef.current, JSON.stringify(updated))
+      .then(() => console.log('💾 [PENDING] Actividad guardada en AsyncStorage'))
+      .catch((e) => console.error('❌ [PENDING] Error guardando en AsyncStorage', e));
+
+    logEvent('ACTIVITY_SAVED_LOCALLY', JSON.stringify(withId));
 
     const state = await NetInfo.fetch();
     const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
-
-    if (!online) {
-      console.log('🚫 [SYNC] No hay conexión, abortando sincronización');
-      return;
+    if (online) {
+      await sync();
     }
-
-    const userId = getAuth().currentUser?.uid;
-    if (!userId) {
-      console.log('🚫 [SYNC] Usuario no autenticado, abortando sincronización');
-      return;
-    }
-
-    console.log(`✅ [SYNC] Conectado a internet, tipo: ${state.type}`);
-    console.log(`📦 [SYNC] Actividades pendientes: ${pendingRef.current.length}`);
-
-  const remaining: PendingActivity[] = [];
-
-  const currentPending = pendingRef.current.slice();
-  for (const act of currentPending) {
-    if (uploadedRef.current.includes(act.id)) {
-      console.log(`⏩ [SYNC] Actividad ${act.id} ya fue subida, la salto`);
-      continue;
-    }
-
-    try {
-      console.log(`🚀 [SYNC] Subiendo actividad ${act.id}...`);
-      await sendToFirebase(act);
-      console.log(`✅ [SYNC] Actividad ${act.id} subida correctamente`);
-
-      uploadedRef.current.push(act.id);
-      await AsyncStorage.setItem(uploadedKeyRef.current, JSON.stringify(uploadedRef.current));
-      logEvent('ACTIVITY_UPLOADED', act.id);
-    } catch (error) {
-      console.log(`❌ [SYNC] Falló la subida de ${act.id}:`, error);
-      logEvent('UPLOAD_FAILED', act.id);
-      remaining.push(act);
-    }
-  }
-
-  pendingRef.current = remaining;
-  setPending(remaining);
-  await AsyncStorage.setItem(keyRef.current, JSON.stringify(remaining)).catch(() => undefined);
-
-  console.log('✅ [SYNC] Sincronización finalizada');
-  } finally {
-    isSyncingRef.current = false;
-  }
-};
-
-
-  const add = async (activity: PendingActivityInput) => {
-  const userId = getAuth().currentUser?.uid;
-  if (!userId || !keyRef.current) {
-    console.error('🚨 [PENDING] No se puede agregar actividad: usuario no autenticado o key vacía');
-    return;
-  }
-
-  const withId: PendingActivity = {
-    ...activity,
-    id: generateId(),
   };
-
-  console.log('➕ [PENDING] Agregando actividad local:', withId);
-
-  const updated = [...pendingRef.current, withId];
-  pendingRef.current = updated;
-  setPending(updated);
-  await AsyncStorage.setItem(keyRef.current, JSON.stringify(updated))
-    .then(() => console.log('💾 [PENDING] Actividad guardada en AsyncStorage'))
-    .catch((e) => console.error('❌ [PENDING] Error guardando en AsyncStorage', e));
-
-  logEvent('ACTIVITY_SAVED_LOCALLY', JSON.stringify(withId));
-
-  const state = await NetInfo.fetch();
-  const online = Boolean(state.isConnected) && state.isInternetReachable !== false;
-  if (online) {
-    await sync();
-  }
-
-};
-
-
-
 
   const logPending = () => {
     console.log(`\uD83D\uDC65 Pendientes: ${pending.length}`);
@@ -245,7 +247,11 @@ const sync = async () => {
           // ignore parse errors
         }
       } else {
-        console.log('🚫 [AUTH] Usuario deslogueado');
+        console.log(
+          authInitRef.current
+            ? '🚫 [AUTH] Usuario deslogueado'
+            : '[AUTH] Esperando autenticación...',
+        );
         keyRef.current = '';
         uploadedKeyRef.current = '';
         setPending([]);
@@ -260,7 +266,6 @@ const sync = async () => {
     pendingRef.current = pending;
     console.log('📥 [PENDING] Estado actualizado:', pending.length);
   }, [pending]);
-
 
   const confirmSync = async () => {
     setAskSync(false);

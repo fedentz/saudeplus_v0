@@ -24,6 +24,7 @@ export default function App() {
   const { user, loading, authInitialized } = useUser();
 
   if (!authInitialized) {
+    console.log('[AUTH] Esperando autenticación...');
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
