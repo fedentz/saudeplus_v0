@@ -2,8 +2,9 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Home from '../screens/Home';
-import Stats from '../screens/Stats';
+import StatsStack from './StatsStack';
 import Profile from '../screens/Profile';
+import { View } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
 
 const Tab = createBottomTabNavigator();
@@ -12,6 +13,7 @@ export default function MainTabs() {
   const theme = useAppTheme();
   return (
     <Tab.Navigator
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarShowLabel: false,
@@ -38,11 +40,15 @@ export default function MainTabs() {
           let icon = 'home';
           if (route.name === 'Stats') icon = 'bar-chart';
           if (route.name === 'Profile') icon = 'person';
-          return <Ionicons name={icon as any} size={size} color={color} />;
+          return (
+            <View style={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <Ionicons name={icon as any} size={size} color={color} />
+            </View>
+          );
         },
       })}
     >
-      <Tab.Screen name="Stats" component={Stats} />
+      <Tab.Screen name="Stats" component={StatsStack} />
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
