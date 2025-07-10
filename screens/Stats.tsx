@@ -23,6 +23,7 @@ export default function Stats() {
   const [activities, setActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
   const theme = useAppTheme();
+  const showBackButton = navigation.canGoBack();
 
   useEffect(() => {
     if (!authInitialized) return;
@@ -95,9 +96,13 @@ const renderActivity = ({ item }: { item: any }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
-        </TouchableOpacity>
+        {showBackButton ? (
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          </TouchableOpacity>
+        ) : (
+          <View style={{ width: 24 }} />
+        )}
         <Text style={styles.title}>Registro de Actividades</Text>
         <View style={{ width: 24 }} />
       </View>
