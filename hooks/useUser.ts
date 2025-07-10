@@ -10,6 +10,10 @@ export function useUser() {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+      console.log(
+        '[AUTH] Estado de autenticación inicial recibido:',
+        firebaseUser?.uid || 'sin usuario',
+      );
       setUser(firebaseUser);
       setLoading(false);
       setAuthInitialized(true);

@@ -5,12 +5,16 @@ import { useUser } from './useUser';
 let initialized = false;
 
 export default function useActivitySync() {
-  const { authInitialized } = useUser();
+  const { authInitialized, user } = useUser();
 
   useEffect(() => {
-    if (!authInitialized || initialized) return;
+    if (!authInitialized || !user) {
+      console.log('[AUTH] Esperando autenticación...');
+      return;
+    }
+    if (initialized) return;
     initialized = true;
     setupActivitySync();
     return () => undefined;
-  }, [authInitialized]);
+  }, [authInitialized, user]);
 }
