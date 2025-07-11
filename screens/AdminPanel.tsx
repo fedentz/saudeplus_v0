@@ -15,7 +15,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '../hooks/useUser';
-import { findUserByEmail, getUserRole } from '../services/userService';
+import { findUserByEmail, isAdminUser } from '../services/userService';
 import { getUserActivitiesSummary, MonthlySummary } from '../services/activityService';
 
 export default function AdminPanel() {
@@ -24,19 +24,28 @@ export default function AdminPanel() {
   const theme = useAppTheme();
   const { t } = useTranslation();
 
-  const [role, setRole] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<MonthlySummary[]>([]);
 
   useEffect(() => {
-    const loadRole = async () => {
+    const verifyRole = async () => {
       if (user) {
-        const r = await getUserRole(user.uid);
-        setRole(r);
+        try {
+          const admin = await isAdminUser(user);
+          setIsAdmin(admin);
+          if (!admin) {
+            console.log('AdminPanel: acceso denegado, redirigiendo a Home');
+            navigation.replace('MainTabs');
+          }
+        } catch (err) {
+          console.log('AdminPanel: error verificando custom claims', err);
+          navigation.replace('MainTabs');
+        }
       }
     };
-    loadRole();
+    verifyRole();
   }, [user]);
 
   const formatTime = (secs: number) => {
@@ -71,7 +80,15 @@ export default function AdminPanel() {
     }
   };
 
-  if (role !== 'admin') {
+  if (isAdmin === null) {
+    return (
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
+  if (isAdmin === false) {
     return (
       <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>{t('admin.restricted')}</Text>
