@@ -3,20 +3,37 @@ import { Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useUser } from '../hooks/useUser';
+import { isAdminUser } from '../services/userService';
 import { useTranslation } from 'react-i18next';
 
 export default function SplashScreen() {
   const navigation = useNavigation<any>();
-  const { user } = useUser();
+  const { user, authInitialized } = useUser();
   const theme = useAppTheme();
   const { t } = useTranslation();
   const styles = createStyles(theme);
 
   useEffect(() => {
-    if (user) {
-      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
-    }
-  }, [user]);
+    const checkRoleAndNavigate = async () => {
+      if (!authInitialized) return;
+      if (user) {
+        try {
+          const admin = await isAdminUser(user);
+          if (admin) {
+            console.log('SplashScreen: redirigiendo a AdminPanel');
+            navigation.reset({ index: 0, routes: [{ name: 'AdminPanel' }] });
+          } else {
+            console.log('SplashScreen: redirigiendo a Home');
+            navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+          }
+        } catch (err) {
+          console.log('SplashScreen: error obteniendo custom claims', err);
+          navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+        }
+      }
+    };
+    checkRoleAndNavigate();
+  }, [user, authInitialized]);
 
   return (
     <SafeAreaView style={styles.container}>
