@@ -84,7 +84,15 @@ export default function Stats() {
             ⏱️ {t('activity.duration', { minutes: durationMin, seconds: durationSec })}
           </Text>
           <Text style={styles.activityInfo}>📏 {t('activity.distance', { distance })}</Text>
-          <Text style={[styles.activityInfo, { color: statusColor }]}>✅ {statusText}</Text>
+          <Text style={[styles.activityInfo, { color: statusColor }]}>
+            {item.status === 'valida'
+              ? '✅'
+              : item.status === 'invalida'
+              ? '❌'
+              : '⏳'}{' '}
+            {statusText}
+          </Text>
+
         </View>
       );
     } catch (error) {
