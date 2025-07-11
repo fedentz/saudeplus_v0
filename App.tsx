@@ -9,6 +9,7 @@ import Settings from './screens/Settings';
 import ChangePassword from './screens/ChangePassword';
 import AdminPanel from './screens/AdminPanel';
 import MainTabs from './navigation/MainTabs';
+import './i18n';
 import { ThemeProvider } from './context/ThemeContext';
 import { EmojiProvider } from './context/EmojiContext';
 import { PendingActivityProvider } from './context/PendingActivitiesContext';

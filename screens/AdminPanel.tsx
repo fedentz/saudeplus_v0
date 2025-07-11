@@ -13,6 +13,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
+import { useTranslation } from 'react-i18next';
 import { useUser } from '../hooks/useUser';
 import { findUserByEmail, getUserRole } from '../services/userService';
 import { getUserActivitiesSummary, MonthlySummary } from '../services/activityService';
@@ -21,6 +22,7 @@ export default function AdminPanel() {
   const navigation = useNavigation<any>();
   const { user } = useUser();
   const theme = useAppTheme();
+  const { t } = useTranslation();
 
   const [role, setRole] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -51,19 +53,19 @@ export default function AdminPanel() {
   };
 
   const handleSearch = async () => {
-    if (!query) return Alert.alert('Atenção', 'Digite um e-mail para buscar');
+    if (!query) return Alert.alert(t('admin.panel'), t('admin.emailRequired'));
     try {
       setLoading(true);
       const found = await findUserByEmail(query);
       if (!found) {
-        Alert.alert('Usuário não encontrado');
+        Alert.alert(t('admin.userNotFound'));
         setSummary([]);
         return;
       }
       const data = await getUserActivitiesSummary(found.id);
       setSummary(data);
     } catch (e) {
-      Alert.alert('Erro ao buscar dados');
+      Alert.alert(t('admin.searchError'));
     } finally {
       setLoading(false);
     }
@@ -72,7 +74,7 @@ export default function AdminPanel() {
   if (role !== 'admin') {
     return (
       <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Acesso restrito</Text>
+        <Text>{t('admin.restricted')}</Text>
       </SafeAreaView>
     );
   }
@@ -93,14 +95,14 @@ export default function AdminPanel() {
           <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={{ fontSize: 20, fontWeight: 'bold', color: theme.colors.text }}>
-          Painel Admin
+          {t('admin.panel')}
         </Text>
         <View style={{ width: 24 }} />
       </View>
 
       <View style={{ padding: 20 }}>
         <TextInput
-          placeholder="Buscar por e-mail"
+          placeholder={t('admin.searchPlaceholder')}
           placeholderTextColor={theme.colors.darkGray}
           value={query}
           onChangeText={setQuery}
@@ -118,7 +120,7 @@ export default function AdminPanel() {
           onPress={handleSearch}
           style={{ backgroundColor: theme.colors.primary, padding: 12, borderRadius: 6 }}
         >
-          <Text style={{ color: theme.colors.white, textAlign: 'center' }}>Buscar</Text>
+          <Text style={{ color: theme.colors.white, textAlign: 'center' }}>{t('admin.search')}</Text>
         </TouchableOpacity>
       </View>
       {loading ? (
@@ -136,9 +138,9 @@ export default function AdminPanel() {
               }}
             >
               <Text style={{ fontWeight: 'bold', color: theme.colors.text }}>{item.month}</Text>
-              <Text style={{ color: theme.colors.text }}>Atividades: {item.totalActivities}</Text>
-              <Text style={{ color: theme.colors.text }}>Distância: {item.totalDistance} km</Text>
-              <Text style={{ color: theme.colors.text }}>Tempo: {formatTime(item.totalTime)}</Text>
+              <Text style={{ color: theme.colors.text }}>{t('admin.activities', { count: item.totalActivities })}</Text>
+              <Text style={{ color: theme.colors.text }}>{t('admin.distance', { distance: item.totalDistance })}</Text>
+              <Text style={{ color: theme.colors.text }}>{t('admin.time', { time: formatTime(item.totalTime) })}</Text>
             </View>
           )}
         />

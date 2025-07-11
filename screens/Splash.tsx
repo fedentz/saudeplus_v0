@@ -3,11 +3,13 @@ import { Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useUser } from '../hooks/useUser';
+import { useTranslation } from 'react-i18next';
 
 export default function SplashScreen() {
   const navigation = useNavigation<any>();
   const { user } = useUser();
   const theme = useAppTheme();
+  const { t } = useTranslation();
   const styles = createStyles(theme);
 
   useEffect(() => {
@@ -18,21 +20,21 @@ export default function SplashScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Saúde+</Text>
-      <Text style={styles.subtitle}>Transforme passos em economia</Text>
+      <Text style={styles.title}>{t('splash.title')}</Text>
+      <Text style={styles.subtitle}>{t('splash.subtitle')}</Text>
 
       <TouchableOpacity
         style={styles.primaryButton}
         onPress={() => navigation.navigate('Register')}
       >
-        <Text style={styles.primaryButtonText}>CRIAR CONTA</Text>
+        <Text style={styles.primaryButtonText}>{t('splash.createAccount')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.secondaryButtonText}>JÁ POSSUO CONTA</Text>
+        <Text style={styles.secondaryButtonText}>{t('splash.haveAccount')}</Text>
       </TouchableOpacity>
 
-      <Text style={styles.footer}>© 2025 Saúde+. Todos os direitos reservados.</Text>
+      <Text style={styles.footer}>{t('splash.footer')}</Text>
     </SafeAreaView>
   );
 }

@@ -5,6 +5,7 @@ import { auth } from '../firebase/firebase';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 export default function ChangePassword({ navigation }: any) {
   const [current, setCurrent] = useState('');
@@ -13,20 +14,21 @@ export default function ChangePassword({ navigation }: any) {
   const [error, setError] = useState('');
   const theme = useAppTheme();
   const { theme: mode } = useTheme();
+  const { t } = useTranslation();
   const styles = createStyles(theme, mode);
 
   const handleSave = async () => {
     setError('');
     if (!current || !newPass || !repeat) {
-      setError('Preencha todos os campos');
+      setError(t('changePassword.fillAll'));
       return;
     }
     if (newPass.length < 6) {
-      setError('A senha deve ter ao menos 6 caracteres');
+      setError(t('changePassword.minLength'));
       return;
     }
     if (newPass !== repeat) {
-      setError('As senhas não coincidem');
+      setError(t('changePassword.mismatch'));
       return;
     }
     try {
@@ -35,10 +37,10 @@ export default function ChangePassword({ navigation }: any) {
       const cred = EmailAuthProvider.credential(user.email, current);
       await reauthenticateWithCredential(user, cred);
       await updatePassword(user, newPass);
-      Alert.alert('Sucesso', 'Senha atualizada');
+      Alert.alert(t('changePassword.success'), t('changePassword.updated'));
       navigation.goBack();
     } catch (e: any) {
-      setError(e.message || 'Erro ao atualizar');
+      setError(e.message || t('changePassword.error'));
     }
   };
 
@@ -48,7 +50,7 @@ export default function ChangePassword({ navigation }: any) {
         <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
       </TouchableOpacity>
       <TextInput
-        placeholder="Senha atual"
+        placeholder={t('changePassword.current')}
         secureTextEntry
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
@@ -56,7 +58,7 @@ export default function ChangePassword({ navigation }: any) {
         onChangeText={setCurrent}
       />
       <TextInput
-        placeholder="Nova senha"
+        placeholder={t('changePassword.new')}
         secureTextEntry
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
@@ -64,7 +66,7 @@ export default function ChangePassword({ navigation }: any) {
         onChangeText={setNewPass}
       />
       <TextInput
-        placeholder="Confirmar senha"
+        placeholder={t('changePassword.confirm')}
         secureTextEntry
         placeholderTextColor={mode === 'dark' ? '#aaa' : '#666'}
         style={styles.input}
@@ -73,7 +75,7 @@ export default function ChangePassword({ navigation }: any) {
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>Salvar alterações</Text>
+        <Text style={styles.buttonText}>{t('changePassword.save')}</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

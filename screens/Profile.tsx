@@ -8,12 +8,14 @@ import { useUser } from '../hooks/useUser';
 import { useEmoji } from '../context/EmojiContext';
 import { auth } from '../firebase/firebase';
 import { log } from '../utils/logger';
+import { useTranslation } from 'react-i18next';
 
 export default function Profile() {
   const navigation = useNavigation<any>();
   const { user: authUser, authInitialized } = useUser();
   const { emoji, setEmoji } = useEmoji();
   const theme = useAppTheme();
+  const { t } = useTranslation();
   const [modalVisible, setModalVisible] = React.useState(false);
   const styles = StyleSheet.create({
     container: {
@@ -93,7 +95,7 @@ export default function Profile() {
           <Text style={styles.emojiAvatar}>{emoji}</Text>
         </View>
         {!authInitialized ? (
-          <Text style={styles.email}>Cargando usuario...</Text>
+          <Text style={styles.email}>{t('profile.loading')}</Text>
         ) : (
           <Text style={styles.email}>{authUser?.email}</Text>
         )}
@@ -110,7 +112,7 @@ export default function Profile() {
           onPress={() => setModalVisible(true)}
         >
           <Text style={[styles.logoutText, { color: theme.colors.primary }]}>
-            Escolher emoji de atividade
+            {t('profile.chooseEmoji')}
           </Text>
         </TouchableOpacity>
 
@@ -118,7 +120,7 @@ export default function Profile() {
         <View style={{ height: 24 }} />
 
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <Text style={styles.logoutText}>Sair</Text>
+          <Text style={styles.logoutText}>{t('profile.logout')}</Text>
         </TouchableOpacity>
       </View>
 

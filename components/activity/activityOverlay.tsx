@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform, Animated } from 'react-native';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useEmoji } from '../../context/EmojiContext';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   distance: number;
@@ -13,6 +14,7 @@ type Props = {
 export default function ActivityOverlay({ distance, timeFormatted, onEnd, disabled }: Props) {
   const theme = useAppTheme();
   const { emoji } = useEmoji();
+  const { t } = useTranslation();
   const scale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -29,15 +31,17 @@ export default function ActivityOverlay({ distance, timeFormatted, onEnd, disabl
     <>
       <View style={styles.header}>
         <Animated.Text style={[styles.emoji, { transform: [{ scale }] }]}>{emoji}</Animated.Text>
-        <Text style={styles.distance}>{distance.toFixed(2)} km</Text>
+        <Text style={styles.distance}>
+          {t('activity.distance', { distance: distance.toFixed(2) })}
+        </Text>
         <Text style={styles.time}>
-          Duração:
+          {t('activity.durationLabel')}
           {timeFormatted}
         </Text>
       </View>
       <View style={styles.footer} pointerEvents="box-none">
         <TouchableOpacity style={styles.button} onPress={onEnd} disabled={disabled}>
-          <Text style={styles.buttonText}>FINALIZAR</Text>
+          <Text style={styles.buttonText}>{t('activity.finishButton')}</Text>
         </TouchableOpacity>
       </View>
     </>
