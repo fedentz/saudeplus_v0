@@ -26,7 +26,7 @@ import useSpeedValidation from '../hooks/useSpeedValidation';
 import useWalkingPattern from '../hooks/useWalkingPattern';
 import useInactivityTimeout from '../hooks/useInactivityTimeout';
 import { useActivityFlags } from '../context/ActivityContext';
-import { requestBiometricValidation } from '../services/antiCheat';
+import { validateBiometricsEnd, validateBiometricsStart } from '../utils/biometrics';
 
 import { usePendingActivities } from '../context/PendingActivitiesContext';
 
@@ -89,7 +89,7 @@ export default function Activity() {
   const handleEndActivity = async () => {
     if (activityEnded) return;
 
-    const ok = await requestBiometricValidation();
+    const ok = await validateBiometricsEnd();
     if (!ok) {
       setFlag('biometricsRejected', true);
       Alert.alert('Biometría requerida');
@@ -188,9 +188,10 @@ export default function Activity() {
     checkInitial();
 
     const init = async () => {
-      const ok = await requestBiometricValidation();
+      const ok = await validateBiometricsStart();
       if (!ok) {
         setFlag('biometricsRejected', true);
+        Alert.alert('Biometría requerida');
         navigation.goBack();
         return;
       }
