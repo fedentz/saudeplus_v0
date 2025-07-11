@@ -22,6 +22,11 @@ import { log } from '../utils/logger';
 import { evaluateActivityStatus } from '../utils/stats';
 
 import useTracking from '../hooks/useTracking';
+import useSpeedValidation from '../hooks/useSpeedValidation';
+import useWalkingPattern from '../hooks/useWalkingPattern';
+import useInactivityTimeout from '../hooks/useInactivityTimeout';
+import { useActivityFlags } from '../context/ActivityContext';
+import { validateBiometricsEnd, validateBiometricsStart } from '../utils/biometrics';
 
 import { usePendingActivities } from '../context/PendingActivitiesContext';
 
@@ -41,6 +46,7 @@ export default function Activity() {
     stopTracking,
     formatElapsedTime,
     startTime,
+    gpsLost,
   } = useTracking();
 
   const mapRef = useRef<MapView>(null);
@@ -55,6 +61,13 @@ export default function Activity() {
   const [exitModalVisible, setExitModalVisible] = useState(false);
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const { setFlag } = useActivityFlags();
+  const { speedTooHigh } = useSpeedValidation(location?.speed ?? null);
+  const { noWalkingPattern, setNoWalkingPattern } = useWalkingPattern();
+  useInactivityTimeout(location ?? null, !noWalkingPattern, () => {
+    setFlag('inactiveTimeout', true);
+    handleEndActivity();
+  });
 
   const handleSaveAndExit = async () => {
     await handleEndActivity();
@@ -76,6 +89,13 @@ export default function Activity() {
   const handleEndActivity = async () => {
     if (activityEnded) return;
 
+    const ok = await validateBiometricsEnd();
+    if (!ok) {
+      setFlag('biometricsRejected', true);
+      Alert.alert('Biometría requerida');
+      return;
+    }
+
     setActivityEnded(true);
     await stopTracking();
 
@@ -87,7 +107,12 @@ export default function Activity() {
     setSummaryVisible(true);
 
     if (!startTime) {
-      log('screens/Activity.tsx', 'handleEndActivity', 'ACTIVITY', 'No se puede guardar actividad: startTime es null');
+      log(
+        'screens/Activity.tsx',
+        'handleEndActivity',
+        'ACTIVITY',
+        'No se puede guardar actividad: startTime es null',
+      );
       return;
     }
     const end = new Date();
@@ -95,7 +120,12 @@ export default function Activity() {
     const rawConnection =
       net.isConnected && net.isInternetReachable !== false ? net.type || 'unknown' : 'offline';
 
-    const conexion = rawConnection === 'wifi' ? 'wifi' : rawConnection === 'cellular' ? 'datos_moviles' : 'offline';
+    const conexion =
+      rawConnection === 'wifi'
+        ? 'wifi'
+        : rawConnection === 'cellular'
+          ? 'datos_moviles'
+          : 'offline';
     const metodoGuardado = conexion === 'offline' ? 'offline_post_sync' : 'online';
 
     const { status, invalidReason, velocidadPromedio } = evaluateActivityStatus(
@@ -145,19 +175,46 @@ export default function Activity() {
       const state = await NetInfo.fetch();
       const connected = Boolean(state.isConnected);
       prev = connected;
-      log('screens/Activity.tsx', 'checkInitial', 'NETWORK', connected ? 'Conectado' : 'Sin conexión');
+      log(
+        'screens/Activity.tsx',
+        'checkInitial',
+        'NETWORK',
+        connected ? 'Conectado' : 'Sin conexión',
+      );
       if (connected) {
         sync();
       }
     };
     checkInitial();
 
-    startTracking();
+    const init = async () => {
+      const ok = await validateBiometricsStart();
+      if (!ok) {
+        setFlag('biometricsRejected', true);
+        Alert.alert('Biometría requerida');
+        navigation.goBack();
+        return;
+      }
+      startTracking();
+    };
+    init();
 
     return () => {
       stopTracking();
     };
   }, []);
+
+  useEffect(() => {
+    setFlag('speedTooHigh', speedTooHigh);
+  }, [speedTooHigh]);
+
+  useEffect(() => {
+    setFlag('noWalkingPattern', noWalkingPattern);
+  }, [noWalkingPattern]);
+
+  useEffect(() => {
+    setFlag('gpsInactive', gpsLost);
+  }, [gpsLost]);
 
   useEffect(() => {
     if (location) {
@@ -167,11 +224,7 @@ export default function Activity() {
 
   useEffect(() => {
     if (location?.speed !== null && location?.speed !== undefined && location.speed > 6) {
-      Alert.alert(
-        t('activity.autoStopTitle'),
-        t('activity.autoStopMessage'),
-        [{ text: 'OK' }],
-      );
+      Alert.alert(t('activity.autoStopTitle'), t('activity.autoStopMessage'), [{ text: 'OK' }]);
       stopActivityWithoutSaving();
     }
   }, [location?.speed]);
@@ -318,7 +371,11 @@ export default function Activity() {
               {t('activity.exitQuestion')}
             </Text>
             <View style={{ marginTop: 24 }}>
-              <Button title={t('activity.saveAndExit')} color="#1d3557" onPress={handleSaveAndExit} />
+              <Button
+                title={t('activity.saveAndExit')}
+                color="#1d3557"
+                onPress={handleSaveAndExit}
+              />
               <Button title={t('activity.cancel')} onPress={() => setExitModalVisible(false)} />
             </View>
           </View>

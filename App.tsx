@@ -14,6 +14,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { EmojiProvider } from './context/EmojiContext';
 import { PendingActivityProvider } from './context/PendingActivitiesContext';
 import { KmProvider } from './context/KmContext';
+import { ActivityProvider } from './context/ActivityContext';
 import { useUser } from './hooks/useUser';
 import useGlobalNetwork from './hooks/useGlobalNetwork';
 import useActivitySync from './hooks/useActivitySync';
@@ -50,27 +51,29 @@ export default function App() {
     <ThemeProvider>
       <EmojiProvider>
         <PendingActivityProvider>
-          <KmProvider>
-            <NavigationContainer>
-              <Stack.Navigator
-                initialRouteName={initialRoute}
-                screenOptions={{
-                  headerShown: false,
-                  animation: 'fade_from_bottom',
-                  gestureEnabled: true,
-                }}
-              >
-                <Stack.Screen name="Splash" component={Splash} />
-                <Stack.Screen name="Login" component={Login} />
-                <Stack.Screen name="Register" component={Register} />
-                <Stack.Screen name="MainTabs" component={MainTabs} />
-                <Stack.Screen name="Activity" component={Activity} />
-                <Stack.Screen name="Settings" component={Settings} />
-                <Stack.Screen name="ChangePassword" component={ChangePassword} />
-                <Stack.Screen name="AdminPanel" component={AdminPanel} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </KmProvider>
+          <ActivityProvider>
+            <KmProvider>
+              <NavigationContainer>
+                <Stack.Navigator
+                  initialRouteName={initialRoute}
+                  screenOptions={{
+                    headerShown: false,
+                    animation: 'fade_from_bottom',
+                    gestureEnabled: true,
+                  }}
+                >
+                  <Stack.Screen name="Splash" component={Splash} />
+                  <Stack.Screen name="Login" component={Login} />
+                  <Stack.Screen name="Register" component={Register} />
+                  <Stack.Screen name="MainTabs" component={MainTabs} />
+                  <Stack.Screen name="Activity" component={Activity} />
+                  <Stack.Screen name="Settings" component={Settings} />
+                  <Stack.Screen name="ChangePassword" component={ChangePassword} />
+                  <Stack.Screen name="AdminPanel" component={AdminPanel} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </KmProvider>
+          </ActivityProvider>
         </PendingActivityProvider>
       </EmojiProvider>
     </ThemeProvider>
