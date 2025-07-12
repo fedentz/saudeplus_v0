@@ -25,15 +25,16 @@ export default function Login({ navigation }: any) {
   const [loading, setLoading] = useState(false);
   const theme = useAppTheme();
   const { theme: mode } = useTheme();
-  const { user } = useUser();
+  const { user, isAdmin } = useUser();
   const { t } = useTranslation();
   const styles = createStyles(theme, mode);
 
   useEffect(() => {
     if (user) {
-      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+      const target = isAdmin ? 'AdminPanel' : 'MainTabs';
+      navigation.reset({ index: 0, routes: [{ name: target }] });
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -57,7 +58,6 @@ export default function Login({ navigation }: any) {
     try {
       setLoading(true);
       await loginWithEmail(email, password);
-      navigation.replace('MainTabs');
     } catch (error: any) {
       if (error.code === 'auth/user-not-found') {
         Alert.alert(t('login.userNotFound'));

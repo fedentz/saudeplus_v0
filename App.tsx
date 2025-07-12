@@ -25,7 +25,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   useGlobalNetwork();
   useActivitySync();
-  const { user, loading, authInitialized } = useUser();
+  const { user, loading, authInitialized, isAdmin } = useUser();
 
   if (!authInitialized) {
     log('App.tsx', 'App', 'AUTH', 'Esperando autenticación...');
@@ -36,7 +36,10 @@ export default function App() {
     );
   }
 
-  const initialRoute = user ? 'MainTabs' : 'Splash';
+  let initialRoute = 'Splash';
+  if (user) {
+    initialRoute = isAdmin ? 'AdminPanel' : 'MainTabs';
+  }
   log('App.tsx', 'App', 'APP', `Ruta inicial seleccionada: ${initialRoute}`);
 
   if (loading) {
@@ -55,6 +58,7 @@ export default function App() {
             <KmProvider>
               <NavigationContainer>
                 <Stack.Navigator
+                  key={initialRoute}
                   initialRouteName={initialRoute}
                   screenOptions={{
                     headerShown: false,
