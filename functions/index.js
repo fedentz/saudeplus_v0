@@ -1,2 +1,7 @@
 const { grantAdminRole } = require('./grantAdminRole');
-exports.grantAdminRole = grantAdminRole;
+const { saveActivity } = require('./saveActivity');
+
+module.exports = {
+  grantAdminRole,
+  saveActivity,
+};

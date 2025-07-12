@@ -3,7 +3,7 @@ import { Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useUser } from '../hooks/useUser';
-import { isAdminUser } from '../services/userService';
+import { isCurrentUserAdmin } from '../services/userService';
 import { useTranslation } from 'react-i18next';
 
 export default function SplashScreen() {
@@ -18,7 +18,7 @@ export default function SplashScreen() {
       if (!authInitialized) return;
       if (user) {
         try {
-          const admin = await isAdminUser(user);
+          const admin = await isCurrentUserAdmin();
           if (admin) {
             console.log('SplashScreen: redirigiendo a AdminPanel');
             navigation.reset({ index: 0, routes: [{ name: 'AdminPanel' }] });

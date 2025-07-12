@@ -1,9 +1,11 @@
 const functions = require('firebase-functions');
-const admin = require('./firebase');
+const admin = require('./firebaseAdmin');
 const db = admin.firestore();
 
 function log(file, method, tag, message) {
-  console.log(`\n-------------------- (${file} > ${method}) --------------------\n[${tag}] ${message}\n-----------------------------------------------------------------------\n`);
+  console.log(
+    `\n-------------------- (${file} > ${method}) --------------------\n[${tag}] ${message}\n-----------------------------------------------------------------------\n`,
+  );
 }
 
 exports.saveActivity = functions.https.onRequest(async (req, res) => {
@@ -22,7 +24,7 @@ exports.saveActivity = functions.https.onRequest(async (req, res) => {
     metodoGuardado,
     velocidadPromedio,
     conexion,
-    aceleracionPromedio
+    aceleracionPromedio,
   } = req.body;
 
   if (!userId || !date || distance == null || duration == null) {
