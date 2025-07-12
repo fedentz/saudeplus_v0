@@ -15,7 +15,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '../hooks/useUser';
-import { findUserByEmail, isAdminUser } from '../services/userService';
+import { findUserByEmail, isCurrentUserAdmin } from '../services/userService';
 import { getUserActivitiesSummary, MonthlySummary } from '../services/activityService';
 
 export default function AdminPanel() {
@@ -33,7 +33,7 @@ export default function AdminPanel() {
     const verifyRole = async () => {
       if (user) {
         try {
-          const admin = await isAdminUser(user);
+          const admin = await isCurrentUserAdmin();
           setIsAdmin(admin);
           if (!admin) {
             console.log('AdminPanel: acceso denegado, redirigiendo a Home');
@@ -137,7 +137,9 @@ export default function AdminPanel() {
           onPress={handleSearch}
           style={{ backgroundColor: theme.colors.primary, padding: 12, borderRadius: 6 }}
         >
-          <Text style={{ color: theme.colors.white, textAlign: 'center' }}>{t('admin.search')}</Text>
+          <Text style={{ color: theme.colors.white, textAlign: 'center' }}>
+            {t('admin.search')}
+          </Text>
         </TouchableOpacity>
       </View>
       {loading ? (
@@ -155,9 +157,15 @@ export default function AdminPanel() {
               }}
             >
               <Text style={{ fontWeight: 'bold', color: theme.colors.text }}>{item.month}</Text>
-              <Text style={{ color: theme.colors.text }}>{t('admin.activities', { count: item.totalActivities })}</Text>
-              <Text style={{ color: theme.colors.text }}>{t('admin.distance', { distance: item.totalDistance })}</Text>
-              <Text style={{ color: theme.colors.text }}>{t('admin.time', { time: formatTime(item.totalTime) })}</Text>
+              <Text style={{ color: theme.colors.text }}>
+                {t('admin.activities', { count: item.totalActivities })}
+              </Text>
+              <Text style={{ color: theme.colors.text }}>
+                {t('admin.distance', { distance: item.totalDistance })}
+              </Text>
+              <Text style={{ color: theme.colors.text }}>
+                {t('admin.time', { time: formatTime(item.totalTime) })}
+              </Text>
             </View>
           )}
         />

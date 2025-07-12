@@ -1,5 +1,6 @@
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { getIdTokenResult, User } from 'firebase/auth';
+import { auth } from '../firebase/firebase';
 import db from '../firebase/db';
 
 export const findUserByEmail = async (email: string) => {
@@ -24,4 +25,10 @@ export const isAdminUser = async (currentUser: User): Promise<boolean> => {
   const isAdmin = tokenResult.claims?.admin === true;
   console.log(`isAdminUser: admin -> ${isAdmin}`);
   return isAdmin;
+};
+
+export const isCurrentUserAdmin = async (): Promise<boolean> => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return false;
+  return isAdminUser(currentUser);
 };
